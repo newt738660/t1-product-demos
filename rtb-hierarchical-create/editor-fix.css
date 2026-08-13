@@ -9,13 +9,13 @@
 /* Keep hierarchy navigation spatially stable while only the editor changes. */
 .create-workspace {
   display: grid;
-  grid-template-columns: 224px minmax(0, 1fr);
-  gap: 0;
+  grid-template-columns: 196px minmax(0, 1fr);
+  gap: 18px;
   align-items: start;
   overflow: visible;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: linear-gradient(to right, #fafbff 0 224px, #fff 224px 100%);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .create-workspace > .flow-steps {
@@ -27,10 +27,11 @@
   align-items: stretch;
   gap: 0;
   margin: 0;
-  padding: 20px 12px;
-  border-right: 1px solid var(--line);
-  border-radius: 12px 0 0 12px;
-  background: #fafbff;
+  padding: 18px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 3px 16px rgba(20,30,50,.04);
 }
 
 .flow-title {
@@ -91,13 +92,13 @@
 
 .create-workspace .tree {
   padding: 0;
-  background: #fff;
-  border-radius: 0 12px 12px 0;
+  background: transparent;
+  border-radius: 12px;
 }
 .create-workspace .tree .card {
-  border: 0;
-  border-radius: 0 12px 12px 0;
-  box-shadow: none;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 3px 16px rgba(20,30,50,.05);
 }
 .create-workspace .tree .head { padding: 24px 28px 18px; }
 .create-workspace .tree .body { padding: 22px 28px 24px; }
