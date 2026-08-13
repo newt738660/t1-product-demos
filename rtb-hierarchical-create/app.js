@@ -1,4 +1,4 @@
-document.head.insertAdjacentHTML('beforeend','<link rel="stylesheet" href="extra.css?v=2026081309">');
+document.head.insertAdjacentHTML('beforeend','<link rel="stylesheet" href="extra.css?v=2026081310">');
 const A=document.querySelector('#app'),T=document.querySelector('#toast');let view='list',filter='all',stage=0,period='long',uploaded=false,selectedCreateType='';
 let returnStage=null,planSnapshot=null;
 const d=new Date(),today=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`,compact=today.replaceAll('-','');
@@ -31,7 +31,7 @@ function renderCreate(anchor=false){A.innerHTML=`<div class="top"><div><h1>创�
 function render(){view==='list'?A.innerHTML=listHTML():renderCreate(false)}render();
 
 /* V0.3 refinements: wide list, frozen actions, explicit 3-level expectation, persisted plan row. */
-document.head.insertAdjacentHTML('beforeend','<link rel="stylesheet" href="extra2.css?v=2026081309">');
+document.head.insertAdjacentHTML('beforeend','<link rel="stylesheet" href="extra2.css?v=2026081310">');
 let activePlanRow=null;
 const originalStart=start;start=function(){activePlanRow=null;originalStart()};
 function ensurePlanRow(){if(activePlanRow)return;activePlanRow=[plan.name,'C-NEW01','rtb',period==='long'?'长期投放':`${plan.start} 至 ${plan.end}`,'待添加广告组',period==='long'?`每日预算：$${plan.budget}`:`总预算：$${plan.budget}`,'—','—'];rows.unshift(activePlanRow)}
