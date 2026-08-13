@@ -10,8 +10,12 @@
 .create-workspace {
   display: grid;
   grid-template-columns: 210px minmax(0, 1fr);
-  gap: 20px;
+  gap: 0;
   align-items: start;
+  overflow: visible;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
 }
 
 .create-workspace > .flow-steps {
@@ -23,8 +27,10 @@
   align-items: stretch;
   gap: 0;
   margin: 0;
-  padding: 16px 14px;
-  border-radius: 12px;
+  padding: 20px 14px;
+  border-right: 1px solid var(--line);
+  border-radius: 12px 0 0 12px;
+  background: #fff;
 }
 
 .flow-title {
@@ -41,7 +47,24 @@
   padding: 9px 6px;
   gap: 10px;
   border-radius: 9px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
 }
+
+.create-workspace .flow-step.editable { cursor: pointer; }
+.create-workspace .flow-step.editable:hover { background: var(--soft); }
+.create-workspace .flow-step em {
+  margin-left: auto;
+  color: var(--pri);
+  font-size: 12px;
+  font-style: normal;
+  opacity: 0;
+  transition: opacity .16s ease;
+}
+.create-workspace .flow-step.editable:hover em { opacity: 1; }
 
 .create-workspace .flow-step:not(:last-child)::after {
   content: "";
@@ -66,6 +89,9 @@
   min-width: 0;
 }
 
+.create-workspace .tree { padding: 24px 28px 28px; }
+.create-workspace .tree .card { border: 0; box-shadow: none; }
+
 @media (max-width: 900px) {
   .create-workspace {
     grid-template-columns: 1fr;
@@ -73,6 +99,9 @@
   .create-workspace > .flow-steps {
     position: static;
     flex-direction: row;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 12px 12px 0 0;
   }
   .create-workspace .flow-step {
     flex: 1;
