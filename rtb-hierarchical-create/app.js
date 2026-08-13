@@ -33,7 +33,7 @@ const originalKeepGroup=keepGroup;keepGroup=function(){const ok=originalKeepGrou
 groupNext=function(){if(!keepGroup())return;creative.name=`${plan.name}｜创意01`;stage=2;renderCreate(true)};
 upload=function(){creative.name=val('cname')||`${plan.name}｜创意01`;creative.landing=val('landing');uploaded=true;renderCreate(false)};
 const oldGroupForm=groupForm;groupForm=function(){return oldGroupForm().replace('placeholder="填写配置后可使用建议名称"','').replace('<button class="ghost" onclick="suggest()">使用建议名称</button>','').replace('</div><div><label>投放地区','<div class="hint">由广告计划名称自动衍生，可修改</div></div><div><label>投放地区')};
-const oldListHTML=listHTML;listHTML=function(){return oldListHTML().replace('<th>预算 / 代投运营</th>','<th>预算</th><th>代投运营</th>').replaceAll(/<td>(代投运营：[^<]+)<\/td>/g,'<td>—</td><td>$1</td>').replaceAll(/<td>((?:每日预算|总预算)：[^<]+)<\/td>/g,'<td>$1</td><td>—</td>')};
+const oldListHTML=listHTML;listHTML=function(){return oldListHTML().replace('<th>预算 / 代投运营</th>','<th>预算</th><th>代投运营</th>').replaceAll(/<td>代投运营：([^<]+)<\/td>/g,'<td>—</td><td>$1</td>').replaceAll(/<td>((?:每日预算|总预算)：[^<]+)<\/td>/g,'<td>$1</td><td>—</td>')};
 function flowSteps(){const labels=[stage>0?plan.name:'广告计划',stage>1?group.name:'广告组','广告创意'];return `<div class="flow-steps">${labels.map((x,i)=>`${i?'<span class="flow-line"></span>':''}<div class="flow-step ${i<stage?'done':i===stage?'on':''}"><i>${i<stage?'✓':i+1}</i><span><small>${['广告计划','广告组','广告创意'][i]}</small><b>${x}</b></span></div>`).join('')}</div>`}
 const oldRenderCreate=renderCreate;renderCreate=function(anchor=false){oldRenderCreate(anchor);const top=A.querySelector('.top');if(top)top.insertAdjacentHTML('afterend',flowSteps())};
 strip=function(){return ''};
