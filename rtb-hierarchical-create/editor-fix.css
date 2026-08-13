@@ -9,8 +9,8 @@
 /* Keep hierarchy navigation spatially stable while only the editor changes. */
 .create-workspace {
   display: grid;
-  grid-template-columns: 196px minmax(0, 1fr);
-  gap: 18px;
+  grid-template-columns: 188px minmax(0, 1fr);
+  gap: 16px;
   align-items: start;
   overflow: visible;
   border: 0;
@@ -27,15 +27,18 @@
   align-items: stretch;
   gap: 0;
   margin: 0;
-  padding: 18px 10px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 3px 16px rgba(20,30,50,.04);
+  padding: 4px 8px 4px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .flow-title {
-  padding: 0 5px 12px;
+  padding: 0 12px 12px;
   color: var(--mut);
   font-size: 11px;
   font-weight: 700;
@@ -44,10 +47,10 @@
 
 .create-workspace .flow-step {
   position: relative;
-  min-height: 66px;
-  padding: 9px 6px;
+  min-height: 64px;
+  padding: 9px 10px 9px 12px;
   gap: 10px;
-  border-radius: 9px;
+  border-radius: 0 9px 9px 0;
   width: 100%;
   border: 0;
   background: transparent;
@@ -56,7 +59,7 @@
 }
 
 .create-workspace .flow-step.editable { cursor: pointer; }
-.create-workspace .flow-step.editable:hover { background: var(--soft); }
+.create-workspace .flow-step.editable:hover { background: rgba(65,65,203,.055); }
 .create-workspace .flow-step em {
   margin-left: auto;
   color: var(--pri);
@@ -70,7 +73,7 @@
 .create-workspace .flow-step:not(:last-child)::after {
   content: "";
   position: absolute;
-  left: 18px;
+  left: 24px;
   top: 43px;
   width: 1px;
   height: 31px;
@@ -78,11 +81,22 @@
 }
 
 .create-workspace .flow-step.on {
-  background: var(--soft);
+  color: var(--pri);
+  background: linear-gradient(90deg, rgba(65,65,203,.09), rgba(65,65,203,.025));
+  box-shadow: inset 3px 0 0 var(--ac);
+}
+
+.create-workspace .flow-step.done {
+  color: #334155;
+}
+
+.create-workspace .flow-step:disabled {
+  cursor: default;
+  opacity: .72;
 }
 
 .create-workspace .flow-step b {
-  max-width: 135px;
+  max-width: 118px;
 }
 
 .create-workspace > :not(.flow-steps) {
@@ -98,7 +112,7 @@
 .create-workspace .tree .card {
   border: 1px solid var(--line);
   border-radius: 12px;
-  box-shadow: 0 3px 16px rgba(20,30,50,.05);
+  box-shadow: 0 4px 18px rgba(20,30,50,.055);
 }
 .create-workspace .tree .head { padding: 24px 28px 18px; }
 .create-workspace .tree .body { padding: 22px 28px 24px; }
@@ -111,13 +125,14 @@
   .create-workspace > .flow-steps {
     position: static;
     flex-direction: row;
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-    border-radius: 12px 12px 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
   }
   .create-workspace .flow-step {
     flex: 1;
     min-height: auto;
+    border-radius: 8px;
   }
   .create-workspace .flow-step:not(:last-child)::after,
   .flow-title {

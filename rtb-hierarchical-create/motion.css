@@ -23,9 +23,9 @@ input,select{transition:border-color .18s ease,box-shadow .18s ease,background-c
 .choice-help{margin-right:auto;color:var(--mut);font-size:12px;transition:color .18s ease}
 .choice-actions .primary.ready{animation:button-ready .3s ease}
 @keyframes button-ready{50%{transform:scale(1.035)}}
-.tree{transition:opacity .18s ease,transform .22s cubic-bezier(.2,.8,.2,1)}
-.tree.entering{opacity:0;transform:translateY(18px)}
-.tree.leaving{opacity:0;transform:translateY(-16px)}
+.tree{transition:opacity .16s ease,transform .2s cubic-bezier(.2,.8,.2,1)}
+.tree.entering{opacity:0;transform:translateY(10px)}
+.tree.leaving{opacity:0;transform:translateY(-6px)}
 .flow-step i,.flow-step b{transition:background-color .22s ease,color .22s ease,transform .22s ease}
 .flow-step.done i{animation:step-done .34s cubic-bezier(.2,1.4,.4,1)}
 @keyframes step-done{0%{transform:scale(.7)}100%{transform:scale(1)}}
