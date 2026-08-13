@@ -5,3 +5,84 @@
 .node {
   display: block;
 }
+
+/* Keep hierarchy navigation spatially stable while only the editor changes. */
+.create-workspace {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.create-workspace > .flow-steps {
+  position: sticky;
+  top: 84px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  margin: 0;
+  padding: 16px 14px;
+  border-radius: 12px;
+}
+
+.flow-title {
+  padding: 0 5px 12px;
+  color: var(--mut);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.create-workspace .flow-step {
+  position: relative;
+  min-height: 66px;
+  padding: 9px 6px;
+  gap: 10px;
+  border-radius: 9px;
+}
+
+.create-workspace .flow-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 43px;
+  width: 1px;
+  height: 31px;
+  background: var(--line);
+}
+
+.create-workspace .flow-step.on {
+  background: var(--soft);
+}
+
+.create-workspace .flow-step b {
+  max-width: 135px;
+}
+
+.create-workspace > :not(.flow-steps) {
+  grid-column: 2;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .create-workspace {
+    grid-template-columns: 1fr;
+  }
+  .create-workspace > .flow-steps {
+    position: static;
+    flex-direction: row;
+  }
+  .create-workspace .flow-step {
+    flex: 1;
+    min-height: auto;
+  }
+  .create-workspace .flow-step:not(:last-child)::after,
+  .flow-title {
+    display: none;
+  }
+  .create-workspace > :not(.flow-steps) {
+    grid-column: 1;
+  }
+}
