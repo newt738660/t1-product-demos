@@ -1,0 +1,7 @@
+.tree::before {
+  display: none;
+}
+
+.node {
+  display: block;
+}
