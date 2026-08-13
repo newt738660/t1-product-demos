@@ -19,3 +19,19 @@ function creativeForm(){return `<div class="body"><div class="grid"><div><label>
 function done(){return `<div class="success">广告创建完成：计划和广告组已创建，广告创意正在审核中。</div>${strip()}<div class="card"><div class="summary"><div><small>广告创意</small><b>${creative.name}</b></div><div><small>状态</small><b>审核中</b></div><span></span><button class="primary" onclick="list()">返回广告投放列表</button></div></div>`}
 function renderCreate(anchor=false){A.innerHTML=`<div class="top"><div><h1>创建 RTB 广告</h1><p>逐层创建，每一层创建成功后都可以结束或继续。</p></div><button class="outline" onclick="exit()">返回广告投放</button></div>${stage===3?done():`${strip()}<div id="editor" class="tree"><div class="node active"><div class="dot">${stage+1}</div><article class="card"><div class="head"><div><h2>${['广告计划','广告组','广告创意'][stage]}</h2><p>${['定义整体投放周期与预算','在当前计划下配置一套投放策略','为当前广告组添加用户最终看到的内容'][stage]}</p></div><span></span><em class="badge">正在编辑</em></div>${stage===0?planForm():stage===1?groupForm():creativeForm()}</article></div></div>`}`;if(anchor)requestAnimationFrame(()=>document.querySelector('#editor')?.scrollIntoView({behavior:'smooth',block:'start'}))}
 function render(){view==='list'?A.innerHTML=listHTML():renderCreate(false)}render();
+
+/* V0.3 refinements: wide list, frozen actions, explicit 3-level expectation, persisted plan row. */
+document.head.insertAdjacentHTML('beforeend','<link rel="stylesheet" href="extra2.css">');
+let activePlanRow=null;
+const originalStart=start;start=function(){activePlanRow=null;originalStart()};
+function ensurePlanRow(){if(activePlanRow)return;activePlanRow=[plan.name,'C-NEW01','rtb',period==='long'?'长期投放':`${plan.start} 至 ${plan.end}`,'待添加广告组',period==='long'?`每日预算：$${plan.budget}`:`总预算：$${plan.budget}`,'—','—'];rows.unshift(activePlanRow)}
+planOnly=function(){if(!keepPlan())return;ensurePlanRow();toast('广告计划已创建');setTimeout(list,450)};
+planNext=function(){if(!keepPlan())return;ensurePlanRow();group.name=`${plan.name}｜组01`;stage=1;renderCreate(true)};
+const originalKeepGroup=keepGroup;keepGroup=function(){const ok=originalKeepGroup();if(ok&&activePlanRow)activePlanRow[4]='待添加创意';return ok};
+groupNext=function(){if(!keepGroup())return;creative.name=`${plan.name}｜创意01`;stage=2;renderCreate(true)};
+upload=function(){creative.name=val('cname')||`${plan.name}｜创意01`;creative.landing=val('landing');uploaded=true;renderCreate(false)};
+const oldGroupForm=groupForm;groupForm=function(){return oldGroupForm().replace('placeholder="填写配置后可使用建议名称"','').replace('<button class="ghost" onclick="suggest()">使用建议名称</button>','').replace('</div><div><label>投放地区','<div class="hint">由广告计划名称自动衍生，可修改</div></div><div><label>投放地区')};
+const oldListHTML=listHTML;listHTML=function(){return oldListHTML().replace('<th>预算 / 代投运营</th>','<th>预算</th><th>代投运营</th>').replaceAll(/<td>(代投运营：[^<]+)<\/td>/g,'<td>—</td><td>$1</td>').replaceAll(/<td>((?:每日预算|总预算)：[^<]+)<\/td>/g,'<td>$1</td><td>—</td>')};
+function flowSteps(){return `<div class="flow-steps">${['广告计划','广告组','广告创意'].map((x,i)=>`${i?'<span class="flow-line"></span>':''}<div class="flow-step ${i<stage?'done':i===stage?'on':''}"><i>${i<stage?'✓':i+1}</i>${x}</div>`).join('')}</div>`}
+const oldRenderCreate=renderCreate;renderCreate=function(anchor=false){oldRenderCreate(anchor);const top=A.querySelector('.top');if(top)top.insertAdjacentHTML('afterend',flowSteps())};
+const oldRender=render;render=function(){A.classList.toggle('list-page',view==='list');oldRender()};render();
