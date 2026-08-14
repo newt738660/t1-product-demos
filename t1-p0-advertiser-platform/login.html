@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>T1 Ads · 登录</title>
+<link rel="stylesheet" href="assets/app.css?v=2026081403" />
+<style>
+  body.auth-page{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(900px 520px at 55% -10%,#e9eafe 0%,var(--bg) 58%)}
+  .auth-shell{width:100%;max-width:1080px;min-height:650px;display:grid;grid-template-columns:1.08fr 1fr;background:var(--surface);border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow-lg);overflow:hidden}
+  .auth-brand{position:relative;overflow:hidden;padding:46px 42px;color:#fff;background:linear-gradient(150deg,#6666f3,#4141c9);display:flex;flex-direction:column}
+  .auth-brand:after{content:"";position:absolute;width:340px;height:340px;border-radius:50%;right:-120px;top:-100px;background:rgba(255,255,255,.16);filter:blur(55px)}
+  .auth-logo{position:relative;z-index:1;width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-weight:800;font-size:19px}
+  .auth-brand-copy{position:relative;z-index:1;margin-top:auto}
+  .auth-brand h2{font-size:31px;line-height:1.2;letter-spacing:-.7px;margin-bottom:14px}
+  .auth-brand p{color:rgba(255,255,255,.82);max-width:340px;line-height:1.7}
+  .auth-points{list-style:none;margin-top:25px;display:grid;gap:12px}
+  .auth-points li{display:flex;gap:10px;align-items:center;color:rgba(255,255,255,.92)}
+  .auth-points li:before{content:"✓";width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.17);display:grid;place-items:center;font-size:12px;font-weight:800}
+  .auth-form{padding:42px 48px;display:flex;flex-direction:column;justify-content:center}
+  .auth-view{display:none}.auth-view.on{display:block;animation:authIn .22s ease}
+  @keyframes authIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .auth-head{margin-bottom:23px}.auth-head h1{font-size:25px;letter-spacing:-.4px}.auth-head p{color:var(--text-2);margin-top:6px}
+  .auth-row{display:flex;align-items:center;justify-content:space-between;margin:3px 0 5px}
+  .auth-check{display:flex;align-items:center;gap:7px;color:var(--text-2);font-size:12.5px}.auth-check input{accent-color:var(--accent)}
+  .auth-link{color:var(--accent);font-weight:650;font-size:12.5px}.auth-link:hover{text-decoration:underline}
+  .auth-submit{width:100%;justify-content:center;padding:13px;margin-top:8px;font-size:15px}
+  .auth-switch{text-align:center;color:var(--text-2);margin-top:20px;font-size:13px}
+  .auth-error{min-height:20px;color:var(--negative);font-size:12px;margin-top:6px}.auth-error.ok{color:var(--positive)}
+  .auth-back{display:inline-flex;color:var(--text-2);font-weight:600;margin-bottom:17px}.auth-back:hover{color:var(--text)}
+  .application-note{padding:12px 14px;border-radius:10px;background:var(--accent-soft);color:var(--accent-strong);font-size:12.5px;margin-bottom:18px}
+  .auth-success{text-align:center}.success-icon{width:58px;height:58px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;background:#e9f8ef;color:var(--positive);font-size:26px;font-weight:800}
+  .auth-demo{position:relative;z-index:1;margin-top:28px;padding-top:22px;border-top:1px solid rgba(255,255,255,.2)}
+  .auth-demo b{display:block;font-size:13px;margin-bottom:10px}.auth-demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .auth-demo button{padding:9px 10px;border:1px solid rgba(255,255,255,.24);border-radius:9px;color:#fff;text-align:left;font-size:12px;background:rgba(255,255,255,.08)}
+  .auth-demo button:hover{background:rgba(255,255,255,.16)}.auth-terms{font-size:11.5px;color:var(--text-3);line-height:1.6;margin-top:12px}
+  @media(max-width:780px){.auth-shell{grid-template-columns:1fr;max-width:450px}.auth-brand{display:none}.auth-form{padding:36px 28px}}
+</style>
+</head>
+<body class="dsp auth-page">
+  <main class="auth-shell">
+    <aside class="auth-brand">
+      <div class="auth-logo">T1</div>
+      <div class="auth-brand-copy">
+        <h2>让每一次投放<br>更清晰、更可控</h2>
+        <p>T1 Ads 为广告主投放人员提供 CPD 项目查看与 RTB 自助投放的一体化工作空间。</p>
+        <ul class="auth-points">
+          <li>统一管理广告计划、广告组与创意</li>
+          <li>查看投放数据与审核进度</li>
+          <li>注册与广告主开通相互独立</li>
+        </ul>
+        <div class="auth-demo"><b>首页状态预览</b><div class="auth-demo-grid"><button onclick="Auth.previewState('unbound')">未绑定</button><button onclick="Auth.previewState('pending')">审核中</button><button onclick="Auth.previewState('rejected')">已驳回</button><button onclick="Auth.previewState('empty')">已绑定未投放</button><button onclick="Auth.previewState('active')">已有投放</button></div></div>
+      </div>
+    </aside>
+
+    <section class="auth-form">
+      <div class="auth-view on" id="auth-login">
+        <div class="auth-head"><h1>登录 T1 Ads</h1><p>欢迎回来，请使用你的账号进入广告主工作台</p></div>
+        <div class="field"><label>邮箱或账号</label><input class="input" id="loginAccount" placeholder="you@example.com" autocomplete="username"></div>
+        <div class="field"><label>密码</label><input class="input" id="loginPassword" type="password" placeholder="请输入密码" autocomplete="current-password"></div>
+        <div class="auth-row">
+          <label class="auth-check"><input type="checkbox" checked>记住我</label>
+          <button class="auth-link" onclick="Auth.show('forgot')">忘记密码？</button>
+        </div>
+        <div class="auth-error" id="loginError"></div>
+        <button class="btn btn-primary auth-submit" onclick="Auth.login()">登录</button>
+        <div class="auth-switch">还没有账号？ <button class="auth-link" onclick="Auth.show('register')">立即注册</button></div>
+      </div>
+
+      <div class="auth-view" id="auth-register">
+        <button class="auth-back" onclick="Auth.show('login')">← 返回登录</button>
+        <div class="auth-head"><h1>创建 T1 账号</h1><p>账号用于登录 T1；注册不会自动创建或绑定广告主</p></div>
+        <div class="field"><label>姓名</label><input class="input" id="registerName" placeholder="请输入姓名" autocomplete="name"></div>
+        <div class="field"><label>邮箱</label><input class="input" id="registerEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
+        <div class="field"><label>密码</label><input class="input" id="registerPassword" type="password" placeholder="至少 6 位" autocomplete="new-password"></div>
+        <div class="field"><label>确认密码</label><input class="input" id="registerPassword2" type="password" placeholder="再次输入密码" autocomplete="new-password"></div>
+        <div class="auth-error" id="registerError"></div>
+        <button class="btn btn-primary auth-submit" onclick="Auth.register()">注册并进入 T1</button>
+        <div class="auth-terms">开始真实投放时，需另行提交广告主创建或绑定申请。</div>
+      </div>
+
+      <div class="auth-view" id="auth-application">
+        <button class="auth-back" onclick="Auth.show('register')">← 返回注册信息</button>
+        <div class="auth-head"><h1>申请开通广告主</h1><p>运营人员将根据实际业务确认新建或关联已有广告主</p></div>
+        <div class="application-note">你不需要判断广告主是否已经存在，提交后由运营人员联系确认。</div>
+        <div class="field"><label>广告主名称</label><input class="input" id="advertiserName" placeholder="请输入品牌、公司或业务名称"></div>
+        <div class="field"><label>所属行业</label><select class="select" id="advertiserIndustry"><option value="">请选择行业</option><option>游戏</option><option>电商零售</option><option>互联网服务</option><option>金融</option><option>教育</option><option>其他</option></select></div>
+        <div class="field"><label>销售人员</label><select class="select" id="advertiserSales"><option value="">请选择或由运营确认</option><option>销售 A · S001</option><option>销售 B · S002</option><option>不清楚，由运营确认</option></select></div>
+        <div class="field"><label>联系电话</label><input class="input" id="advertiserPhone" placeholder="便于运营人员与你联系" autocomplete="tel"></div>
+        <div class="auth-error" id="applicationError"></div>
+        <button class="btn btn-primary auth-submit" onclick="Auth.apply()">提交开通申请</button>
+      </div>
+
+      <div class="auth-view auth-success" id="auth-pending">
+        <div class="success-icon">✓</div>
+        <div class="auth-head"><h1>申请已提交</h1><p>当前状态：待运营确认</p></div>
+        <p style="color:var(--text-2);line-height:1.8">运营人员将通过你填写的邮箱或电话联系你，确认新建广告主或关联已有广告主。</p>
+        <button class="btn btn-primary auth-submit" onclick="Auth.previewApproval()">演示：完成运营确认并进入平台</button>
+        <button class="btn btn-ghost auth-submit" onclick="Auth.show('login')">返回登录</button>
+      </div>
+
+      <div class="auth-view" id="auth-forgot">
+        <button class="auth-back" onclick="Auth.show('login')">← 返回登录</button>
+        <div class="auth-head"><h1>找回密码</h1><p>输入注册邮箱，我们将发送密码重置链接</p></div>
+        <div class="field"><label>注册邮箱</label><input class="input" id="forgotEmail" type="email" placeholder="you@example.com"></div>
+        <div class="auth-error" id="forgotError"></div>
+        <button class="btn btn-primary auth-submit" onclick="Auth.forgot()">发送重置链接</button>
+      </div>
+    </section>
+  </main>
+<script src="assets/auth.js?v=2026081403"></script>
+<script src="assets/theme.js?v=2026081403"></script>
+</body>
+</html>
