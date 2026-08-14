@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>T1 Ads · 新架构探索版</title>
-<link rel="stylesheet" href="assets/app.css?v=2026081404" />
+<title>T1 Ads · 广告投放平台</title>
+<link rel="stylesheet" href="assets/app.css?v=2026081405" />
 <script src="assets/session.js?v=2026081403"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
@@ -32,13 +32,10 @@
 
   <main class="main">
     <header class="topbar">
-      <div>
-        <div class="page-title" id="topTitle">仪表盘</div>
-        <div class="page-sub" id="topSub">投放总览与花费</div>
-      </div>
+      <div class="page-title" id="topTitle" hidden>首页</div>
+      <div class="page-sub" id="topSub" hidden>投放表现、异常与待处理事项</div>
+      <div class="workspace-chip" id="workspaceChip"><span class="workspace-dot"></span>演示广告主</div>
       <div class="spacer"></div>
-      <a class="btn btn-ghost btn-sm" href="compare.html" style="text-decoration:none">方案对比</a>
-      <div class="workspace-chip" id="workspaceChip"><span class="workspace-dot"></span>演示广告主 · 主账户</div>
       <button class="icon-btn" id="bellBtn" onclick="App.toggleNotif(event)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
         <span class="dot"></span>
@@ -57,7 +54,7 @@
 <div class="modal-mask" id="modalMask"></div>
 <div class="toast-wrap" id="toastWrap"></div>
 
-<script src="assets/dsp.js?v=2026081404"></script>
+<script src="assets/dsp.js?v=2026081405"></script>
 <script src="assets/theme.js?v=2026081403"></script>
 </body>
 </html>

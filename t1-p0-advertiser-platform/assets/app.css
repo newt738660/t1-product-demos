@@ -764,3 +764,15 @@ body.dsp .code-body { color: #d7d7fb; }
 .inherit-card{display:flex;align-items:center;gap:14px;padding:15px;border:1px solid #c8ecd4;border-radius:11px;background:#f1fbf5}.inherit-card>div{display:flex;flex-direction:column;gap:5px;flex:1}.inherit-card b{font-size:13px}.inherit-card small{color:var(--text-3)}
 @media(max-width:1050px){.unified-create{grid-template-columns:190px minmax(0,1fr)}}
 @media(max-width:800px){.unified-create{display:block}.form-toc{position:sticky;top:64px;z-index:12;display:flex;overflow-x:auto;margin-bottom:12px}.form-toc .toc-title,.form-toc .toc-rule,.form-toc button small{display:none}.form-toc button{min-width:max-content}.unified-actions{left:0}.choice-grid{grid-template-columns:1fr 1fr!important}.growth-hero{grid-template-columns:1fr;padding:25px}.growth-copy h1{font-size:29px}.growth-grid{grid-template-columns:1fr}.growth-wide{grid-column:auto;grid-template-columns:auto 1fr}.growth-wide .data-placeholder{grid-column:span 2}.growth-section,.growth-cta{align-items:flex-start;flex-direction:column}.compact-hero{padding:23px}.compact-hero .growth-copy h1{font-size:27px}.compact-capabilities{grid-template-columns:1fr}.compact-evidence{padding:14px}}
+
+/* P0 PC 信息层级收敛：全局操作保持克制，创建页只突出当前步骤。 */
+.btn-primary{box-shadow:none}
+.unified-create{padding-bottom:24px}
+.unified-actions{display:none}
+.paper-level.stage-hidden{display:none}
+.paper-level.completed{display:block}
+.paper-level.completed .level-heading{background:var(--surface)}
+.paper-level.completed .level-heading>span{width:32px;height:32px;border-radius:9px;background:#e7f7ed;color:#157a3e}
+.paper-level.completed .level-heading em{display:none}
+.paper-level:not(.completed) .level-heading{background:var(--surface)}
+.choice.sel{border-color:var(--accent);background:var(--accent-soft)}
