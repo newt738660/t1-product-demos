@@ -724,20 +724,32 @@ const App = {
   view_rtbplans(){ return this.viewPlanList('rtb'); },
   view_plans(){
     return `<div class="page-head"><div><h1>广告投放</h1><p>查看和管理 CPD 代投与 RTB 自助投放 · ${DB.campaigns.length} 个计划</p></div><div class="spacer"></div><button class="btn btn-primary" onclick="App.openUnifiedCreateChoice()">${svg(I.plus)}新建投放</button></div>
-      <div class="card"><div class="card-head"><select class="select" id="unifiedTypeFilter" style="width:170px" onchange="App.renderUnifiedPlans()"><option value="all">全部投放类型</option><option value="cpd">CPD 代投</option><option value="rtb">RTB 自助投放</option></select><select class="select" id="unifiedStatusFilter" style="width:130px" onchange="App.renderUnifiedPlans()"><option value="">全部状态</option><option value="active">投放中</option><option value="paused">已暂停</option><option value="draft">草稿</option></select><div class="spacer"></div><input class="input" id="unifiedSearch" style="width:260px" placeholder="搜索计划名称 / ID" oninput="App.renderUnifiedPlans()"></div>
-      <div class="table-wrap"><table><thead><tr><th>广告计划</th><th>投放类型</th><th>状态</th><th>广告位 / 库存</th><th>投放周期</th><th class="num">曝光</th><th class="num">点击</th><th class="num">CTR</th><th>创意状态</th><th class="act">操作</th></tr></thead><tbody id="unifiedPlanBody"></tbody></table></div><div id="unifiedPlanPager"></div></div>`;
+      <div class="card plan-list-card"><div class="card-head plan-list-tools"><div class="segment" id="unifiedTypeTabs"><button class="active" onclick="App.setUnifiedType(this,'all')">全部</button><button onclick="App.setUnifiedType(this,'rtb')">RTB 自助</button><button onclick="App.setUnifiedType(this,'cpd')">CPD 代投</button></div><div class="spacer"></div><select class="select" id="unifiedStatusFilter" style="width:130px" onchange="App.renderUnifiedPlans()"><option value="">全部状态</option><option value="active">投放中</option><option value="paused">已暂停</option><option value="draft">草稿</option></select><input class="input" id="unifiedSearch" style="width:260px" placeholder="搜索计划名称或 ID" oninput="App.renderUnifiedPlans()"></div>
+      <div class="table-wrap"><table class="plan-list-table"><thead><tr id="unifiedPlanHead"></tr></thead><tbody id="unifiedPlanBody"></tbody></table></div><div id="unifiedPlanPager"></div></div>`;
   },
-  after_plans(){ this.pages.unifiedPlan=1; this.renderUnifiedPlans(); },
+  after_plans(){ this.pages.unifiedPlan=1;this.unifiedType='all';this.renderUnifiedPlans(); },
+  setUnifiedType(btn,type){ document.querySelectorAll('#unifiedTypeTabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');this.unifiedType=type;this.pages.unifiedPlan=1;this.renderUnifiedPlans(); },
   renderUnifiedPlans(){
-    const type=document.getElementById('unifiedTypeFilter')?.value||'all',status=document.getElementById('unifiedStatusFilter')?.value||'',kw=(document.getElementById('unifiedSearch')?.value||'').trim().toLowerCase();
+    const type=this.unifiedType||'all',status=document.getElementById('unifiedStatusFilter')?.value||'',kw=(document.getElementById('unifiedSearch')?.value||'').trim().toLowerCase();
     const all=DB.campaigns.filter(c=>(type==='all'||c.mode===type)&&(!status||c.status===status)&&(!kw||[c.name,c.id,c.alias].some(v=>(v||'').toLowerCase().includes(kw))));
     const list=this.pageSlice(all,'unifiedPlan');
+    const heads={
+      all:['广告计划','投放类型','状态','投放周期','广告位 / 库存','曝光','点击','CTR','创意状态','操作'],
+      rtb:['广告计划','状态','投放周期','预算','花费','广告位 / 库存','曝光','点击','CTR','操作'],
+      cpd:['广告计划','状态','投放周期','订单编号','代投运营','广告位 / 库存','曝光','点击','CTR','操作'],
+    }[type];
+    document.getElementById('unifiedPlanHead').innerHTML=heads.map((h,i)=>`<th class="${['曝光','点击','CTR'].includes(h)?'num ':''}${i===heads.length-1?'act':''}">${h}</th>`).join('');
     document.getElementById('unifiedPlanBody').innerHTML=list.map(cp=>{
       const creatives=DB.creatives.filter(a=>a.camp===cp.id),imps=creatives.reduce((s,a)=>s+(a.imps||0),0),clicks=creatives.reduce((s,a)=>s+(a.clicks||0),0),ctr=imps?(clicks/imps*100).toFixed(2)+'%':'—',isCpd=cp.mode==='cpd';
       const active=creatives.filter(a=>a.status==='active').length,review=creatives.filter(a=>a.status==='review').length;
       const creativeText=!creatives.length?'尚未创建':review?`${review} 条审核中`:`${active} 条投放中`;
       const action=cp.status==='draft'?`<button class="btn btn-ghost btn-sm" onclick="App.openPlan('${cp.id}')">继续创建</button>`:`<button class="btn btn-ghost btn-sm" onclick="App.openPlan('${cp.id}')">查看详情</button>`;
-      return `<tr><td><button class="link-btn" onclick="App.openPlan('${cp.id}')"><b>${cp.alias||cp.name}</b></button><div class="cell-sub">${cp.id}</div></td><td><span class="badge ${isCpd?'amber':'blue'}">${isCpd?'CPD 代投':'RTB 自助'}</span></td><td>${this.statusBadge(cp.status)}</td><td>${cp.placement||'待配置'}</td><td>${cp.period||'—'}</td><td class="num">${fmtK(imps)}</td><td class="num">${fmtK(clicks)}</td><td class="num">${ctr}</td><td>${creativeText}</td><td class="act">${action}</td></tr>`;
+      const plan=`<td><button class="link-btn" onclick="App.openPlan('${cp.id}')"><b>${cp.alias||cp.name}</b></button><div class="cell-sub">${cp.id}</div></td>`;
+      const common=`<td>${this.statusBadge(cp.status)}</td><td class="plan-period">${cp.period||'—'}</td>`;
+      const metrics=`<td class="num">${fmtK(imps)}</td><td class="num">${fmtK(clicks)}</td><td class="num">${ctr}</td>`;
+      if(type==='rtb')return `<tr>${plan}${common}<td>${fmtMoney(cp.budget||cp.totalBudget||cp.dailyBudget||0)}</td><td>${fmtMoney(cp.spend||0)}</td><td class="plan-inventory">${cp.placement||'待配置'}</td>${metrics}<td class="act">${action}</td></tr>`;
+      if(type==='cpd')return `<tr>${plan}${common}<td class="mono">${cp.order||'—'}</td><td class="plan-owner">${cp.operator||'待分配'}</td><td class="plan-inventory">${cp.placement||'待配置'}</td>${metrics}<td class="act">${action}</td></tr>`;
+      return `<tr>${plan}<td><span class="badge ${isCpd?'amber':'blue'}">${isCpd?'CPD 代投':'RTB 自助'}</span></td>${common}<td class="plan-inventory">${cp.placement||'待配置'}</td>${metrics}<td>${creativeText}</td><td class="act">${action}</td></tr>`;
     }).join('')||'<tr><td colspan="10"><div class="empty">暂无符合条件的广告计划</div></td></tr>';
     document.getElementById('unifiedPlanPager').innerHTML=this.pagerHTML('unifiedPlan',all.length);
   },
