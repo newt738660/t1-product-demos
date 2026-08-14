@@ -118,6 +118,28 @@
 .create-workspace .tree .body { padding: 22px 28px 24px; }
 .create-workspace .tree .actions { padding: 16px 28px 22px; }
 
+input.invalid, select.invalid {
+  border-color: #d95045;
+  box-shadow: 0 0 0 3px rgba(217,80,69,.1);
+}
+
+.advanced-box {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.advanced-toggle { padding-left: 0; }
+.advanced-toggle span { display: inline-block; margin-left: 4px; }
+.advanced-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 15px;
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 10px;
+  background: #f8f9fc;
+}
+
 @media (max-width: 900px) {
   .create-workspace {
     grid-template-columns: 1fr;
@@ -140,5 +162,8 @@
   }
   .create-workspace > :not(.flow-steps) {
     grid-column: 1;
+  }
+  .advanced-grid {
+    grid-template-columns: 1fr;
   }
 }
