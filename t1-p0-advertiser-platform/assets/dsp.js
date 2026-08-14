@@ -604,10 +604,8 @@ const App = {
     return `
     <div class="page-head compact-page-head">
       <div><h1>晚上好，Victor</h1><p>查看账户表现与待处理事项</p></div>
-      <div class="spacer"></div>
-      <button class="btn btn-primary" onclick="${draft?`App.openPlan('${draft.id}')`:`App.go('newplan')`}">${svg(draft?I.edit:I.plus)}${draft?'继续 RTB 草稿':'新建 RTB 投放'}</button>
     </div>
-    ${tasks.length?`<div class="compact-tasks"><div><b>待处理</b><span>${tasks.length} 项</span></div>${tasks.join('')}</div>`:''}
+    ${tasks.length?`<div class="compact-tasks"><div class="compact-tasks-head"><b>待办事项</b><span>${tasks.length}</span></div><div class="compact-tasks-list">${tasks.join('')}</div></div>`:''}
     <div class="performance-head"><div><div class="section-kicker">PERFORMANCE</div><h2>账户表现</h2><p>${meta.label} · 数据更新至今天 10:00</p></div><div class="performance-filters"><div class="segment"><button class="${meta.mode==='all'?'active':''}" onclick="App.setDashMode('all')">全部</button><button class="${meta.mode==='cpd'?'active':''}" onclick="App.setDashMode('cpd')">CPD</button><button class="${meta.mode==='rtb'?'active':''}" onclick="App.setDashMode('rtb')">RTB</button></div><div class="segment">${[7,14,30].map(d=>`<button class="${meta.days===d?'active':''}" onclick="App.setDashRange(${d})">近 ${d} 天</button>`).join('')}</div></div></div>
     <div class="grid cols-4" style="margin-bottom:18px">
       ${kpis.map(k=>`<div class="card kpi"><div class="kpi-top"><div class="kpi-ico">${svg(k.ico)}</div><div class="kpi-label">${k.label}</div></div><div class="kpi-val">${k.val}</div><div class="kpi-foot"><span class="trend ${k.t}">${svg(k.t==='up'?'<path d=\"m6 15 6-6 6 6\"/>':'<path d=\"m6 9 6 6 6-6\"/>')}${k.d}</span><span>较上周</span></div></div>`).join('')}
