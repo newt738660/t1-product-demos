@@ -778,17 +778,18 @@ body.dsp .code-body { color: #d7d7fb; }
 .choice.sel{border-color:var(--accent);background:var(--accent-soft)}
 .plan-list-tools{gap:10px;flex-wrap:wrap}
 .plan-list-card .table-wrap{position:relative}
-.plan-list-table{min-width:2260px}
+.plan-list-table{min-width:1980px;font-size:13px}
 .plan-list-table .select-col{position:sticky;left:0;z-index:3;width:46px;min-width:46px;max-width:46px;text-align:center;background:var(--surface)}
-.plan-list-table .plan-name-col{position:sticky;left:46px;z-index:3;min-width:210px;max-width:210px;background:var(--surface);box-shadow:8px 0 12px -12px rgba(15,27,45,.32)}
+.plan-list-table .plan-name-col{position:sticky;left:46px;z-index:3;min-width:196px;max-width:196px;background:var(--surface);box-shadow:8px 0 12px -12px rgba(15,27,45,.32)}
 .plan-list-table thead .select-col,.plan-list-table thead .plan-name-col{z-index:5;background:var(--surface-2)}
-.plan-list-table th:not(.select-col):not(.plan-name-col),.plan-list-table td:not(.select-col):not(.plan-name-col){min-width:110px}
-.plan-list-table th:nth-child(5),.plan-list-table td:nth-child(5){min-width:125px}
+.plan-list-table th,.plan-list-table td{padding:10px 12px}
+.plan-list-table th:not(.select-col):not(.plan-name-col),.plan-list-table td:not(.select-col):not(.plan-name-col){min-width:88px}
+.plan-list-table th:nth-child(4),.plan-list-table td:nth-child(4){min-width:112px}
 .plan-list-table th:nth-child(16),.plan-list-table td:nth-child(16){min-width:120px}
 .plan-list-table .plan-period{min-width:160px;white-space:nowrap}
 .plan-list-table .plan-owner{min-width:94px}
 .plan-list-table .plan-inventory{min-width:150px}
-.plan-list-table th.act,.plan-list-table td.act{position:sticky;right:0;z-index:4;min-width:190px;background:var(--surface);box-shadow:-8px 0 12px -12px rgba(15,27,45,.25)}
+.plan-list-table th.act,.plan-list-table td.act{position:sticky;right:0;z-index:4;min-width:86px;background:var(--surface);box-shadow:-8px 0 12px -12px rgba(15,27,45,.25)}
 .plan-list-table thead th.act{z-index:6;background:var(--surface-2)}
 .plan-list-table tbody tr:hover td{background:#fafbff}
 .plan-list-table tbody tr:hover td.act,.plan-list-table tbody tr:hover td.select-col,.plan-list-table tbody tr:hover td.plan-name-col{background:#fafbff}
