@@ -777,12 +777,28 @@ body.dsp .code-body { color: #d7d7fb; }
 .paper-level:not(.completed) .level-heading{background:var(--surface)}
 .choice.sel{border-color:var(--accent);background:var(--accent-soft)}
 .plan-list-tools{gap:10px;flex-wrap:wrap}
-.plan-list-table th:first-child,.plan-list-table td:first-child{min-width:178px}
-.plan-list-table th:nth-last-child(2),.plan-list-table td:nth-last-child(2){min-width:76px}
+.plan-list-card .table-wrap{position:relative}
+.plan-list-table{min-width:2260px}
+.plan-list-table .select-col{position:sticky;left:0;z-index:3;width:46px;min-width:46px;max-width:46px;text-align:center;background:var(--surface)}
+.plan-list-table .plan-name-col{position:sticky;left:46px;z-index:3;min-width:210px;max-width:210px;background:var(--surface);box-shadow:8px 0 12px -12px rgba(15,27,45,.32)}
+.plan-list-table thead .select-col,.plan-list-table thead .plan-name-col{z-index:5;background:var(--surface-2)}
+.plan-list-table th:not(.select-col):not(.plan-name-col),.plan-list-table td:not(.select-col):not(.plan-name-col){min-width:110px}
+.plan-list-table th:nth-child(5),.plan-list-table td:nth-child(5){min-width:125px}
+.plan-list-table th:nth-child(16),.plan-list-table td:nth-child(16){min-width:120px}
 .plan-list-table .plan-period{min-width:160px;white-space:nowrap}
 .plan-list-table .plan-owner{min-width:94px}
 .plan-list-table .plan-inventory{min-width:150px}
-.plan-list-table th.act,.plan-list-table td.act{position:sticky;right:0;z-index:2;background:var(--surface);box-shadow:-8px 0 12px -12px rgba(15,27,45,.25)}
-.plan-list-table thead th.act{z-index:3;background:var(--surface-2)}
+.plan-list-table th.act,.plan-list-table td.act{position:sticky;right:0;z-index:4;min-width:190px;background:var(--surface);box-shadow:-8px 0 12px -12px rgba(15,27,45,.25)}
+.plan-list-table thead th.act{z-index:6;background:var(--surface-2)}
 .plan-list-table tbody tr:hover td{background:#fafbff}
-.plan-list-table tbody tr:hover td.act{background:#fafbff}
+.plan-list-table tbody tr:hover td.act,.plan-list-table tbody tr:hover td.select-col,.plan-list-table tbody tr:hover td.plan-name-col{background:#fafbff}
+.plan-bulk-bar{display:none;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--accent-soft)}
+.plan-bulk-bar.show{display:flex}
+.plan-bulk-bar span{font-size:12px;color:var(--text-3)}
+.plan-action-list{display:grid;gap:10px}
+.plan-action-list>button{display:flex;align-items:center;gap:13px;width:100%;padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);text-align:left;color:var(--text);cursor:pointer}
+.plan-action-list>button:hover{border-color:var(--accent);background:var(--accent-soft)}
+.plan-action-list>button svg{width:20px;height:20px;color:var(--accent)}
+.plan-action-list>button span{display:grid;gap:3px}
+.plan-action-list>button small{color:var(--text-3)}
+.na-value{color:var(--text-3);cursor:help}
