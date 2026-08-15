@@ -778,29 +778,27 @@ body.dsp .code-body { color: #d7d7fb; }
 .choice.sel{border-color:var(--accent);background:var(--accent-soft)}
 .plan-list-tools{gap:10px;flex-wrap:wrap}
 .plan-list-card .table-wrap{position:relative}
-.plan-list-table{min-width:2390px;font-size:13px}
+.plan-list-table{min-width:1990px;font-size:13px}
+.plan-list-table.type-hidden{min-width:1900px}
 .plan-list-table .select-col{position:sticky;left:0;z-index:3;width:46px;min-width:46px;max-width:46px;text-align:center;background:var(--surface)}
-.plan-list-table .plan-name-col{position:sticky;left:46px;z-index:3;min-width:254px;max-width:254px;background:var(--surface);box-shadow:8px 0 12px -12px rgba(15,27,45,.32)}
+.plan-list-table .plan-type-col{position:sticky;left:46px;z-index:3;width:84px;min-width:84px;max-width:84px;background:var(--surface)}
+.plan-list-table .plan-name-col{position:sticky;left:130px;z-index:3;min-width:254px;max-width:254px;background:var(--surface);box-shadow:8px 0 12px -12px rgba(15,27,45,.32)}
+.plan-list-table.type-hidden .plan-name-col{left:46px}
 .plan-list-table .plan-name-col .link-btn{display:block;max-width:226px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .plan-list-table .plan-name-col .cell-sub{max-width:226px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.plan-list-table thead .select-col,.plan-list-table thead .plan-name-col{z-index:5;background:var(--surface-2)}
+.plan-list-table thead .select-col,.plan-list-table thead .plan-type-col,.plan-list-table thead .plan-name-col{z-index:5;background:var(--surface-2)}
 .plan-list-table th,.plan-list-table td{padding:11px 14px;white-space:nowrap}
-.plan-list-table th:not(.select-col):not(.plan-name-col),.plan-list-table td:not(.select-col):not(.plan-name-col){min-width:100px}
-.plan-list-table th:nth-child(4),.plan-list-table td:nth-child(4){min-width:124px}
-.plan-list-table th:nth-child(5),.plan-list-table td:nth-child(5){min-width:112px}
-.plan-list-table th:nth-child(8),.plan-list-table td:nth-child(8){min-width:118px}
-.plan-list-table th:nth-child(14),.plan-list-table td:nth-child(14),.plan-list-table th:nth-child(15),.plan-list-table td:nth-child(15){min-width:116px}
-.plan-list-table th:nth-child(16),.plan-list-table td:nth-child(16){min-width:128px}
-.plan-list-table th:nth-child(17),.plan-list-table td:nth-child(17){min-width:190px}
-.plan-list-table th:nth-child(18),.plan-list-table td:nth-child(18){min-width:150px}
-.plan-list-table th:nth-child(19),.plan-list-table td:nth-child(19){min-width:112px}
+.plan-list-table .status-col{min-width:100px}.plan-list-table .issue-col{min-width:124px}.plan-list-table .money-col{min-width:112px}.plan-list-table .money-col.wide{min-width:124px}.plan-list-table .metric-col{min-width:96px}.plan-list-table .date-col{min-width:116px}.plan-list-table .order-col{min-width:150px}.plan-list-table .owner-col{min-width:112px}
 .plan-list-table .plan-period{min-width:160px;white-space:nowrap}
 .plan-list-table .plan-owner{min-width:94px}
 .plan-list-table .plan-inventory{min-width:150px}
 .plan-list-table th.act,.plan-list-table td.act{position:sticky;right:0;z-index:4;min-width:86px;background:var(--surface);box-shadow:-8px 0 12px -12px rgba(15,27,45,.25)}
 .plan-list-table thead th.act{z-index:6;background:var(--surface-2)}
 .plan-list-table tbody tr:hover td{background:#fafbff}
-.plan-list-table tbody tr:hover td.act,.plan-list-table tbody tr:hover td.select-col,.plan-list-table tbody tr:hover td.plan-name-col{background:#fafbff}
+.plan-list-table tbody tr:hover td.act,.plan-list-table tbody tr:hover td.select-col,.plan-list-table tbody tr:hover td.plan-type-col,.plan-list-table tbody tr:hover td.plan-name-col{background:#fafbff}
+.cpd-contact-link{margin-right:4px;font-weight:650;white-space:nowrap}
+.plan-context-note{display:none;align-items:center;gap:12px;padding:10px 16px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:#fffaf0;color:var(--text-2);font-size:12.5px}
+.plan-context-note.show{display:flex}.plan-context-note .text-link{margin-left:auto;white-space:nowrap}
 .plan-bulk-bar{display:none;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--accent-soft)}
 .plan-bulk-bar.show{display:flex}
 .plan-bulk-bar span{font-size:12px;color:var(--text-3)}
