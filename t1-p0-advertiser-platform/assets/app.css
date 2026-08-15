@@ -792,14 +792,16 @@ body.dsp .code-body { color: #d7d7fb; }
 .plan-list-table .plan-period{min-width:160px;white-space:nowrap}
 .plan-list-table .plan-owner{min-width:94px}
 .plan-list-table .plan-inventory{min-width:150px}
-.plan-list-table th.act,.plan-list-table td.act{position:sticky;right:0;z-index:4;min-width:86px;background:var(--surface);box-shadow:-8px 0 12px -12px rgba(15,27,45,.25)}
+.plan-list-table th.act,.plan-list-table td.act{position:sticky;right:0;z-index:4;min-width:176px;background:var(--surface);box-shadow:-8px 0 12px -12px rgba(15,27,45,.25)}
 .plan-list-table thead th.act{z-index:6;background:var(--surface-2)}
 .plan-list-table tbody tr:hover td{background:#fafbff}
 .plan-list-table tbody tr:hover td.act,.plan-list-table tbody tr:hover td.select-col,.plan-list-table tbody tr:hover td.plan-type-col,.plan-list-table tbody tr:hover td.plan-name-col{background:#fafbff}
 .cpd-contact-link{margin-right:4px;font-weight:650;white-space:nowrap}
 .plan-context-note{display:none;align-items:center;gap:12px;padding:10px 16px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:#fffaf0;color:var(--text-2);font-size:12.5px}
 .plan-context-note.show{display:flex}.plan-context-note .text-link{margin-left:auto;white-space:nowrap}
-.plan-row-action{min-width:76px;min-height:32px;padding:6px 10px;font-size:12.5px;font-weight:650}
+.plan-row-actions{display:flex;align-items:center;justify-content:flex-end;gap:14px;white-space:nowrap}
+.plan-row-action{appearance:none;border:0;background:none;padding:3px 0;color:var(--accent);font-family:inherit;font-size:12.5px;font-weight:650;line-height:20px;white-space:nowrap;cursor:pointer}
+.plan-row-action:hover{text-decoration:underline}.plan-row-action:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
 .plan-bulk-bar{display:none;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--accent-soft)}
 .plan-bulk-bar.show{display:flex}
 .plan-bulk-bar span{font-size:12px;color:var(--text-3)}
