@@ -1127,6 +1127,7 @@ const App = {
   },
   view_unifiednew(){
     const assets=DB.assetFiles.filter(f=>f.type==='image').slice(0,6);
+    const advertiserName=this.profile()?.advertiserName||'T1演示广告主';
     return `<div class="page-head unified-head"><div><h1>新建 RTB 投放</h1><p>按广告计划、广告组和广告创意三个层级完成设置；提交前不会创建投放对象</p></div><div class="spacer"></div><button class="btn btn-ghost" onclick="App.go('plans')">取消创建</button></div>
     <div class="unified-create">
       <aside class="form-toc" id="unifiedToc">
@@ -1138,9 +1139,9 @@ const App = {
         <button class="locked" data-target="uf-review" disabled><span>🔒</span><div><b>检查与发布</b><small>完成创意后解锁</small></div></button>
       </aside>
       <div class="unified-paper">
-        <section class="paper-level" id="uf-campaign" data-level="01"><div class="level-heading"><span>01</span><div><h2>广告计划</h2><p>设置本次投放的周期和总预算</p></div><em>当前步骤</em></div>
-          <div class="paper-block"><h3>基本信息</h3><div class="field" style="margin-bottom:0"><label>计划名称<span class="req">*</span></label><input class="input" id="ufPlanName" placeholder="如：欧洲夏季拉新｜长期｜01"></div></div>
-          <div class="paper-block"><h3>投放周期与预算</h3><div class="pill-group" id="ufDuration"><label class="radio-pill sel" data-value="fixed" onclick="App.pickUfDuration(this)"><b>固定周期</b><small>总预算，可设每日上限</small></label><label class="radio-pill" data-value="ongoing" onclick="App.pickUfDuration(this)"><b>长期投放</b><small>只设置每日预算</small></label></div><div class="input-row" style="margin-top:14px"><div class="field"><label>开始日期<span class="req">*</span></label><input class="input" type="date" id="ufPlanStart" value="2026-08-12"></div><div class="field" id="ufPlanEndField"><label>结束日期<span class="req">*</span></label><input class="input" type="date" id="ufPlanEnd" value="2026-08-31"></div></div><div id="ufFixedBudget"><div class="input-row"><div class="field"><label>活动总预算（USD）<span class="req">*</span></label><input class="input" id="ufTotal" value="5000"></div><div class="field"><label>每日上限（选填）</label><input class="input" id="ufDailyCap" placeholder="如：300"></div></div></div><div id="ufOngoingBudget" style="display:none"><div class="field"><label>每日预算（USD）<span class="req">*</span></label><input class="input" id="ufDaily" value="150"></div></div></div><div class="level-actions"><span>确认后继续设置广告组，数据将在最终提交时创建</span><button class="btn btn-primary" onclick="App.saveUfCampaign()">确认广告计划并继续 →</button></div>
+        <section class="paper-level" id="uf-campaign" data-level="01"><div class="level-heading"><span>01</span><div><h2>广告计划</h2><p>设置本次投放的周期、预算和计划名称</p></div><em>当前步骤</em></div>
+          <div class="paper-block"><h3>投放周期与预算</h3><div class="pill-group" id="ufDuration"><label class="radio-pill sel" data-value="fixed" onclick="App.pickUfDuration(this)"><b>固定周期</b><small>总预算，可设每日上限</small></label><label class="radio-pill" data-value="ongoing" onclick="App.pickUfDuration(this)"><b>长期投放</b><small>只设置每日预算</small></label></div><div class="input-row" style="margin-top:14px"><div class="field"><label>开始日期<span class="req">*</span></label><input class="input" type="date" id="ufPlanStart" value="2026-08-12" onchange="App.updateUfPlanName()"></div><div class="field" id="ufPlanEndField"><label>结束日期<span class="req">*</span></label><input class="input" type="date" id="ufPlanEnd" value="2026-08-31" onchange="App.updateUfPlanName()"></div></div><div id="ufFixedBudget"><div class="input-row"><div class="field"><label>活动总预算（USD）<span class="req">*</span></label><input class="input" id="ufTotal" value="5000"></div><div class="field"><label>每日上限（选填）</label><input class="input" id="ufDailyCap" placeholder="如：300"></div></div></div><div id="ufOngoingBudget" style="display:none"><div class="field"><label>每日预算（USD）<span class="req">*</span></label><input class="input" id="ufDaily" value="150"></div></div></div>
+          <div class="paper-block"><h3>计划名称</h3><div class="field"><label>命名方式</label><div class="pill-group compact-pill-group" id="ufNameMode"><label class="radio-pill sel" data-value="auto" onclick="App.pickUfNameMode(this)"><b>自动生成</b><small>随投放周期同步更新</small></label><label class="radio-pill" data-value="custom" onclick="App.pickUfNameMode(this)"><b>自定义名称</b><small>由你填写，周期变化不会影响</small></label></div></div><div class="field" style="margin-bottom:0"><label>计划名称<span class="req">*</span></label><input class="input" id="ufPlanName" data-advertiser="${advertiserName}" oninput="App.ufCustomPlanName=this.value" readonly><div class="hint" id="ufPlanNameHint">名称由广告主、周期类型、投放日期和顺序号自动生成。</div></div></div><div class="level-actions"><span>确认后继续设置广告组，数据将在最终提交时创建</span><button class="btn btn-primary" onclick="App.saveUfCampaign()">确认广告计划并继续 →</button></div>
         </section>
         <section class="paper-level stage-hidden" id="uf-group" data-level="02"><div class="level-heading"><span>02</span><div><h2>广告组</h2><p>设置出价、定向和可投放库存</p></div><em>当前步骤</em></div>
           <div class="paper-block"><h3>基本信息与继承设置</h3><div class="field"><label>广告组名称<span class="req">*</span></label><input class="input" id="ufGroupName" placeholder="如：信息流｜德国法国｜01"></div><div class="inherit-card"><div><span class="badge green">默认继承</span><b>沿用广告计划的周期、预算与均匀投放节奏</b><small id="ufInheritSummary">确认广告计划后自动带入，无需重复填写。</small></div><button class="btn btn-ghost btn-sm" onclick="App.toggleUfGroupAdvanced()">调整广告组设置</button></div><div id="ufGroupAdvanced" style="display:none"><div class="notice info" style="margin-top:14px">调整后广告组排期独立存储，不持续联动，但始终受 Campaign 硬边界限制。</div><div class="input-row" style="margin-top:14px"><div class="field"><label>开始日期</label><input class="input" type="date" id="ufGroupStart" value="2026-08-12"></div><div class="field"><label>结束日期</label><input class="input" type="date" id="ufGroupEnd" value="2026-08-31"></div></div><div class="input-row"><div class="field"><label id="ufGroupBudgetLabel">广告组分配预算（USD）<span class="req">*</span></label><input class="input" id="ufGroupBudget" value="5000"></div><div class="field"><label>广告组每日上限（选填）</label><input class="input" id="ufGroupCap"></div></div><div class="field" style="margin-bottom:0"><label>投放节奏</label><div class="pill-group" id="ufPace"><label class="radio-pill sel" data-value="even" onclick="App.pickRadio(this)"><b>均匀投放</b></label><label class="radio-pill" data-value="fast" onclick="App.pickRadio(this)"><b>加速投放</b></label></div></div></div></div>
@@ -1165,14 +1166,37 @@ const App = {
     const sections=document.querySelectorAll('.paper-level');
     this.ufObserver=new IntersectionObserver(entries=>{ const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0]; if(visible){ document.querySelectorAll('#unifiedToc button').forEach(b=>b.classList.toggle('active',b.dataset.target===visible.target.id)); } },{rootMargin:'-120px 0px -45% 0px',threshold:[0,.2,.5]});
     sections.forEach(s=>this.ufObserver.observe(s));
+    this.ufCustomPlanName='';
+    this.updateUfPlanName();
   },
   jumpUnified(id){ document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}); },
+  ufPlanNameMode(){ return document.querySelector('#ufNameMode .sel')?.dataset?.value||'auto'; },
+  formatUfPlanDate(value){ const p=(value||'').split('-');return p.length===3?`${p[1]}.${p[2]}`:'待定'; },
+  generatedUfPlanName(){
+    const input=document.getElementById('ufPlanName'),advertiser=input?.dataset?.advertiser||'广告主',duration=(document.querySelector('#ufDuration .sel')||{}).dataset?.value||'fixed',start=this.formatUfPlanDate(document.getElementById('ufPlanStart')?.value),end=this.formatUfPlanDate(document.getElementById('ufPlanEnd')?.value);
+    const base=duration==='ongoing'?`${advertiser}｜长期投放｜${start}`:`${advertiser}｜固定周期｜${start}–${end}`;
+    const seq=String(DB.campaigns.filter(c=>(c.name||'').startsWith(base+'｜')).length+1).padStart(2,'0');
+    return `${base}｜${seq}`;
+  },
+  updateUfPlanName(){
+    const input=document.getElementById('ufPlanName');if(!input||this.ufPlanNameMode()!=='auto')return;
+    input.value=this.generatedUfPlanName();input.readOnly=true;
+  },
+  pickUfNameMode(el){
+    const input=document.getElementById('ufPlanName'),current=this.ufPlanNameMode();if(!input)return;
+    if(current==='custom')this.ufCustomPlanName=input.value;
+    this.pickRadio(el);const custom=el.dataset.value==='custom';input.readOnly=!custom;
+    const hint=document.getElementById('ufPlanNameHint');
+    if(custom){input.value=this.ufCustomPlanName||'';input.placeholder='请输入便于识别的计划名称';if(hint)hint.textContent='自定义名称不会随投放周期变化。';setTimeout(()=>input.focus(),0);}
+    else{this.updateUfPlanName();if(hint)hint.textContent='名称由广告主、周期类型、投放日期和顺序号自动生成。';}
+  },
   pickUfDuration(el){
     this.pickRadio(el); const ongoing=el.dataset.value==='ongoing';
     document.getElementById('ufPlanEndField').style.display=ongoing?'none':''; document.getElementById('ufFixedBudget').style.display=ongoing?'none':''; document.getElementById('ufOngoingBudget').style.display=ongoing?'':'none';
     const start=document.getElementById('ufPlanStart').value, end=ongoing?'':document.getElementById('ufPlanEnd').value;
     document.getElementById('ufGroupStart').value=start; document.getElementById('ufGroupEnd').value=end;
     document.getElementById('ufGroupBudgetLabel').innerHTML=`${ongoing?'广告组每日预算':'广告组分配预算'}（USD）<span class="req">*</span>`; document.getElementById('ufGroupBudget').value=ongoing?document.getElementById('ufDaily').value:document.getElementById('ufTotal').value;
+    this.updateUfPlanName();
   },
   updateUfFormat(){ const s=document.getElementById('ufFormat'),h=document.getElementById('ufFormatHint'); if(s&&h)h.textContent=`库存与“${s.options[s.selectedIndex].text}”联动；第三层只展示兼容素材。`; },
   toggleUfGroupAdvanced(){
