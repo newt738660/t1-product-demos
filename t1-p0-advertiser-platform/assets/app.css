@@ -812,3 +812,64 @@ body.dsp .code-body { color: #d7d7fb; }
 .plan-action-list>button span{display:grid;gap:3px}
 .plan-action-list>button small{color:var(--text-3)}
 .na-value{color:var(--text-3);cursor:help}
+
+/* RTB 创建首屏：保留层级导航，以更紧凑的双列节奏完成广告计划设置。 */
+@media (min-width: 1051px) {
+  .unified-head{margin-bottom:10px}
+  .unified-head h1{font-size:22px}
+  .unified-head p{margin-top:3px}
+  .unified-create{grid-template-columns:220px minmax(0,860px);gap:16px;padding-bottom:16px}
+  .form-toc{top:76px;padding:8px;border-radius:12px}
+  .toc-title{padding:6px 9px 8px}
+  .form-toc button{gap:9px;padding:8px 9px}
+  .form-toc button>span{width:26px;height:26px;border-radius:7px}
+  .toc-rule{margin:5px 7px}
+
+  #uf-campaign{border-radius:14px}
+  #uf-campaign .level-heading{gap:12px;padding:14px 18px}
+  #uf-campaign .level-heading>span{width:36px;height:36px;border-radius:10px}
+  #uf-campaign .level-heading h2{font-size:18px}
+  #uf-campaign .level-heading p{margin-top:3px}
+  #uf-campaign .paper-block{padding:14px 18px}
+  #uf-campaign .paper-block h3{margin-bottom:10px}
+  #uf-campaign .pill-group{gap:8px}
+  #uf-campaign .radio-pill{min-height:48px;padding:9px 12px}
+  #uf-campaign .radio-pill small{margin-top:2px}
+  #uf-campaign .input-row{gap:12px;margin-top:10px!important}
+  #uf-campaign .field{margin-bottom:10px}
+  #uf-campaign .field>label{margin-bottom:5px}
+  #uf-campaign .input{height:36px}
+  #uf-campaign .hint{margin-top:4px;line-height:1.35}
+  #uf-campaign .compact-pill-group{max-width:none}
+  #uf-campaign .level-actions{padding:11px 18px}
+  #uf-campaign .level-actions .btn{min-height:36px}
+}
+
+@media (min-width: 1051px) and (max-height: 780px) {
+  .content{padding-top:8px;padding-bottom:8px}
+  .unified-head{margin-bottom:4px}
+  .unified-head p{display:none}
+  #uf-campaign .level-heading{padding-top:10px;padding-bottom:10px}
+  #uf-campaign .paper-block{padding-top:11px;padding-bottom:11px}
+  #uf-campaign .radio-pill{min-height:42px;padding-top:7px;padding-bottom:7px}
+  #uf-campaign .level-actions{padding-top:9px;padding-bottom:9px}
+}
+
+@media (min-width: 1051px) and (max-height: 740px) {
+  .topbar{height:56px}
+  .content{padding-top:4px;padding-bottom:4px}
+  .unified-head{margin-bottom:2px}
+  .unified-head h1{font-size:19px}
+  #uf-campaign .level-heading{padding-top:7px;padding-bottom:7px}
+  #uf-campaign .level-heading>span{width:32px;height:32px}
+  #uf-campaign .level-heading p{display:none}
+  #uf-campaign .paper-block{padding-top:8px;padding-bottom:8px}
+  #uf-campaign .paper-block h3{margin-bottom:7px}
+  #uf-campaign .radio-pill{min-height:34px;padding-top:6px;padding-bottom:6px}
+  #uf-campaign .radio-pill small{display:none}
+  #uf-campaign .input-row{margin-top:7px!important}
+  #uf-campaign .field{margin-bottom:7px}
+  #uf-campaign .input{height:32px}
+  #uf-campaign .hint{display:none}
+  #uf-campaign .level-actions{padding-top:7px;padding-bottom:7px}
+}
