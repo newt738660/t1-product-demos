@@ -1164,7 +1164,15 @@ const App = {
     actionLabels.forEach(([action,label])=>{const button=document.querySelector(`.unified-paper button[onclick="${action}"]`);if(button)button.textContent=label;});
     this.ufObserver?.disconnect?.();
     const sections=document.querySelectorAll('.paper-level');
-    this.ufObserver=new IntersectionObserver(entries=>{ const visible=entries.filter(e=>e.isIntersecting&&!e.target.classList.contains('completed')&&!e.target.classList.contains('stage-hidden')).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0]; if(visible){ document.querySelectorAll('#unifiedToc button').forEach(b=>b.classList.toggle('active',b.dataset.target===visible.target.id)); } },{rootMargin:'-120px 0px -45% 0px',threshold:[0,.2,.5]});
+    this.ufObserver=new IntersectionObserver(entries=>{
+      /* 从已有计划新增广告组时，当前步骤由流程状态决定，不能被首屏中仍可见的计划摘要覆盖。 */
+      if(this.resumeCampId&&!document.getElementById('uf-group')?.classList.contains('completed')){
+        this.setUfActiveStep('uf-group');
+        return;
+      }
+      const visible=entries.filter(e=>e.isIntersecting&&!e.target.classList.contains('completed')&&!e.target.classList.contains('stage-hidden')).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+      if(visible)this.setUfActiveStep(visible.target.id);
+    },{rootMargin:'-120px 0px -45% 0px',threshold:[0,.2,.5]});
     sections.forEach(s=>this.ufObserver.observe(s));
     this.ufCustomPlanName='';
     this.updateUfPlanName();
@@ -1207,6 +1215,11 @@ const App = {
     const title=document.querySelector('.unified-head h1'),desc=document.querySelector('.unified-head p');
     if(title)title.textContent='新建广告组';
     if(desc)desc.textContent=`在广告计划「${cp.name}」下新增广告组，并继续设置广告创意`;
+    this.setUfActiveStep('uf-group');
+    requestAnimationFrame(()=>this.setUfActiveStep('uf-group'));
+  },
+  setUfActiveStep(target){
+    document.querySelectorAll('#unifiedToc button').forEach(btn=>btn.classList.toggle('active',btn.dataset.target===target));
   },
   jumpUnified(id){ document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}); },
   ufPlanNameMode(){ return document.querySelector('#ufNameMode .sel')?.dataset?.value||'auto'; },
