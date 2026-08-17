@@ -1164,7 +1164,7 @@ const App = {
     actionLabels.forEach(([action,label])=>{const button=document.querySelector(`.unified-paper button[onclick="${action}"]`);if(button)button.textContent=label;});
     this.ufObserver?.disconnect?.();
     const sections=document.querySelectorAll('.paper-level');
-    this.ufObserver=new IntersectionObserver(entries=>{ const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0]; if(visible){ document.querySelectorAll('#unifiedToc button').forEach(b=>b.classList.toggle('active',b.dataset.target===visible.target.id)); } },{rootMargin:'-120px 0px -45% 0px',threshold:[0,.2,.5]});
+    this.ufObserver=new IntersectionObserver(entries=>{ const visible=entries.filter(e=>e.isIntersecting&&!e.target.classList.contains('completed')&&!e.target.classList.contains('stage-hidden')).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0]; if(visible){ document.querySelectorAll('#unifiedToc button').forEach(b=>b.classList.toggle('active',b.dataset.target===visible.target.id)); } },{rootMargin:'-120px 0px -45% 0px',threshold:[0,.2,.5]});
     sections.forEach(s=>this.ufObserver.observe(s));
     this.ufCustomPlanName='';
     this.updateUfPlanName();
@@ -1256,6 +1256,7 @@ const App = {
   unlockUf(target, tocIndex, status){
     const section=document.getElementById(target); section.classList.remove('stage-hidden'); section.classList.add('stage-reveal');
     const btn=document.querySelector(`#unifiedToc button[data-target="${target}"]`); btn.disabled=false; btn.classList.remove('locked'); btn.onclick=()=>this.jumpUnified(target); btn.querySelector('span').textContent=String(tocIndex).padStart(2,'0');
+    document.querySelectorAll('#unifiedToc button').forEach(item=>item.classList.toggle('active',item===btn));
     setTimeout(()=>section.scrollIntoView({behavior:'smooth',block:'start'}),180);
   },
   completeUfLevel(target, summary){
