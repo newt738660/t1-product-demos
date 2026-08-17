@@ -893,25 +893,33 @@ const App = {
     const ctr=imps?(clicks/imps*100).toFixed(2)+'%':'—';
     const spend=cp.spend||0,budget=cp.duration==='ongoing'?(cp.dailyBudget||cp.budget):(cp.totalBudget||cp.budget);
     return `
-    <div class="page-head">
-      <div><h1>${cp.name}</h1><p>${cp.id} · ${cp.mode==='cpd'?'CPD 运营代投':'RTB 自助投放'} · ${cp.alias||'未设置客户备注'}</p></div>
+    <div class="page-head campaign-detail-head">
+      <div><div class="detail-title-line"><h1>${cp.name}</h1>${this.statusBadge(cp.status)}</div><p>${cp.id} · ${cp.mode==='cpd'?'CPD 运营代投':'RTB 自助投放'} · ${cp.alias||'未设置客户备注'}</p></div>
       <div class="spacer"></div>
       <button class="btn btn-ghost" onclick="App.go('plans')">← 返回计划列表</button>
       ${cp.mode==='rtb'?`<button class="btn btn-ghost" onclick="App.openCampaignEdit('${cp.id}')">${svg(I.edit)}编辑广告计划</button><button class="btn btn-primary" onclick="App.startNewGroup('${cp.id}')">${svg(I.plus)}新建广告组</button>`:''}
     </div>
-    <div class="card" style="margin-bottom:16px"><div class="card-head"><div><b>广告计划概览</b><div class="cell-sub">计划层的全局边界与汇总数据</div></div><div class="spacer"></div>${this.statusBadge(cp.status)}</div>
-      <div class="grid cols-4" style="padding:0 20px 20px">
-        <div class="kpi"><div class="kpi-label">投放周期</div><div class="kpi-val" style="font-size:15px;margin-top:10px">${cp.period||'—'}</div></div>
-        <div class="kpi"><div class="kpi-label">${cp.mode==='cpd'?'广告位 / 库存':'预算 / 花费'}</div><div class="kpi-val" style="font-size:15px;margin-top:10px">${cp.mode==='cpd'?(cp.placement||'—'):`${fmtMoney(budget||0)} / ${fmtMoney(spend)}`}</div></div>
-        <div class="kpi"><div class="kpi-label">曝光 / 点击 / CTR</div><div class="kpi-val" style="font-size:15px;margin-top:10px">${fmtK(imps)} / ${fmtK(clicks)} / ${ctr}</div></div>
-        <div class="kpi"><div class="kpi-label">${cp.mode==='cpd'?'代投运营':'转化'}</div><div class="kpi-val" style="font-size:15px;margin-top:10px">${cp.mode==='cpd'?(cp.operator||'待分配'):fmtK(conv)}</div></div>
-      </div>
+    <div class="campaign-summary" aria-label="广告计划概览">
+      <div><span>投放周期</span><b>${cp.period||'—'}</b></div>
+      <div><span>${cp.mode==='cpd'?'广告位 / 库存':'预算 / 花费'}</span><b>${cp.mode==='cpd'?(cp.placement||'—'):`${fmtMoney(budget||0)} / ${fmtMoney(spend)}`}</b></div>
+      <div><span>曝光</span><b>${fmtK(imps)}</b></div>
+      <div><span>点击</span><b>${fmtK(clicks)}</b></div>
+      <div><span>CTR</span><b>${ctr}</b></div>
+      <div><span>${cp.mode==='cpd'?'代投运营':'转化'}</span><b>${cp.mode==='cpd'?(cp.operator||'待分配'):fmtK(conv)}</b></div>
     </div>
     ${cp.mode==='cpd'?`<div class="notice info" style="margin-bottom:14px">该计划由运营创建并管理。价格、库存、投放周期、时段和启停状态不可修改；你可以查看数据并提交创意图片、文案或落地页变更。</div>`:''}
-    <div class="card"><div class="card-head"><div><b>广告组</b><div class="cell-sub">共 ${groups.length} 个广告组；进入广告组后查看和管理其下创意</div></div>${cp.mode==='rtb'?`<div class="spacer"></div><button class="btn btn-primary btn-sm" onclick="App.startNewGroup('${cp.id}')">${svg(I.plus)}新建广告组</button>`:''}</div>
-      <div class="table-wrap"><table><thead><tr><th>广告组</th><th>状态</th><th>排期</th><th>${cp.mode==='cpd'?'广告形式 / 库存':'预算 / 竞价'}</th><th class="num">创意</th><th class="num">曝光</th><th class="num">点击</th><th class="num">CTR</th><th class="act">操作</th></tr></thead><tbody>
-      ${groups.map(g=>{const ga=ads.filter(a=>a.groupId===g.id||a.group===g.name),gi=ga.reduce((s,a)=>s+(a.imps||0),0),gc=ga.reduce((s,a)=>s+(a.clicks||0),0),gctr=gi?(gc/gi*100).toFixed(2)+'%':'—',needsCreative=ga.length===0;return `<tr><td><div class="cell-main" style="color:var(--accent);cursor:pointer" onclick="App.openGroupDetail('${g.id}','${g.name.replaceAll("'","&#39;")}')">${g.name}</div><div class="cell-sub">${g.id}</div></td><td>${needsCreative?'<span class="badge amber">待创建创意</span>':this.statusBadge(g.status)}</td><td>${g.start||cp.start||'—'}<div class="cell-sub">${g.end?'至 '+g.end:'长期投放'}</div></td><td>${cp.mode==='cpd'?`${FMT[g.format]?.name||'—'}<div class="cell-sub">${g.inventory||cp.placement||'—'}</div>`:`${fmtMoney(g.budget||0)}<div class="cell-sub">${g.bidType||'CPM'} · ${fmtMoney(g.bid||0)}</div>`}</td><td class="num">${needsCreative?'<span class="badge amber">0 · 待补充</span>':ga.length}</td><td class="num">${fmtK(gi)}</td><td class="num">${fmtK(gc)}</td><td class="num">${gctr}</td><td class="act"><div class="t-actions"><button class="btn btn-ghost btn-sm" onclick="App.openGroupDetail('${g.id}','${g.name.replaceAll("'","&#39;")}')">查看</button>${cp.mode==='rtb'&&needsCreative?`<button class="btn btn-primary btn-sm" onclick="App.openNewCreativeForGroup('${g.id}')">创建创意</button>`:''}</div></td></tr>`}).join('')||`<tr><td colspan="9"><div class="empty">${svg(I.group||I.camp)}<div>当前广告计划还没有广告组</div>${cp.mode==='rtb'?`<button class="btn btn-primary btn-sm" onclick="App.startNewGroup('${cp.id}')">创建第一个广告组</button>`:''}</div></td></tr>`}
+    <div class="card group-list-card"><div class="card-head"><div><b>广告组</b><div class="cell-sub">共 <span id="visibleGroupCount">${groups.length}</span> 个广告组；点击名称进入广告组详情</div></div><div class="spacer"></div>${groups.length?`<input class="input group-search" id="campaignGroupSearch" placeholder="搜索广告组名称 / ID" oninput="App.filterCampaignGroups()"><select class="select group-status-filter" id="campaignGroupStatus" onchange="App.filterCampaignGroups()"><option value="">全部状态</option><option value="active">投放中</option><option value="draft">草稿</option><option value="review">审核中</option><option value="needs-creative">待创建创意</option></select>`:''}</div>
+      <div class="table-wrap"><table><thead><tr><th>广告组</th><th>状态</th><th>排期</th><th>${cp.mode==='cpd'?'广告形式 / 库存':'预算 / 竞价'}</th><th class="num">创意</th><th class="num">投放数据</th><th class="act">操作</th></tr></thead><tbody id="campaignGroupRows">
+      ${groups.map(g=>{const ga=ads.filter(a=>a.groupId===g.id||a.group===g.name),gi=ga.reduce((s,a)=>s+(a.imps||0),0),gc=ga.reduce((s,a)=>s+(a.clicks||0),0),gctr=gi?(gc/gi*100).toFixed(2)+'%':'—',needsCreative=ga.length===0;return `<tr data-group-row data-search="${(g.name+' '+g.id).toLowerCase()}" data-status="${needsCreative?'needs-creative':g.status}"><td><div class="cell-main" style="color:var(--accent);cursor:pointer" onclick="App.openGroupDetail('${g.id}','${g.name.replaceAll("'","&#39;")}')">${g.name}</div><div class="cell-sub">${g.id}</div></td><td>${needsCreative?'<span class="badge amber">待创建创意</span>':this.statusBadge(g.status)}</td><td>${g.start||cp.start||'—'}<div class="cell-sub">${g.end?'至 '+g.end:'长期投放'}</div></td><td>${cp.mode==='cpd'?`${FMT[g.format]?.name||'—'}<div class="cell-sub">${g.inventory||cp.placement||'—'}</div>`:`${fmtMoney(g.budget||0)}<div class="cell-sub">${g.bidType||'CPM'} · ${fmtMoney(g.bid||0)}</div>`}</td><td class="num">${needsCreative?'<span class="badge amber">0 · 待补充</span>':ga.length}</td><td class="num"><b>${fmtK(gi)} / ${fmtK(gc)}</b><div class="cell-sub">曝光 / 点击 · CTR ${gctr}</div></td><td class="act"><div class="t-actions"><button class="btn btn-ghost btn-sm" onclick="App.openGroupDetail('${g.id}','${g.name.replaceAll("'","&#39;")}')">查看</button>${cp.mode==='rtb'&&needsCreative?`<button class="btn btn-primary btn-sm" onclick="App.openNewCreativeForGroup('${g.id}')">创建创意</button>`:''}</div></td></tr>`}).join('')||`<tr><td colspan="7"><div class="empty">${svg(I.group||I.camp)}<div>当前广告计划还没有广告组</div>${cp.mode==='rtb'?`<button class="btn btn-primary btn-sm" onclick="App.startNewGroup('${cp.id}')">创建第一个广告组</button>`:''}</div></td></tr>`}
       </tbody></table></div></div>`;
+  },
+  filterCampaignGroups(){
+    const keyword=(document.getElementById('campaignGroupSearch')?.value||'').trim().toLowerCase();
+    const status=document.getElementById('campaignGroupStatus')?.value||'';
+    const rows=[...document.querySelectorAll('#campaignGroupRows [data-group-row]')];
+    let visible=0;
+    rows.forEach(row=>{const show=(!keyword||row.dataset.search.includes(keyword))&&(!status||row.dataset.status===status);row.style.display=show?'':'none';if(show)visible++;});
+    const count=document.getElementById('visibleGroupCount');if(count)count.textContent=visible;
   },
   after_campdetail(){},
   switchCampaignTab(btn, tab){
