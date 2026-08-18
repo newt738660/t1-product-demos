@@ -113,7 +113,7 @@ function cssVar(v){ return getComputedStyle(document.body).getPropertyValue(v).t
 
 const DB = {
   balance: 8420.50,
-  meta: { schemaVersion:12, scenario:'T1 P0 汇报标准场景', seededAt:'2026-08-15' },
+  meta: { schemaVersion:13, scenario:'T1 P0 全状态评审场景', seededAt:'2026-08-18' },
   uiState: { lastPage:'dash', updatedAt:null },
   auditLogs: [
     {id:'LOG-1',time:'2026-08-14 09:15',actor:'Amy Chen',action:'提交充值凭证',target:'RC-4002',result:'待审核'},
@@ -125,16 +125,34 @@ const DB = {
   campaigns: [
     {id:'C-1001', scenario:'standard', name:'T1 夏季增长｜欧洲信息流获客', alias:'欧洲信息流获客', mode:'rtb', placement:'Web / H5 信息流', period:'2026-08-01 至 2026-08-31', duration:'fixed', start:'2026-08-01', end:'2026-08-31', fmt:'feed', model:'CPM', bid:2.40, status:'active', spend:1560.80, imps:680000, clicks:5440, conv:420, geo:['🇩🇪 德国','🇫🇷 法国'], inv:['web','h5'], budget:5000, totalBudget:5000, owner:'Amy Chen'},
     {id:'C-1002', scenario:'standard', name:'T1 品牌升级｜App 首页开屏', alias:'品牌升级开屏', mode:'cpd', placement:'T1 News App · 首页开屏', period:'2026-08-12 至 2026-08-18', duration:'fixed', start:'2026-08-12', end:'2026-08-18', fmt:'splashimg', model:'CPD', bid:0, status:'active', spend:0, imps:1240000, clicks:8420, conv:0, geo:['🌍 全部'], inv:['app'], budget:0, operator:'Linda Zhao', order:'CPD-202608-018'},
+    {id:'C-1003', scenario:'state-case', name:'秋季新品预热｜即将开始', alias:'新品预热', mode:'cpd', placement:'T1 News App · 信息流首刷', period:'2026-08-25 至 2026-09-05', duration:'fixed', start:'2026-08-25', end:'2026-09-05', fmt:'feed', model:'CPD', status:'active', imps:0, clicks:0, operator:'Kevin Wu', order:'CPD-202608-025'},
+    {id:'C-1004', scenario:'state-case', name:'会员日活动｜计划暂停', alias:'会员日暂停', mode:'cpd', placement:'T1 Video · 首页焦点图', period:'2026-08-10 至 2026-08-28', duration:'fixed', start:'2026-08-10', end:'2026-08-28', fmt:'bbanner', model:'CPD', status:'paused', imps:356000, clicks:2140, operator:'Linda Zhao', order:'CPD-202608-021'},
+    {id:'C-1005', scenario:'state-case', name:'游戏预约｜创意审核中', alias:'游戏预约审核', mode:'cpd', placement:'T1 Games · 开屏', period:'2026-08-15 至 2026-08-31', duration:'fixed', start:'2026-08-15', end:'2026-08-31', fmt:'splashimg', model:'CPD', status:'active', imps:228000, clicks:1368, operator:'Mia Sun', order:'CPD-202608-022'},
+    {id:'C-1006', scenario:'state-case', name:'暑期促销｜创意被驳回', alias:'暑促驳回', mode:'cpd', placement:'T1 Mall · 商品信息流', period:'2026-08-15 至 2026-08-31', duration:'fixed', start:'2026-08-15', end:'2026-08-31', fmt:'feed', model:'CPD', status:'active', imps:0, clicks:0, operator:'Kevin Wu', order:'CPD-202608-023'},
+    {id:'C-1007', scenario:'state-case', name:'数据同步异常｜待处理', alias:'同步异常', mode:'cpd', placement:'T1 News App · 文章页横幅', period:'2026-08-16 至 2026-08-30', duration:'fixed', start:'2026-08-16', end:'2026-08-30', fmt:'mbanner', model:'CPD', status:'active', syncStatus:'failed', imps:0, clicks:0, operator:'Linda Zhao', order:'CPD-202608-024'},
+    {id:'C-1008', scenario:'state-case', name:'春季品牌活动｜已结束', alias:'春季品牌', mode:'cpd', placement:'T1 News App · 首页开屏', period:'2026-04-01 至 2026-04-15', duration:'fixed', start:'2026-04-01', end:'2026-04-15', fmt:'splashimg', model:'CPD', status:'ended', imps:2860000, clicks:17160, operator:'Mia Sun', order:'CPD-202604-006'},
   ],
   adGroups: [
     {id:'G-2001',scenario:'standard',camp:'C-1001',name:'德国与法国｜Web/H5 信息流',periodType:'fixed',start:'2026-08-01',end:'2026-08-31',pace:'even',budget:5000,dailyCap:200,bidType:'CPM',bid:2.40,geo:'德国、法国',device:'不限',format:'feed',inventory:'Web / H5 优质信息流',status:'active'},
     {id:'G-2002',scenario:'standard',camp:'C-1002',name:'T1 News App｜首页开屏｜全天',periodType:'fixed',start:'2026-08-12',end:'2026-08-18',pace:'even',budget:0,dailyCap:0,bidType:'CPD',bid:0,geo:'全部',device:'Android、iOS',format:'splashimg',inventory:'T1 News App · 首页开屏',status:'active',managedBy:'Linda Zhao'},
+    {id:'G-2003',scenario:'state-case',camp:'C-1003',name:'信息流首刷｜新品预热',start:'2026-08-25',end:'2026-09-05',format:'feed',inventory:'T1 News App · 信息流首刷',status:'active',managedBy:'Kevin Wu'},
+    {id:'G-2004',scenario:'state-case',camp:'C-1004',name:'首页焦点图｜会员日',start:'2026-08-10',end:'2026-08-28',format:'bbanner',inventory:'T1 Video · 首页焦点图',status:'active',managedBy:'Linda Zhao'},
+    {id:'G-2005',scenario:'state-case',camp:'C-1005',name:'游戏开屏｜预约期',start:'2026-08-15',end:'2026-08-31',format:'splashimg',inventory:'T1 Games · 开屏',status:'active',managedBy:'Mia Sun'},
+    {id:'G-2006',scenario:'state-case',camp:'C-1006',name:'商品信息流｜暑促',start:'2026-08-15',end:'2026-08-31',format:'feed',inventory:'T1 Mall · 商品信息流',status:'active',managedBy:'Kevin Wu'},
+    {id:'G-2007',scenario:'state-case',camp:'C-1007',name:'文章页横幅｜同步异常',start:'2026-08-16',end:'2026-08-30',format:'mbanner',inventory:'T1 News App · 文章页横幅',status:'active',managedBy:'Linda Zhao'},
+    {id:'G-2008',scenario:'state-case',camp:'C-1008',name:'首页开屏｜春季品牌',start:'2026-04-01',end:'2026-04-15',format:'splashimg',inventory:'T1 News App · 首页开屏',status:'ended',managedBy:'Mia Sun'},
   ],
   creatives: [
     {id:'CR-3001',scenario:'standard',name:'欧洲信息流主图 A',group:'德国与法国｜Web/H5 信息流',groupId:'G-2001',assetId:'F-1',fmt:'feed',kind:'image',size:'1200×628',camp:'C-1001',headline:'让增长触达更多用户',description:'面向欧洲市场的高质量流量',landing:'https://www.t1t1.com/growth',imps:410000,clicks:3280,ctr:0.80,status:'active',version:2,created:'2026-08-01'},
     {id:'CR-3002',scenario:'standard',name:'欧洲信息流主图 B',group:'德国与法国｜Web/H5 信息流',groupId:'G-2001',assetId:'F-2',fmt:'feed',kind:'image',size:'1200×628',camp:'C-1001',headline:'开启全球增长',description:'覆盖 Web 与 H5 优质资源',landing:'https://www.t1t1.com/global',imps:270000,clicks:2160,ctr:0.80,status:'active',version:1,created:'2026-08-02'},
     {id:'CR-3003',scenario:'standard',name:'品牌升级开屏主视觉',group:'T1 News App｜首页开屏｜全天',groupId:'G-2002',assetId:'F-3',fmt:'splashimg',kind:'image',size:'1080×1920',camp:'C-1002',headline:'连接每一次增长',description:'T1 品牌全新升级',landing:'https://www.t1t1.com/brand',imps:1240000,clicks:8420,ctr:0.68,status:'active',version:1,created:'2026-08-08'},
-    {id:'CR-3004',scenario:'standard',name:'品牌升级开屏备选版',group:'T1 News App｜首页开屏｜全天',groupId:'G-2002',assetId:'F-4',fmt:'splashimg',kind:'image',size:'1080×1920',camp:'C-1002',headline:'让品牌被更多人看见',description:'新版视觉待运营确认',landing:'https://www.t1t1.com/brand',imps:0,clicks:0,ctr:0,status:'review',version:2,created:'2026-08-14'},
+    {id:'CR-3004',scenario:'standard',name:'品牌升级开屏备选版',group:'T1 News App｜首页开屏｜全天',groupId:'G-2002',assetId:'F-4',fmt:'splashimg',kind:'image',size:'1080×1920',camp:'C-1002',headline:'让品牌被更多人看见',description:'新版视觉已通过审核',landing:'https://www.t1t1.com/brand',imps:0,clicks:0,ctr:0,status:'active',version:2,created:'2026-08-14'},
+    {id:'CR-3005',scenario:'state-case',name:'秋季新品预热主图',group:'信息流首刷｜新品预热',groupId:'G-2003',fmt:'feed',kind:'image',size:'1200×628',camp:'C-1003',headline:'秋季新品即将发布',description:'预约获取新品提醒',landing:'https://www.t1t1.com/autumn',imps:0,clicks:0,status:'active',version:1,created:'2026-08-17'},
+    {id:'CR-3006',scenario:'state-case',name:'会员日焦点图',group:'首页焦点图｜会员日',groupId:'G-2004',fmt:'bbanner',kind:'image',size:'720×150',camp:'C-1004',headline:'会员日限时权益',landing:'https://www.t1t1.com/member',imps:356000,clicks:2140,status:'active',version:1,created:'2026-08-10'},
+    {id:'CR-3007',scenario:'state-case',name:'游戏预约开屏 V2',group:'游戏开屏｜预约期',groupId:'G-2005',fmt:'splashimg',kind:'image',size:'1080×1920',camp:'C-1005',headline:'立即预约新版本',landing:'https://www.t1t1.com/game',imps:228000,clicks:1368,status:'review',version:2,created:'2026-08-17',changeStatus:'review'},
+    {id:'CR-3008',scenario:'state-case',name:'暑促商品信息流',group:'商品信息流｜暑促',groupId:'G-2006',fmt:'feed',kind:'image',size:'1200×628',camp:'C-1006',headline:'暑期折扣低至五折',landing:'https://www.t1t1.com/sale',imps:0,clicks:0,status:'rejected',version:1,created:'2026-08-16',changeStatus:'rejected',rejectReason:'素材中的“五折”优惠与落地页展示的折扣信息不一致，请修改素材文案或落地页后重新提交。'},
+    {id:'CR-3009',scenario:'state-case',name:'文章页品牌横幅',group:'文章页横幅｜同步异常',groupId:'G-2007',fmt:'mbanner',kind:'image',size:'320×50',camp:'C-1007',headline:'品牌焕新',landing:'https://www.t1t1.com/new',imps:0,clicks:0,status:'active',version:1,created:'2026-08-16'},
+    {id:'CR-3010',scenario:'state-case',name:'春季品牌开屏',group:'首页开屏｜春季品牌',groupId:'G-2008',fmt:'splashimg',kind:'image',size:'1080×1920',camp:'C-1008',headline:'春日品牌季',landing:'https://www.t1t1.com/spring',imps:2860000,clicks:17160,status:'ended',version:1,created:'2026-03-28'},
   ],
   txns: [
     {id:'TX-4001',date:'2026-08-01',type:'充值',method:'USDT · TRC20',amount:10000.00,scenario:'standard'},
@@ -293,7 +311,8 @@ const App = {
     const previewState=new URLSearchParams(location.search).get('state'); if(previewState)this.homeState=previewState;
     this.syncAccountContext();
     const requestedNew=new URLSearchParams(location.search).get('new')==='rtb';
-    this.go(requestedNew?'newplan':(DB.uiState?.lastPage||'dash'));
+    if(this.isDemoMode()) DB.uiState.planListView='all';
+    this.go(requestedNew?'newplan':(this.isDemoMode()?'dash':(DB.uiState?.lastPage||'dash')));
     document.getElementById('balTop').textContent = fmtMoney(DB.balance); this.syncBell();
   },
 
@@ -309,7 +328,7 @@ const App = {
   },
 
   load(){
-    try{ const s=JSON.parse(localStorage.getItem('t1-p0-demo-store')); if(s && s.__v===12) Object.assign(DB, s.data); }catch(e){}
+    try{ const s=JSON.parse(localStorage.getItem('t1-p0-demo-store')); if(s && s.__v===13) Object.assign(DB, s.data); }catch(e){}
     DB.uiState=DB.uiState||{lastPage:'dash',updatedAt:null};
     DB.auditLogs=DB.auditLogs||[];
     this.migrateAccountPosts();
@@ -326,7 +345,7 @@ const App = {
     try{
       DB.uiState=DB.uiState||{};
       DB.uiState.updatedAt=new Date().toISOString();
-      localStorage.setItem('t1-p0-demo-store', JSON.stringify({__v:12,savedAt:DB.uiState.updatedAt,data:DB}));
+      localStorage.setItem('t1-p0-demo-store', JSON.stringify({__v:13,savedAt:DB.uiState.updatedAt,data:DB}));
     }catch(e){ this.toast?.('演示数据保存失败，请检查浏览器存储空间','warn'); }
   },
   resetData(){
@@ -515,7 +534,7 @@ const App = {
   },
 
   statusBadge(s){
-    const m={active:['green','投放中'],review:['amber','审核中'],paused:['gray','已暂停'],rejected:['red','审核驳回']};
+    const m={active:['green','投放中'],review:['amber','审核中'],paused:['gray','已暂停'],rejected:['red','审核驳回'],ended:['gray','已结束'],draft:['gray','草稿']};
     const [c,t]=m[s]||['gray',s];
     return `<span class="badge ${c}"><span class="dot-status ${c}"></span>${t}</span>`;
   },
@@ -720,7 +739,7 @@ const App = {
   view_rtbplans(){ return this.viewPlanList('rtb'); },
   view_plans(){
     return `<div class="page-head"><div><h1>广告投放</h1><p>统一查看和管理 CPD 代投与 RTB 自助投放 · ${DB.campaigns.length} 个计划</p></div><div class="spacer"></div><button class="text-link cpd-contact-link" onclick="App.showCpdContact()">需要 CPD 代投？联系运营</button><button class="btn btn-primary" onclick="App.startRtbCreate()">${svg(I.plus)}新建 RTB 投放</button></div>
-      <div class="card plan-list-card"><div class="card-head plan-list-tools"><div class="segment" id="unifiedTypeTabs"><button data-type="all" onclick="App.setUnifiedType(this,'all')">全部</button><button data-type="rtb" onclick="App.setUnifiedType(this,'rtb')">RTB 自助</button><button data-type="cpd" onclick="App.setUnifiedType(this,'cpd')">CPD 代投</button></div><div class="spacer"></div><select class="select" id="unifiedStatusFilter" style="width:130px" onchange="App.resetUnifiedPage()"><option value="">全部状态</option><option value="active">投放中</option><option value="paused">已暂停</option></select><select class="select" id="unifiedIssueFilter" style="width:150px" onchange="App.resetUnifiedPage()"><option value="">全部投放情况</option><option value="ready">正常投放</option><option value="paused">计划已暂停</option><option value="review">创意审核中</option></select><select class="select" id="unifiedScheduleFilter" style="width:138px" onchange="App.resetUnifiedPage()"><option value="">全部投放时间</option><option value="running">当前排期中</option><option value="upcoming">即将开始</option><option value="ended">已结束</option></select><input class="input" id="unifiedSearch" style="width:270px" placeholder="搜索计划名称 / ID / 订单编号" oninput="App.resetUnifiedPage()"><button class="btn btn-ghost btn-sm" onclick="App.resetUnifiedFilters()">重置筛选</button></div>
+      <div class="card plan-list-card"><div class="card-head plan-list-tools"><div class="segment" id="unifiedTypeTabs"><button data-type="all" onclick="App.setUnifiedType(this,'all')">全部</button><button data-type="rtb" onclick="App.setUnifiedType(this,'rtb')">RTB 自助</button><button data-type="cpd" onclick="App.setUnifiedType(this,'cpd')">CPD 代投</button></div><div class="spacer"></div><select class="select" id="unifiedStatusFilter" style="width:130px" onchange="App.resetUnifiedPage()"><option value="">全部状态</option><option value="active">投放中</option><option value="paused">已暂停</option><option value="ended">已结束</option></select><select class="select" id="unifiedIssueFilter" style="width:150px" onchange="App.resetUnifiedPage()"><option value="">全部投放情况</option><option value="ready">正常投放</option><option value="upcoming">即将开始</option><option value="paused">计划已暂停</option><option value="review">创意审核中</option><option value="rejected">创意已驳回</option><option value="error">投放异常</option><option value="ended">投放已结束</option></select><select class="select" id="unifiedScheduleFilter" style="width:138px" onchange="App.resetUnifiedPage()"><option value="">全部投放时间</option><option value="running">当前排期中</option><option value="upcoming">即将开始</option><option value="ended">已结束</option></select><input class="input" id="unifiedSearch" style="width:270px" placeholder="搜索计划名称 / ID / 订单编号" oninput="App.resetUnifiedPage()"><button class="btn btn-ghost btn-sm" onclick="App.resetUnifiedFilters()">重置筛选</button></div>
       <div class="plan-context-note" id="unifiedCpdHint"><span><b>CPD 由运营创建和管理</b>，如需新增投放，请联系运营人员确认广告位、价格和排期。</span><button class="text-link" onclick="App.showCpdContact()">联系运营</button></div>
       <div class="plan-bulk-bar" id="unifiedBulkBar"><b id="unifiedBulkCount">已选择 0 条</b><span>批量操作仅适用于 RTB 广告计划</span><div class="spacer"></div><button class="btn btn-ghost btn-sm" onclick="App.clearUnifiedSelection()">取消选择</button><button class="btn btn-ghost btn-sm" onclick="App.confirmBulkPlanStatus('paused')">批量暂停投放</button><button class="btn btn-primary btn-sm" onclick="App.confirmBulkPlanStatus('active')">批量恢复投放</button></div>
       <div class="table-wrap"><table class="plan-list-table"><thead><tr id="unifiedPlanHead"></tr></thead><tbody id="unifiedPlanBody"></tbody></table></div><div id="unifiedPlanPager"></div></div>`;
@@ -736,8 +755,13 @@ const App = {
   resetUnifiedPage(){this.pages.unifiedPlan=1;this.unifiedSelected=new Set();this.renderUnifiedPlans();},
   resetUnifiedFilters(){['unifiedStatusFilter','unifiedIssueFilter','unifiedScheduleFilter','unifiedSearch'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});this.resetUnifiedPage();},
   unifiedPlanIssue(cp,creatives){
+    const today=new Date().toISOString().slice(0,10);
+    if(cp.syncStatus==='failed')return {key:'error',label:'投放异常',cls:'red'};
     if(cp.status==='paused')return {key:'paused',label:'计划已暂停',cls:'gray'};
+    if(cp.status==='ended'||(cp.end&&cp.end<today))return {key:'ended',label:'投放已结束',cls:'gray'};
+    if(cp.start&&cp.start>today)return {key:'upcoming',label:'即将开始',cls:'blue'};
     if(creatives.some(a=>a.status==='review'))return {key:'review',label:'创意审核中',cls:'amber'};
+    if(creatives.length&&creatives.every(a=>a.status==='rejected'))return {key:'rejected',label:'创意已驳回',cls:'red'};
     return {key:'ready',label:cp.mode==='cpd'?'运营代投中':'正常投放',cls:'green'};
   },
   renderUnifiedPlans(){
@@ -749,11 +773,11 @@ const App = {
     const showType=type==='all',table=document.querySelector('.plan-list-table'),cpdHint=document.getElementById('unifiedCpdHint');
     table?.classList.toggle('show-type',showType);table?.classList.toggle('type-hidden',!showType);table?.classList.toggle('cpd-mode',type==='cpd');if(cpdHint)cpdHint.classList.toggle('show',type==='cpd');
     if(type==='cpd'){
-      const heads=[['广告计划','plan-name-col'],['状态','status-col'],['投放情况','issue-col'],['广告位 / 资源位','placement-col'],['曝光','num metric-col'],['点击','num metric-col'],['CTR','num metric-col'],['开始日期','date-col'],['结束日期','date-col'],['订单编号','order-col'],['操作','act']];
+      const heads=[['广告计划','plan-name-col'],['状态','status-col'],['投放情况','issue-col'],['广告位 / 资源位','placement-col'],['曝光','num metric-col'],['点击','num metric-col'],['CTR','num metric-col'],['开始日期','date-col'],['结束日期','date-col'],['订单编号','order-col'],['代投运营','owner-col'],['操作','act']];
       document.getElementById('unifiedPlanHead').innerHTML=heads.map(([h,cls])=>`<th class="${cls}">${h}</th>`).join('');
       document.getElementById('unifiedPlanBody').innerHTML=list.map(cp=>{
         const creatives=DB.creatives.filter(a=>a.camp===cp.id),imps=creatives.reduce((s,a)=>s+(a.imps||0),0),clicks=creatives.reduce((s,a)=>s+(a.clicks||0),0),ctr=imps?(clicks/imps*100).toFixed(2)+'%':'—',issue=this.unifiedPlanIssue(cp,creatives);
-        return `<tr><td class="plan-name-col"><button class="link-btn" title="进入广告计划详情" onclick="App.openPlan('${cp.id}')"><b>${cp.name}</b></button><div class="cell-sub">${cp.alias?cp.alias+' · ':''}${cp.id}</div></td><td class="status-col">${this.statusBadge(cp.status)}</td><td class="issue-col"><span class="badge ${issue.cls}">${issue.label}</span></td><td class="placement-col">${cp.placement||'—'}</td><td class="num metric-col">${fmtK(imps)}</td><td class="num metric-col">${fmtK(clicks)}</td><td class="num metric-col">${ctr}</td><td class="date-col">${cp.start||'—'}</td><td class="date-col">${cp.end||'长期投放'}</td><td class="mono order-col">${cp.order||'—'}</td><td class="act"><button class="btn btn-ghost btn-sm" onclick="App.openPlan('${cp.id}')">查看详情</button></td></tr>`;
+        return `<tr><td class="plan-name-col"><button class="link-btn" title="进入广告计划详情" onclick="App.openPlan('${cp.id}')"><b>${cp.name}</b></button><div class="cell-sub">${cp.alias?cp.alias+' · ':''}${cp.id}</div></td><td class="status-col">${this.statusBadge(cp.status)}</td><td class="issue-col"><span class="badge ${issue.cls}">${issue.label}</span></td><td class="placement-col">${cp.placement||'—'}</td><td class="num metric-col">${fmtK(imps)}</td><td class="num metric-col">${fmtK(clicks)}</td><td class="num metric-col">${ctr}</td><td class="date-col">${cp.start||'—'}</td><td class="date-col">${cp.end||'长期投放'}</td><td class="mono order-col">${cp.order||'—'}</td><td class="owner-col">${cp.operator||'待分配'}</td><td class="act"><button class="btn btn-ghost btn-sm" onclick="App.openPlan('${cp.id}')">查看详情</button></td></tr>`;
       }).join('')||`<tr><td colspan="${heads.length}"><div class="empty">暂无符合条件的 CPD 广告计划</div></td></tr>`;
       document.getElementById('unifiedPlanPager').innerHTML=this.pagerHTML('unifiedPlan',all.length);
       const bulk=document.getElementById('unifiedBulkBar');if(bulk)bulk.classList.remove('show');
@@ -1058,6 +1082,7 @@ const App = {
     this.modal(`
       <div class="modal-head"><div><h3>修改 CPD 广告创意</h3><p>${a.id} · ${cp.name}</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div>
       <div class="modal-body">
+        ${a.status==='rejected'||a.changeStatus==='rejected'?`<div class="notice warning" style="margin-bottom:16px"><b>审核未通过</b><div style="margin-top:6px">${a.rejectReason||'创意内容未通过审核，请修改后重新提交。'}</div></div>`:''}
         <div class="notice info" style="margin-bottom:16px">仅可修改图片素材、创意文案和落地页。广告位、价格、库存、投放周期与时段由运营管理。</div>
         <div class="input-row">
           <div class="field"><label>所属广告组</label><input class="input" value="${a.group||'默认广告组'}" readonly></div>
