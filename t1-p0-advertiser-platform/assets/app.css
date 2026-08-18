@@ -422,6 +422,7 @@ tbody tr:last-child td { border-bottom: none; }
   width: 30px; height: 30px; border-radius: 8px; display: inline-grid; place-items: center;
   background: var(--surface-2); color: var(--text-2); flex-shrink: 0;
 }
+.creative-thumb { width: 58px; height: 44px; flex: 0 0 58px; display: block; object-fit: cover; border-radius: 7px; border: 1px solid var(--border); background: var(--surface-2); }
 .cell-flex { display: flex; align-items: center; gap: 10px; }
 /* 排行榜行：仪表盘 Top App / Top 广告主 / 余额预警 */
 .rank-row { display: flex; align-items: center; gap: 11px; padding: 9px 0; border-bottom: 1px solid var(--border); }
