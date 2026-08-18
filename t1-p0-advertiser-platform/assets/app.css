@@ -782,12 +782,14 @@ body.dsp .code-body { color: #d7d7fb; }
 .plan-list-card .table-wrap{position:relative}
 .plan-list-table{min-width:1990px;font-size:13px}
 .plan-list-table.type-hidden{min-width:1900px}
-.plan-list-table.cpd-mode{min-width:1280px}
+.plan-list-table.cpd-mode{min-width:1420px}
 .plan-list-table .select-col{position:sticky;left:0;z-index:3;width:46px;min-width:46px;max-width:46px;text-align:center;background:var(--surface)}
 .plan-list-table .plan-type-col{position:sticky;left:46px;z-index:3;width:84px;min-width:84px;max-width:84px;background:var(--surface)}
 .plan-list-table .plan-name-col{position:sticky;left:130px;z-index:3;min-width:254px;max-width:254px;background:var(--surface);box-shadow:8px 0 12px -12px rgba(15,27,45,.32)}
 .plan-list-table.type-hidden .plan-name-col{left:46px}
 .plan-list-table.cpd-mode .plan-name-col{left:0}
+.plan-list-table.cpd-mode .placement-col{min-width:190px}
+.plan-list-table.cpd-mode th.act,.plan-list-table.cpd-mode td.act{min-width:118px}
 .plan-list-table .plan-name-col .link-btn{display:block;max-width:226px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .plan-list-table .plan-name-col .cell-sub{max-width:226px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .plan-list-table thead .select-col,.plan-list-table thead .plan-type-col,.plan-list-table thead .plan-name-col{z-index:5;background:var(--surface-2)}

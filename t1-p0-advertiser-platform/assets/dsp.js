@@ -732,7 +732,7 @@ const App = {
     document.querySelector(`#unifiedTypeTabs [data-type="${this.unifiedType}"]`)?.classList.add('active');
     this.renderUnifiedPlans();
   },
-  setUnifiedType(btn,type){ document.querySelectorAll('#unifiedTypeTabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');this.unifiedType=type;DB.uiState.planListView=type;this.save();this.pages.unifiedPlan=1;this.unifiedSelected=new Set();this.renderUnifiedPlans(); },
+  setUnifiedType(btn,type){ document.querySelectorAll('#unifiedTypeTabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');this.unifiedType=type;DB.uiState.planListView=type;this.save();this.pages.unifiedPlan=1;this.unifiedSelected=new Set();this.renderUnifiedPlans();const wrap=document.querySelector('.plan-list-card .table-wrap');if(wrap)wrap.scrollLeft=0; },
   resetUnifiedPage(){this.pages.unifiedPlan=1;this.unifiedSelected=new Set();this.renderUnifiedPlans();},
   unifiedPlanIssue(cp,creatives){
     if(cp.status==='paused')return {key:'paused',label:'计划已暂停',cls:'gray'};
@@ -752,7 +752,7 @@ const App = {
       document.getElementById('unifiedPlanHead').innerHTML=heads.map(([h,cls])=>`<th class="${cls}">${h}</th>`).join('');
       document.getElementById('unifiedPlanBody').innerHTML=list.map(cp=>{
         const creatives=DB.creatives.filter(a=>a.camp===cp.id),imps=creatives.reduce((s,a)=>s+(a.imps||0),0),clicks=creatives.reduce((s,a)=>s+(a.clicks||0),0),ctr=imps?(clicks/imps*100).toFixed(2)+'%':'—',issue=this.unifiedPlanIssue(cp,creatives);
-        return `<tr><td class="plan-name-col"><button class="link-btn" title="进入广告计划详情" onclick="App.openPlan('${cp.id}')"><b>${cp.name}</b></button><div class="cell-sub">${cp.alias?cp.alias+' · ':''}${cp.id}</div></td><td>${this.statusBadge(cp.status)}</td><td><span class="badge ${issue.cls}">${issue.label}</span></td><td>${cp.placement||'—'}</td><td class="num">${fmtK(imps)}</td><td class="num">${fmtK(clicks)}</td><td class="num">${ctr}</td><td>${cp.start||'—'}</td><td>${cp.end||'长期投放'}</td><td class="mono">${cp.order||'—'}</td><td><button class="btn btn-ghost btn-sm" onclick="App.openPlan('${cp.id}')">查看详情</button></td></tr>`;
+        return `<tr><td class="plan-name-col"><button class="link-btn" title="进入广告计划详情" onclick="App.openPlan('${cp.id}')"><b>${cp.name}</b></button><div class="cell-sub">${cp.alias?cp.alias+' · ':''}${cp.id}</div></td><td class="status-col">${this.statusBadge(cp.status)}</td><td class="issue-col"><span class="badge ${issue.cls}">${issue.label}</span></td><td class="placement-col">${cp.placement||'—'}</td><td class="num metric-col">${fmtK(imps)}</td><td class="num metric-col">${fmtK(clicks)}</td><td class="num metric-col">${ctr}</td><td class="date-col">${cp.start||'—'}</td><td class="date-col">${cp.end||'长期投放'}</td><td class="mono order-col">${cp.order||'—'}</td><td class="act"><button class="btn btn-ghost btn-sm" onclick="App.openPlan('${cp.id}')">查看详情</button></td></tr>`;
       }).join('')||`<tr><td colspan="${heads.length}"><div class="empty">暂无符合条件的 CPD 广告计划</div></td></tr>`;
       document.getElementById('unifiedPlanPager').innerHTML=this.pagerHTML('unifiedPlan',all.length);
       const bulk=document.getElementById('unifiedBulkBar');if(bulk)bulk.classList.remove('show');
