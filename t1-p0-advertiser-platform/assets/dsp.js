@@ -1044,19 +1044,14 @@ const App = {
     const deliveryText=this.deliveryIssueDescription(groupIssue,cp);
     return `<div class="cell-sub" style="margin-bottom:10px"><button class="text-link" onclick="App.openPlan('${cp.id}')">${cp.name||'广告计划'}</button><span style="margin:0 6px">/</span>广告组详情</div>
     <div class="page-head"><div><div class="detail-title-line"><h1>${group.name}</h1>${this.statusBadge(group.status)}</div><p>${group.id||'SSP 同步广告组'} · 所属计划：${cp.name||'—'}</p></div><div class="spacer"></div><button class="btn btn-ghost" onclick="App.openPlan('${cp.id}')">← 返回广告计划</button>${isRtb?`<button class="btn btn-ghost" onclick="App.openGroupEdit('${group.id}')">${svg(I.edit)}编辑广告组</button>${groupCanToggle?`<button class="btn btn-ghost" onclick="App.toggleGroupStatus('${group.id}')">${groupToggleLabel}</button>`:''}<button class="btn btn-primary" onclick="App.openNewCreativeForGroup('${group.id}')">${svg(I.plus)}新建广告创意</button>`:''}</div>
-    <div class="card group-setting-summary">
-      <div class="group-summary-head">
-        <div><b>投放设置</b><span class="badge ${groupIssue.cls}">${groupIssue.label}</span>${groupIssue.key!=='ready'?`<span class="group-issue-reason">${deliveryText}</span>`:''}</div>
-        <button class="text-link" onclick="App.openGroupEdit('${group.id}')">查看或修改投放设置</button>
-      </div>
-      <dl class="group-setting-grid">
-        <div class="group-setting-period"><dt>投放周期</dt><dd>${group.start||cp.start||'—'} 至 ${group.end||cp.end||'长期投放'}</dd></div>
-        <div><dt>${isRtb?'花费 / 预算':'预算'}</dt><dd>${isRtb?`${fmtMoney(groupSpend)} / ${fmtMoney(group.budget||0)}`:'由 CPD 订单管理'}</dd></div>
-        ${isRtb?`<div><dt>每日上限</dt><dd>${group.dailyCap?fmtMoney(group.dailyCap):'未单独设置'}</dd></div>`:''}
-        <div><dt>计费方式</dt><dd>${isRtb?(group.bidType||'CPM'):'CPD 代投'}</dd></div>
-        <div><dt>出价</dt><dd>${isRtb?fmtMoney(group.bid||0):'—'}</dd></div>
-      </dl>
+    <div class="campaign-summary group-detail-summary" aria-label="广告组概览">
+      <div><span>投放周期</span><b>${group.start||cp.start||'—'} 至 ${group.end||cp.end||'长期投放'}</b></div>
+      <div><span>${isRtb?'花费 / 预算':'预算'}</span><b>${isRtb?`${fmtMoney(groupSpend)} / ${fmtMoney(group.budget||0)}`:'由 CPD 订单管理'}</b></div>
+      ${isRtb?`<div><span>每日上限</span><b>${group.dailyCap?fmtMoney(group.dailyCap):'未单独设置'}</b></div>`:''}
+      <div><span>计费方式</span><b>${isRtb?(group.bidType||'CPM'):'CPD 代投'}</b></div>
+      <div><span>出价</span><b>${isRtb?fmtMoney(group.bid||0):'—'}</b></div>
     </div>
+    ${groupIssue.key==='ready'?'':`<div class="campaign-issue-inline"><span class="badge ${groupIssue.cls}">${groupIssue.label}</span><span>${deliveryText}</span></div>`}
     <div class="card"><div class="card-head"><div><b>广告创意</b><div class="cell-sub">审核状态说明内容是否可用；投放状态同时受计划、广告组和创意自身状态影响</div></div>${isRtb?`<div class="spacer"></div><button class="btn btn-primary btn-sm" onclick="App.openNewCreativeForGroup('${group.id}')">${svg(I.plus)}新建创意</button>`:''}</div><div class="table-wrap"><table><thead><tr><th>广告创意</th><th>素材规格</th><th>审核状态</th><th>投放状态</th><th class="num">曝光</th><th class="num">点击</th><th class="num">CTR</th><th>更新时间</th><th>操作</th></tr></thead><tbody>${ads.map(a=>{const ctr=a.imps?((a.clicks||0)/a.imps*100).toFixed(2)+'%':'—',creativeIssue=this.creativeDeliveryIssue(a,group,cp),reviewState=a.pendingVersion?'<span class="badge green">当前版本已通过</span><div class="cell-sub" style="margin-top:4px">新版本审核中</div>':this.statusBadge(a.status),canToggle=isRtb&&['active','paused'].includes(a.status),toggleLabel=a.status==='paused'?'恢复':'暂停',updated=a.pendingVersion?.submittedAt?new Date(a.pendingVersion.submittedAt).toLocaleDateString('zh-CN'):a.updated||a.created||'—';return `<tr><td><div class="cell-flex">${creativeThumb(a)}<div><button class="link-btn" onclick="App.openCreative('${a.id}')"><b>${a.name}</b></button><div class="cell-sub">${a.id} · ${a.headline||'未填写标题'}</div></div></div></td><td>${a.size||'—'}</td><td>${reviewState}</td><td><span class="badge ${creativeIssue.cls}">${creativeIssue.label}</span></td><td class="num">${fmtK(a.imps||0)}</td><td class="num">${fmtK(a.clicks||0)}</td><td class="num">${ctr}</td><td>${updated}</td><td><div class="cell-flex"><button class="plan-row-action" onclick="App.openCreative('${a.id}')">编辑</button>${canToggle?`<button class="plan-row-action" onclick="App.toggleCreativeStatus('${a.id}')">${toggleLabel}</button>`:''}</div></td></tr>`}).join('')||`<tr><td colspan="9"><div class="empty">${svg(I.creative)}<div>当前广告组还没有广告创意</div>${isRtb?`<button class="btn btn-primary btn-sm" onclick="App.openNewCreativeForGroup('${group.id}')">创建第一条创意</button>`:''}</div></td></tr>`}</tbody></table></div></div>`;
   },
   toggleGroupStatus(id,returnPage='groupdetail'){
