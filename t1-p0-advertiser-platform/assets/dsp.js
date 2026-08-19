@@ -140,7 +140,7 @@ const DB = {
     {id:'C-1011', scenario:'state-case', name:'巴西市场拉新｜待补充创意', alias:'巴西拉新', mode:'rtb', placement:'App / H5 图片信息流', period:'2026-08-18 至 2026-09-18', duration:'fixed', start:'2026-08-18', end:'2026-09-18', fmt:'feed', model:'CPM', status:'active', spend:0, imps:0, clicks:0, budget:3000, totalBudget:3000, owner:'Amy Chen'},
   ],
   adGroups: [
-    {id:'G-2001',scenario:'standard',camp:'C-1001',name:'德国与法国｜Web/H5 信息流',periodType:'fixed',start:'2026-08-01',end:'2026-08-31',pace:'even',budget:5000,dailyCap:200,bidType:'CPM',bid:2.40,geo:'德国、法国',device:'不限',format:'feed',inventory:'Web / H5 优质信息流',status:'active'},
+    {id:'G-2001',scenario:'standard',camp:'C-1001',name:'德国与法国｜Web/H5 信息流',periodType:'fixed',start:'2026-08-01',end:'2026-08-31',pace:'even',budget:5000,spend:1560.80,dailyCap:200,bidType:'CPM',bid:2.40,geo:'德国、法国',device:'不限',format:'feed',inventory:'Web / H5 优质信息流',status:'active'},
     {id:'G-2002',scenario:'standard',camp:'C-1002',name:'T1 News App｜首页开屏｜全天',periodType:'fixed',start:'2026-08-12',end:'2026-08-18',pace:'even',budget:0,dailyCap:0,bidType:'CPD',bid:0,geo:'全部',device:'Android、iOS',format:'splashimg',inventory:'T1 News App · 首页开屏',status:'active',managedBy:'Linda Zhao'},
     {id:'G-2003',scenario:'state-case',camp:'C-1003',name:'信息流首刷｜新品预热',start:'2026-08-25',end:'2026-09-05',format:'feed',inventory:'T1 News App · 信息流首刷',status:'active',managedBy:'Kevin Wu'},
     {id:'G-2004',scenario:'state-case',camp:'C-1004',name:'首页焦点图｜会员日',start:'2026-08-10',end:'2026-08-28',format:'bbanner',inventory:'T1 Video · 首页焦点图',status:'active',managedBy:'Linda Zhao'},
@@ -1040,6 +1040,7 @@ const App = {
     const cp=DB.campaigns.find(c=>c.id===group.camp)||{},ads=DB.creatives.filter(a=>a.camp===cp.id&&(a.groupId===group.id||a.group===group.name));
     const groupIssue=this.groupDeliveryIssue(group,cp,ads);
     const isRtb=cp.mode==='rtb',groupCanToggle=['active','paused'].includes(group.status),groupToggleLabel=group.status==='paused'?'恢复广告组':'暂停广告组';
+    const groupImps=ads.reduce((sum,a)=>sum+(a.imps||0),0),groupSpend=group.spend??((cp.imps||0)>0?(cp.spend||0)*groupImps/cp.imps:0);
     const deliveryText=this.deliveryIssueDescription(groupIssue,cp);
     return `<div class="cell-sub" style="margin-bottom:10px"><button class="text-link" onclick="App.openPlan('${cp.id}')">${cp.name||'广告计划'}</button><span style="margin:0 6px">/</span>广告组详情</div>
     <div class="page-head"><div><div class="detail-title-line"><h1>${group.name}</h1>${this.statusBadge(group.status)}</div><p>${group.id||'SSP 同步广告组'} · 所属计划：${cp.name||'—'}</p></div><div class="spacer"></div><button class="btn btn-ghost" onclick="App.openPlan('${cp.id}')">← 返回广告计划</button>${isRtb?`<button class="btn btn-ghost" onclick="App.openGroupEdit('${group.id}')">${svg(I.edit)}编辑广告组</button>${groupCanToggle?`<button class="btn btn-ghost" onclick="App.toggleGroupStatus('${group.id}')">${groupToggleLabel}</button>`:''}<button class="btn btn-primary" onclick="App.openNewCreativeForGroup('${group.id}')">${svg(I.plus)}新建广告创意</button>`:''}</div>
@@ -1050,7 +1051,7 @@ const App = {
       </div>
       <dl class="group-setting-grid">
         <div class="group-setting-period"><dt>投放周期</dt><dd>${group.start||cp.start||'—'} 至 ${group.end||cp.end||'长期投放'}</dd></div>
-        <div><dt>${isRtb?'广告组预算':'预算'}</dt><dd>${isRtb?fmtMoney(group.budget||0):'由 CPD 订单管理'}</dd></div>
+        <div><dt>${isRtb?'花费 / 预算':'预算'}</dt><dd>${isRtb?`${fmtMoney(groupSpend)} / ${fmtMoney(group.budget||0)}`:'由 CPD 订单管理'}</dd></div>
         ${isRtb?`<div><dt>每日上限</dt><dd>${group.dailyCap?fmtMoney(group.dailyCap):'未单独设置'}</dd></div>`:''}
         <div><dt>计费方式</dt><dd>${isRtb?(group.bidType||'CPM'):'CPD 代投'}</dd></div>
         <div><dt>出价</dt><dd>${isRtb?fmtMoney(group.bid||0):'—'}</dd></div>
