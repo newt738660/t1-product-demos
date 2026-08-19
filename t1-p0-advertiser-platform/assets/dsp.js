@@ -972,7 +972,7 @@ const App = {
     </div>
     <div class="campaign-summary" aria-label="广告计划概览">
       <div><span>投放周期</span><b>${cp.period||'—'}</b></div>
-      <div><span>${cp.mode==='cpd'?'广告位 / 库存':'预算 / 花费'}</span><b>${cp.mode==='cpd'?(cp.placement||'—'):`${fmtMoney(budget||0)} / ${fmtMoney(spend)}`}</b></div>
+      <div><span>${cp.mode==='cpd'?'广告位 / 库存':'花费 / 预算'}</span><b>${cp.mode==='cpd'?(cp.placement||'—'):`${fmtMoney(spend)} / ${fmtMoney(budget||0)}`}</b></div>
       <div><span>曝光</span><b>${fmtK(imps)}</b></div>
       <div><span>点击</span><b>${fmtK(clicks)}</b></div>
       <div><span>CTR</span><b>${ctr}</b></div>
