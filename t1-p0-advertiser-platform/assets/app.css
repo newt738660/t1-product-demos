@@ -781,6 +781,7 @@ body.dsp .code-body { color: #d7d7fb; }
 .paper-level:not(.completed) .level-heading{background:var(--surface)}
 .choice.sel{border-color:var(--accent);background:var(--accent-soft)}
 .plan-list-tools{gap:10px;flex-wrap:wrap}
+.plan-list-tools .select,.plan-list-tools .input,.group-list-card .card-head>.select,.group-list-card .card-head>.input{height:38px;padding-top:7px;padding-bottom:7px;line-height:22px}
 .plan-list-card .table-wrap{position:relative}
 .plan-list-table{min-width:1990px;font-size:13px}
 .plan-list-table.type-hidden{min-width:1900px}
