@@ -945,8 +945,9 @@ const App = {
     this.toast(cp.status==='active'?'广告计划已开始':'广告计划已暂停');
   },
   openCampaignEdit(id,returnToList=false){
-    const cp=DB.campaigns.find(c=>c.id===id);if(!cp)return;this.editCampId=id;this.editCampReturnToList=returnToList;
-    this.modal(`<div class="modal-head"><div><h3>编辑广告计划</h3><p>${cp.id} · 修改计划层边界</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg('<path d="M18 6 6 18M6 6l12 12"/>')}</button></div><div class="modal-body"><div class="notice info" style="margin-bottom:14px">修改周期或预算后，系统会校验已有广告组是否仍在父级边界内。</div><div class="field"><label>计划名称</label><input class="input" id="editCampName" value="${cp.name}"></div><div class="input-row"><div class="field"><label>开始日期</label><input class="input" type="date" id="editCampStart" value="${cp.start||''}"></div><div class="field"><label>结束日期</label><input class="input" type="date" id="editCampEnd" value="${cp.end||''}"></div></div><div class="field"><label>${cp.duration==='ongoing'?'每日预算':'活动总预算'}（USD）</label><input class="input" id="editCampBudget" value="${cp.duration==='ongoing'?(cp.dailyBudget||cp.budget):(cp.totalBudget||cp.budget)}"></div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><div class="spacer"></div><button class="btn btn-primary" onclick="App.saveCampaignEdit()">保存修改</button></div>`,true);
+    const cp=DB.campaigns.find(c=>c.id===id);if(!cp)return;
+    this.editFlow={type:'campaign',id,returnPage:returnToList?'plans':'campdetail'};
+    this.curCamp=id;this.go('newplan');
   },
   saveCampaignEdit(){const cp=DB.campaigns.find(c=>c.id===this.editCampId);if(!cp)return;const name=document.getElementById('editCampName').value.trim(),budget=Number(document.getElementById('editCampBudget').value||0),start=document.getElementById('editCampStart').value,end=document.getElementById('editCampEnd').value;if(!name||!budget){this.toast('请填写计划名称和预算','warn');return;}if(cp.duration!=='ongoing'&&(!start||!end||end<start)){this.toast('结束日期不能早于开始日期','warn');return;}cp.name=name;cp.start=start;cp.end=end;if(cp.duration==='ongoing'){cp.dailyBudget=budget;cp.budget=budget;cp.period='长期投放';}else{cp.totalBudget=budget;cp.budget=budget;cp.period=`${cp.start} 至 ${cp.end}`;}this.save();this.closeModal();if(this.editCampReturnToList){this.editCampReturnToList=false;this.renderUnifiedPlans();}else this.go('campdetail');this.toast('广告计划已更新');},
 
@@ -1073,7 +1074,7 @@ const App = {
     this.save();this.go('groupdetail');this.toast(next==='paused'?'广告创意已暂停':'广告创意已恢复；是否实际投放仍取决于上级状态');
   },
   openNewCreativeForGroup(id){const group=(DB.adGroups||[]).find(g=>g.id===id);if(!group)return;this.curGroup=id;this.curCamp=group.camp;this.editRejectedId=null;this.go('newad');},
-  openGroupEdit(id,returnPage='groupdetail'){const g=(DB.adGroups||[]).find(x=>x.id===id);if(!g)return;this.editGroupId=id;this.editGroupReturnPage=returnPage;this.modal(`<div class="modal-head"><div><h3>编辑广告组</h3><p>${g.id} · 调整当前执行策略</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg('<path d="M18 6 6 18M6 6l12 12"/>')}</button></div><div class="modal-body"><div class="field"><label>广告组名称</label><input class="input" id="editGroupName" value="${g.name}"></div><div class="input-row"><div class="field"><label>竞价方式</label><select class="select" id="editGroupBidType"><option ${g.bidType==='CPM'?'selected':''}>CPM</option><option ${g.bidType==='CPC'?'selected':''}>CPC</option></select></div><div class="field"><label>手动出价</label><input class="input" id="editGroupBid" value="${g.bid||0}"></div></div><div class="field"><label>投放范围</label><select class="select" id="editGroupInventory"><option ${g.inventory==='全部兼容库存'?'selected':''}>全部兼容库存</option><option ${g.inventory==='指定 App'?'selected':''}>指定 App</option><option ${g.inventory==='指定广告位'?'selected':''}>指定广告位</option></select></div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><div class="spacer"></div><button class="btn btn-primary" onclick="App.saveGroupEdit()">保存修改</button></div>`,true);},
+  openGroupEdit(id,returnPage='groupdetail'){const g=(DB.adGroups||[]).find(x=>x.id===id);if(!g)return;this.editFlow={type:'group',id,returnPage};this.curGroup=id;this.curCamp=g.camp;this.go('newplan');},
   saveGroupEdit(){const g=(DB.adGroups||[]).find(x=>x.id===this.editGroupId);if(!g)return;const old=g.name,name=document.getElementById('editGroupName').value.trim(),bid=Number(document.getElementById('editGroupBid').value||0);if(!name||!bid){this.toast('请填写广告组名称和出价','warn');return;}g.name=name;g.bidType=document.getElementById('editGroupBidType').value;g.bid=bid;g.inventory=document.getElementById('editGroupInventory').value;DB.creatives.filter(a=>a.groupId===g.id||a.group===old).forEach(a=>a.group=name);this.save();this.closeModal();this.go(this.editGroupReturnPage||'groupdetail');this.editGroupReturnPage=null;this.toast('广告组已更新');},
   openGroupCreatives(group){
     const btn=document.querySelectorAll('#campaignTabs button')[3];
@@ -1136,10 +1137,9 @@ const App = {
     const a=DB.creatives.find(x=>x.id===id); if(!a) return;
     const cp=DB.campaigns.find(c=>c.id===a.camp)||{};
     if(cp.mode==='cpd'){ this.openCpdCreativeEdit(id); return; }
-    if(a.status==='rejected'){ this.openRejectedEdit(id); return; }
     this.openRtbCreativeEdit(id);
   },
-  openRtbCreativeEdit(id){const a=DB.creatives.find(x=>x.id===id);if(!a)return;this.editCreativeId=id;this.modal(`<div class="modal-head"><div><h3>编辑广告创意</h3><p>${a.id} · 修改后重新提交审核</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg('<path d="M18 6 6 18M6 6l12 12"/>')}</button></div><div class="modal-body">${a.pendingVersion?`<div class="grid cols-2" style="margin-bottom:14px"><div class="card card-pad"><div class="cell-sub">当前投放内容</div><b style="display:block;margin-top:8px">${a.name}</b><div style="margin-top:6px">${a.headline||'未填写标题'}</div></div><div class="card card-pad"><div class="cell-sub">本次提交的修改</div><b style="display:block;margin-top:8px">${a.pendingVersion.name}</b><div style="margin-top:6px">${a.pendingVersion.headline||'未填写标题'}</div><span class="badge amber" style="margin-top:8px">修改审核中</span></div></div>`:''}<div class="notice info" style="margin-bottom:14px">审核通过前，当前内容继续投放；审核通过后，本次修改再替换当前投放内容。</div><div class="field"><label>广告创意名称</label><input class="input" id="editCreativeName" value="${a.pendingVersion?.name||a.name}"></div><div class="field"><label>标题 / 文案</label><input class="input" id="editCreativeHeadline" value="${a.pendingVersion?.headline||a.headline||''}"></div><div class="field"><label>目标链接</label><input class="input mono" id="editCreativeLanding" value="${a.pendingVersion?.landing||a.landing||''}"></div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><div class="spacer"></div><button class="btn btn-primary" onclick="App.saveRtbCreativeEdit()">保存并提交审核</button></div>`,true);},
+  openRtbCreativeEdit(id){const a=DB.creatives.find(x=>x.id===id);if(!a)return;const g=(DB.adGroups||[]).find(x=>x.id===a.groupId)||{};this.editFlow={type:'creative',id,returnPage:this.curGroup?'groupdetail':'campdetail'};this.curGroup=g.id||this.curGroup;this.curCamp=a.camp;this.go('newplan');},
   saveRtbCreativeEdit(){const a=DB.creatives.find(x=>x.id===this.editCreativeId);if(!a)return;const name=document.getElementById('editCreativeName').value.trim(),landing=document.getElementById('editCreativeLanding').value.trim();if(!name||!landing){this.toast('请填写创意名称和目标链接','warn');return;}a.pendingVersion={version:(a.version||1)+1,name,headline:document.getElementById('editCreativeHeadline').value.trim(),landing,status:'review',submittedAt:new Date().toISOString()};a.changeStatus='review';this.save();this.closeModal();if(this.curGroup)this.go('groupdetail');else this.go('campdetail');this.toast('新版本已提交审核，当前线上版本保持投放');},
   openCpdCreativeEdit(id){
     const a=DB.creatives.find(x=>x.id===id); if(!a) return;
@@ -1295,6 +1295,7 @@ const App = {
       if(visible)this.setUfActiveStep(visible.target.id);
     },{rootMargin:'-120px 0px -45% 0px',threshold:[0,.2,.5]});
     sections.forEach(s=>this.ufObserver.observe(s));
+    if(this.editFlow){this.initUnifiedEditFlow();return;}
     this.ufCustomPlanName='';
     this.updateUfPlanName();
     if(this.resumeCampId) this.initExistingPlanGroupFlow();
@@ -1305,10 +1306,82 @@ const App = {
     this.go('newplan');
   },
   cancelUnified(){
+    if(this.editFlow){const page=this.editFlow.returnPage||'plans';this.editFlow=null;this.ufWorking=null;this.go(page);return;}
     const returnToCampaign=Boolean(this.resumeCampId);
     this.ufWorking=null;
     this.resumeCampId=null;
     this.go(returnToCampaign?'campdetail':'plans');
+  },
+  setUfValue(id,value){const el=document.getElementById(id);if(el)el.value=value??'';},
+  setUfChoice(selector,value,key='value'){
+    document.querySelectorAll(selector).forEach(el=>el.classList.toggle('sel',el.dataset[key]===value));
+  },
+  fillUfCampaign(cp){
+    const duration=cp.duration==='ongoing'?'ongoing':'fixed';
+    this.setUfChoice('#ufDuration .radio-pill',duration);
+    this.setUfValue('ufPlanStart',cp.start);this.setUfValue('ufPlanEnd',cp.end);
+    this.setUfValue('ufTotal',cp.totalBudget||cp.budget||0);this.setUfValue('ufDaily',cp.dailyBudget||cp.budget||0);this.setUfValue('ufDailyCap',cp.dailyCap||'');
+    this.setUfChoice('#ufNameMode .radio-pill','custom');
+    const name=document.getElementById('ufPlanName');if(name){name.readOnly=false;name.value=cp.name||'';}
+    const hint=document.getElementById('ufPlanNameHint');if(hint)hint.textContent='编辑模式下保留当前名称，你可以直接修改。';
+    document.getElementById('ufPlanEndField').style.display=duration==='ongoing'?'none':'';
+    document.getElementById('ufFixedBudget').style.display=duration==='ongoing'?'none':'';
+    document.getElementById('ufOngoingBudget').style.display=duration==='ongoing'?'':'none';
+    return {name:cp.name,duration,start:cp.start||'',end:cp.end||'',period:cp.period||(duration==='ongoing'?'长期投放':`${cp.start} 至 ${cp.end}`),budget:cp.budget,totalBudget:cp.totalBudget||cp.budget,dailyBudget:cp.dailyBudget||cp.budget,dailyCap:cp.dailyCap||0};
+  },
+  fillUfGroup(group){
+    this.setUfValue('ufGroupName',group.name);this.setUfValue('ufGroupStart',group.start);this.setUfValue('ufGroupEnd',group.end);
+    this.setUfValue('ufGroupBudget',group.budget);this.setUfValue('ufGroupCap',group.dailyCap||'');this.setUfValue('ufBidType',group.bidType||'CPM');this.setUfValue('ufBid',group.bid);
+    this.setUfValue('ufGeo',group.geo||'不限');this.setUfValue('ufDevice',group.device||'不限');this.setUfValue('ufFormat',group.format||'feed');this.setUfValue('ufInventory',group.inventory||'全部兼容库存');
+    this.setUfChoice('#ufPace .radio-pill',group.pace||'even');
+    const advanced=document.getElementById('ufGroupAdvanced');if(advanced)advanced.style.display='';
+    this.updateUfFormat();
+  },
+  fillUfCreative(creative){
+    const data=creative.pendingVersion||creative;
+    this.setUfValue('ufCreativeName',data.name||creative.name);this.setUfValue('ufHeadline',data.headline||creative.headline||'');this.setUfValue('ufLanding',data.landing||creative.landing||'');
+    const assets=document.querySelectorAll('#ufAssets .asset-cell');assets.forEach(el=>el.classList.toggle('picked',el.dataset.id===creative.assetId));
+    if(assets.length&&!document.querySelector('#ufAssets .picked'))assets[0].classList.add('picked');
+  },
+  initUnifiedEditFlow(){
+    const flow=this.editFlow,cp=DB.campaigns.find(c=>c.id===this.curCamp);if(!flow||!cp){this.editFlow=null;this.toast('未找到需要编辑的投放对象','warn');this.go('plans');return;}
+    const labels={campaign:'广告计划',group:'广告组',creative:'广告创意'},target=labels[flow.type];
+    document.getElementById('topTitle').textContent=`编辑${target}`;
+    document.getElementById('topSub').textContent='复用 RTB 三级投放结构，当前仅修改所在层级';
+    const title=document.querySelector('.unified-head h1'),desc=document.querySelector('.unified-head p'),cancel=document.querySelector('.unified-head button');
+    if(title)title.textContent=`编辑${target}`;if(desc)desc.textContent=`已定位到${target}层；其他层级仅用于确认所属关系`;if(cancel)cancel.textContent='取消编辑';
+    const working=this.fillUfCampaign(cp);this.ufWorking={campaign:working,existingCampaignId:cp.id};
+    if(flow.type==='campaign'){
+      const action=document.querySelector('#uf-campaign .level-actions');if(action)action.innerHTML='<span>保存后返回原页面；已有广告组仍受新的计划边界约束</span><button class="btn btn-primary" onclick="App.saveUnifiedCampaignEdit()">保存广告计划</button>';
+      this.setUfActiveStep('uf-campaign');document.getElementById('uf-campaign')?.scrollIntoView({block:'start'});return;
+    }
+    const group=(DB.adGroups||[]).find(g=>g.id===(flow.type==='group'?flow.id:this.curGroup));if(!group){this.toast('未找到所属广告组','warn');this.cancelUnified();return;}
+    this.completeUfLevel('uf-campaign',`${cp.name} · ${cp.id}`);document.querySelector('#uf-campaign .level-summary button')?.remove();this.unlockUf('uf-group',2);this.fillUfGroup(group);this.ufWorking.group={...group};
+    if(flow.type==='group'){
+      const action=document.querySelector('#uf-group .level-actions');if(action)action.innerHTML='<span>保存后返回原页面；所属广告计划不会被修改</span><button class="btn btn-primary" onclick="App.saveUnifiedGroupEdit()">保存广告组</button>';
+      this.setUfActiveStep('uf-group');requestAnimationFrame(()=>this.setUfActiveStep('uf-group'));return;
+    }
+    const creative=DB.creatives.find(c=>c.id===flow.id);if(!creative){this.toast('未找到广告创意','warn');this.cancelUnified();return;}
+    this.completeUfLevel('uf-group',`${group.name} · ${group.id}`);document.querySelector('#uf-group .level-summary button')?.remove();this.unlockUf('uf-creative',3);this.fillUfCreative(creative);
+    const action=document.querySelector('#uf-creative .level-actions');if(action)action.innerHTML='<span>修改后将生成新版本并重新提交审核；计划和广告组不会被修改</span><button class="btn btn-primary" onclick="App.saveUnifiedCreativeEdit()">保存并提交审核</button>';
+    this.setUfActiveStep('uf-creative');requestAnimationFrame(()=>this.setUfActiveStep('uf-creative'));
+  },
+  finishUnifiedEdit(message){const page=this.editFlow?.returnPage||'plans';this.editFlow=null;this.ufWorking=null;this.save();this.go(page);this.toast(message);},
+  saveUnifiedCampaignEdit(){
+    const cp=DB.campaigns.find(c=>c.id===this.editFlow?.id);if(!cp)return;const duration=(document.querySelector('#ufDuration .sel')||{}).dataset?.value||'fixed',name=this.ufVal('ufPlanName'),start=this.ufVal('ufPlanStart'),end=this.ufVal('ufPlanEnd'),total=Number(this.ufVal('ufTotal')||0),daily=Number(this.ufVal('ufDaily')||0);
+    if(!name||!start||(duration==='fixed'&&(!end||end<start||!total))||(duration==='ongoing'&&!daily)){this.toast('请完整、正确地填写广告计划必填项','warn');return;}
+    Object.assign(cp,{name,alias:name,duration,start,end:duration==='fixed'?end:'',period:duration==='fixed'?`${start} 至 ${end}`:'长期投放',budget:duration==='fixed'?total:daily,totalBudget:duration==='fixed'?total:0,dailyBudget:duration==='ongoing'?daily:0,dailyCap:Number(this.ufVal('ufDailyCap')||0)});
+    DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:'编辑广告计划',target:cp.id,result:'成功'});this.finishUnifiedEdit('广告计划已更新');
+  },
+  saveUnifiedGroupEdit(){
+    const g=(DB.adGroups||[]).find(x=>x.id===this.editFlow?.id),cp=DB.campaigns.find(c=>c.id===g?.camp);if(!g||!cp)return;const name=this.ufVal('ufGroupName'),budget=Number(this.ufVal('ufGroupBudget')||0),bid=Number(this.ufVal('ufBid')||0),limit=cp.duration==='ongoing'?(cp.dailyBudget||cp.budget):(cp.totalBudget||cp.budget);if(!name||!budget||!bid){this.toast('请填写广告组名称、预算和出价','warn');return;}if(budget>limit){this.toast('广告组预算不能超过广告计划预算','warn');return;}
+    const old=g.name;Object.assign(g,{name,start:this.ufVal('ufGroupStart'),end:this.ufVal('ufGroupEnd'),pace:(document.querySelector('#ufPace .sel')||{}).dataset?.value||'even',budget,dailyCap:Number(this.ufVal('ufGroupCap')||0),bidType:this.ufVal('ufBidType'),bid,geo:this.ufVal('ufGeo'),device:this.ufVal('ufDevice'),format:this.ufVal('ufFormat'),inventory:this.ufVal('ufInventory')});DB.creatives.filter(a=>a.groupId===g.id||a.group===old).forEach(a=>a.group=name);
+    DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:'编辑广告组',target:g.id,result:'成功'});this.finishUnifiedEdit('广告组已更新');
+  },
+  saveUnifiedCreativeEdit(){
+    const a=DB.creatives.find(x=>x.id===this.editFlow?.id);if(!a)return;const name=this.ufVal('ufCreativeName'),landing=this.ufVal('ufLanding'),assetEl=document.querySelector('#ufAssets .picked');if(!name||!landing||!assetEl){this.toast('请填写创意名称、选择素材并填写目标链接','warn');return;}
+    a.pendingVersion={version:(a.version||1)+1,name,headline:this.ufVal('ufHeadline'),landing,assetId:assetEl.dataset.id,status:'review',submittedAt:new Date().toISOString()};a.changeStatus='review';
+    DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:'编辑广告创意并提交审核',target:a.id,result:'成功'});this.finishUnifiedEdit('新版本已提交审核，当前线上版本保持投放');
   },
   initExistingPlanGroupFlow(){
     const cp=DB.campaigns.find(c=>c.id===this.resumeCampId);
