@@ -959,8 +959,6 @@ const App = {
     const groupObjects=(DB.adGroups||[]).filter(g=>g.camp===cp.id);
     const groups=[...groupObjects];
     [...new Set(ads.map(a=>a.group||'默认广告组'))].forEach(name=>{if(!groups.some(g=>g.name===name))groups.push({id:'',camp:cp.id,name,status:'active',format:ads.find(a=>(a.group||'默认广告组')===name)?.fmt,inventory:cp.placement});});
-    const imps=ads.reduce((s,a)=>s+(a.imps||0),0),clicks=ads.reduce((s,a)=>s+(a.clicks||0),0),conv=ads.reduce((s,a)=>s+(a.conv||0),0);
-    const ctr=imps?(clicks/imps*100).toFixed(2)+'%':'—';
     const spend=cp.spend||0,budget=cp.duration==='ongoing'?(cp.dailyBudget||cp.budget):(cp.totalBudget||cp.budget);
     const planIssue=this.unifiedPlanIssue(cp,ads),planIssueText=this.deliveryIssueDescription(planIssue,cp);
     return `
@@ -976,12 +974,10 @@ const App = {
         ${cp.mode==='rtb'?`<button class="text-link" onclick="App.openCampaignEdit('${cp.id}')">查看或修改投放设置</button>`:''}
       </div>
       <dl class="group-setting-grid plan-setting-grid">
+        <div><dt>投放类型</dt><dd>${cp.mode==='cpd'?'CPD 运营代投':'RTB 自助投放'}</dd></div>
         <div class="group-setting-period"><dt>投放周期</dt><dd>${cp.period||'—'}</dd></div>
         <div><dt>${cp.mode==='cpd'?'广告位 / 库存':'花费 / 预算'}</dt><dd>${cp.mode==='cpd'?(cp.placement||'—'):`${fmtMoney(spend)} / ${fmtMoney(budget||0)}`}</dd></div>
-        <div><dt>曝光</dt><dd>${fmtK(imps)}</dd></div>
-        <div><dt>点击</dt><dd>${fmtK(clicks)}</dd></div>
-        <div><dt>CTR</dt><dd>${ctr}</dd></div>
-        <div><dt>${cp.mode==='cpd'?'数据更新时间':'转化'}</dt><dd>${cp.mode==='cpd'?'5 分钟前':fmtK(conv)}</dd></div>
+        <div><dt>${cp.mode==='cpd'?'管理方式':'每日上限'}</dt><dd>${cp.mode==='cpd'?'由运营管理':(cp.dailyCap?fmtMoney(cp.dailyCap):'未单独设置')}</dd></div>
       </dl>
     </div>
     ${cp.mode==='cpd'?`<div class="notice info" style="margin-bottom:14px">该计划由运营创建并管理。价格、库存、投放周期、时段和启停状态不可修改；你可以查看数据并提交创意图片、文案或落地页变更。</div>`:''}
