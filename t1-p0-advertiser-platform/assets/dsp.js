@@ -1050,7 +1050,7 @@ const App = {
       </div>
       <div class="group-setting-grid">
         <section><h3>排期与预算</h3><dl><div><dt>投放周期</dt><dd>${group.start||cp.start||'—'} 至 ${group.end||cp.end||'长期投放'}</dd></div><div><dt>${isRtb?'广告组预算':'预算'}</dt><dd>${isRtb?fmtMoney(group.budget||0):'由 CPD 订单管理'}</dd></div>${isRtb?`<div><dt>每日上限</dt><dd>${group.dailyCap?fmtMoney(group.dailyCap):'未单独设置'}</dd></div>`:''}</dl></section>
-        <section><h3>竞价与库存</h3><dl><div><dt>计费与出价</dt><dd>${isRtb?`${group.bidType||'CPM'} · ${fmtMoney(group.bid||0)}`:'CPD 代投'}</dd></div><div><dt>广告形式</dt><dd>${FMT[group.format]?.name||'—'}</dd></div><div><dt>投放范围</dt><dd>${group.inventory||cp.placement||'—'}</dd></div></dl></section>
+        <section><h3>竞价</h3><dl><div><dt>计费方式</dt><dd>${isRtb?(group.bidType||'CPM'):'CPD 代投'}</dd></div><div><dt>出价</dt><dd>${isRtb?fmtMoney(group.bid||0):'—'}</dd></div></dl></section>
         <section><h3>定向</h3><dl><div><dt>地域</dt><dd>${group.geo||'不限'}</dd></div><div><dt>设备</dt><dd>${group.device||'不限'}</dd></div></dl></section>
       </div>
     </div>
