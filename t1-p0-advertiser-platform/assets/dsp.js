@@ -1044,8 +1044,8 @@ const App = {
     return `<div class="cell-sub" style="margin-bottom:10px"><button class="text-link" onclick="App.openPlan('${cp.id}')">${cp.name||'广告计划'}</button><span style="margin:0 6px">/</span>广告组详情</div>
     <div class="page-head"><div><div class="detail-title-line"><h1>${group.name}</h1>${this.statusBadge(group.status)}</div><p>${group.id||'SSP 同步广告组'} · 所属计划：${cp.name||'—'}</p></div><div class="spacer"></div><button class="btn btn-ghost" onclick="App.openPlan('${cp.id}')">← 返回广告计划</button>${isRtb?`<button class="btn btn-ghost" onclick="App.openGroupEdit('${group.id}')">${svg(I.edit)}编辑广告组</button>${groupCanToggle?`<button class="btn btn-ghost" onclick="App.toggleGroupStatus('${group.id}')">${groupToggleLabel}</button>`:''}<button class="btn btn-primary" onclick="App.openNewCreativeForGroup('${group.id}')">${svg(I.plus)}新建广告创意</button>`:''}</div>
     <div class="card group-setting-summary">
-      <div class="group-delivery-line">
-        <div><span class="badge ${groupIssue.cls}">${groupIssue.label}</span><span>${deliveryText}</span></div>
+      <div class="group-summary-head">
+        <div><b>投放设置</b><span class="badge ${groupIssue.cls}">${groupIssue.label}</span>${groupIssue.key!=='ready'?`<span class="group-issue-reason">${deliveryText}</span>`:''}</div>
         <button class="text-link" onclick="App.openGroupEdit('${group.id}')">查看或修改投放设置</button>
       </div>
       <div class="group-setting-grid">
