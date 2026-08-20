@@ -1360,7 +1360,13 @@ const App = {
     const campaignAction=document.querySelector('#uf-campaign .level-actions');if(campaignAction)campaignAction.innerHTML=`<span>保存计划修改后返回当前${target}；当前层未提交内容会保留</span><button class="btn btn-primary" onclick="App.saveUnifiedParentCampaign('${campaignReturn}')">保存计划修改</button>`;
     this.completeUfLevel('uf-campaign',`${cp.name} · ${cp.id}`);this.unlockUf('uf-group',2);this.fillUfGroup(group);this.ufWorking.group={...group};
     if(flow.type==='group'){
-      const action=document.querySelector('#uf-group .level-actions');if(action)action.innerHTML='<span>保存后返回原页面；所属广告计划不会被修改</span><button class="btn btn-primary" onclick="App.saveUnifiedGroupEdit()">保存广告组</button>';
+      const hasCreatives=DB.creatives.some(a=>a.groupId===group.id||a.group===group.name);
+      if(hasCreatives){
+        const creativeNav=document.querySelector('#unifiedToc [data-target="uf-creative"]');
+        const creativeHint=creativeNav?.querySelector('small');
+        if(creativeHint)creativeHint.textContent='请前往广告创意中修改';
+      }
+      const action=document.querySelector('#uf-group .level-actions');if(action)action.innerHTML='<span>保存后直接完成编辑并返回原页面，不会进入广告创意</span><button class="btn btn-primary" onclick="App.saveUnifiedGroupEdit()">保存广告组</button>';
       this.setUfActiveStep('uf-group');requestAnimationFrame(()=>this.setUfActiveStep('uf-group'));return;
     }
     const creative=DB.creatives.find(c=>c.id===flow.id);if(!creative){this.toast('未找到广告创意','warn');this.cancelUnified();return;}
