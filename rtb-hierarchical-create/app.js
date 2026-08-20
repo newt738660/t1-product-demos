@@ -72,3 +72,75 @@ const platformRender=render;render=function(){setGlobalMeta();A.classList.toggle
 const platformList=list;list=function(){view='list';render()};
 const platformStart=start;start=function(){platformStart();setGlobalMeta()};
 render();
+
+/* Adaptive creation V0.1: stable campaign model, flexible user-facing flows. */
+let createExperience='',quickPeriod='long',quickUploaded=false,quickSubmitted=false,managedSubmitted=false;
+const quick={goal:'获取访问',name:`快速投放｜${compact}｜001`,budget:'',start:today,end:'',geo:'',inventory:'自动选择优质流量',landing:'',headline:''};
+const managed={name:'',goal:'',budget:'',date:'',note:'',contact:'Victor Wang'};
+Object.assign(pageMeta,{quick:['快速投放','一页完成，系统自动组织投放结构'],managed:['运营代投','提交需求并在线跟踪进度']});
+
+openCreateChoice=function(){
+  selectedCreateType='';
+  document.body.insertAdjacentHTML('beforeend',`<div class="choice-mask" id="choiceMask" onclick="closeCreateChoice(event)"><div class="choice-modal mode-modal" role="dialog" aria-modal="true" aria-labelledby="choiceTitle" onclick="event.stopPropagation()"><div class="choice-head"><div><h2 id="choiceTitle">选择适合你的投放方式</h2><p>三种方式共用账户、资金、素材和数据，后续都能在广告投放中统一管理</p></div><button aria-label="关闭" onclick="closeCreateChoice()">×</button></div><div class="mode-grid"><button class="mode-card" data-type="quick" aria-pressed="false" onclick="selectCreateType('quick')"><span class="choice-check">✓</span><em>推荐 · 最少步骤</em><small>适合目标明确的单一投放</small><b>快速投放</b><p>只填写目标、预算、受众和创意，系统自动完成其余组织。</p><ul><li>一个页面完成</li><li>自动创建默认投放策略</li></ul></button><button class="mode-card" data-type="professional" aria-pressed="false" onclick="selectCreateType('professional')"><span class="choice-check">✓</span><em>更多控制</em><small>适合拆预算与多策略测试</small><b>专业投放</b><p>显式管理广告计划、广告组和广告，控制每层策略。</p><ul><li>多个广告组拆分预算</li><li>测试人群、库存和创意</li></ul></button><button class="mode-card managed" data-type="managed" aria-pressed="false" onclick="selectCreateType('managed')"><span class="choice-check">✓</span><em>运营协助</em><small>适合 CPD 或复杂投放</small><b>运营代投</b><p>提交目标和素材，由运营配置投放，你在线查看并协作。</p><ul><li>减少专业配置</li><li>在线查看状态与修改创意</li></ul></button></div><div class="choice-actions"><span class="choice-help" id="choiceHelp">请选择一种投放方式</span><button class="outline" onclick="closeCreateChoice()">取消</button><button class="primary" id="createContinue" disabled onclick="confirmCreateType()">继续</button></div></div></div>`);
+  requestAnimationFrame(()=>document.querySelector('#choiceMask')?.classList.add('visible'));
+};
+selectCreateType=function(type){
+  selectedCreateType=type;
+  document.querySelectorAll('.mode-card').forEach(card=>{const picked=card.dataset.type===type;card.classList.toggle('selected',picked);card.setAttribute('aria-pressed',picked)});
+  const labels={quick:'已选择快速投放',professional:'已选择专业投放',managed:'已选择运营代投'};
+  const btn=document.querySelector('#createContinue'),help=document.querySelector('#choiceHelp');
+  if(btn)btn.disabled=false;if(help)help.textContent=labels[type];
+};
+confirmCreateType=function(){
+  if(!selectedCreateType)return;
+  createExperience=selectedCreateType;
+  closeCreateChoice();
+  if(createExperience==='professional'){start();return}
+  if(createExperience==='quick')startQuick();else startManaged();
+};
+
+function captureQuick(){
+  quick.name=val('qname')||quick.name;quick.budget=val('qbudget');quick.start=val('qstart')||today;quick.end=val('qend');quick.geo=val('qgeo');quick.inventory=val('qinventory')||quick.inventory;quick.landing=val('qlanding');quick.headline=val('qheadline');
+}
+function startQuick(){
+  view='quick';quickPeriod='long';quickUploaded=false;quickSubmitted=false;
+  Object.assign(quick,{goal:'获取访问',name:`快速投放｜${compact}｜001`,budget:'',start:today,end:'',geo:'',inventory:'自动选择优质流量',landing:'',headline:''});render();
+}
+function setQuickGoal(goal){captureQuick();quick.goal=goal;render()}
+function setQuickPeriod(next){captureQuick();quickPeriod=next;render()}
+function quickUpload(){captureQuick();quickUploaded=true;render()}
+function submitQuick(){
+  captureQuick();
+  for(const [id,message] of [['qname','请输入投放名称'],['qbudget','请输入预算'],['qgeo','请选择投放地区'],['qlanding','请输入落地页链接']])if(!val(id))return invalid(id,message);
+  if(+quick.budget<100)return invalid('qbudget','预算不能低于 100 USD');
+  if(!/^https?:\/\/\S+$/i.test(quick.landing))return invalid('qlanding','请输入有效的落地页链接');
+  if(quickPeriod==='fixed'&&!quick.end)return invalid('qend','请选择结束日期');
+  if(!quickUploaded){toast('请上传广告素材或从素材库选择');return}
+  rows.unshift([quick.name,'C-QK001','rtb',quickPeriod==='long'?'长期投放':`${quick.start} 至 ${quick.end}`,'创意审核中',`每日预算：$${quick.budget}`,'—','—']);quickSubmitted=true;render();
+}
+function quickSummary(){return `<div class="card quick-side"><div class="panel-head"><h3>投放摘要</h3></div><div class="panel-body"><div class="summary-line"><span>投放目标</span><b>${quick.goal}</b></div><div class="summary-line"><span>预算</span><b>${quick.budget?`$${quick.budget}`:'待填写'}</b></div><div class="summary-line"><span>地区</span><b>${quick.geo||'待选择'}</b></div><div class="summary-line"><span>流量</span><b>${quick.inventory}</b></div><div class="summary-line"><span>创意</span><b>${quickUploaded?'已选择':'待上传'}</b></div><div class="system-note"><b>系统会自动完成</b><br>创建一个广告计划、一个默认广告组和一条广告。以后需要拆预算或测试策略时，可切换到专业管理。</div></div></div>`}
+function quickHTML(){
+  if(quickSubmitted)return `<div class="adaptive-page"><div class="success">快速投放已提交，广告创意正在审核中。</div><div class="card"><div class="panel-body"><h2>${quick.name}</h2><p>你只需管理这次投放；系统已经在后台建立完整对象关系。</p><div class="success-detail"><div><small>广告主看到</small><b>1 次投放</b></div><div><small>系统自动组织</small><b>1 个默认策略</b></div><div><small>当前状态</small><b>创意审核中</b></div></div></div><div class="quick-actions"><button class="outline" onclick="startQuick()">再建一个</button><button class="primary" onclick="list()">返回广告投放</button></div></div></div>`;
+  return `<div class="adaptive-page"><div class="top"><div><h1>快速投放</h1><p>填写业务需要，系统自动组织投放结构</p></div><button class="outline" onclick="list()">返回广告投放</button></div><div class="mode-banner"><i>⚡</i><div><b>当前使用快速投放</b><small>适合单一预算、单一策略的投放；后续可以转为专业管理</small></div><button onclick="openCreateChoice()">切换方式</button></div><div class="quick-layout"><div class="card quick-form"><div class="section-block"><div class="section-title"><i>1</i><div><h3>你希望这次投放实现什么</h3><p>目标会帮助系统推荐后续配置</p></div></div><div class="inline-options">${['获取访问','获得转化','提升曝光'].map(x=>`<button class="${quick.goal===x?'on':''}" onclick="setQuickGoal('${x}')">${x}</button>`).join('')}</div></div><div class="section-block"><div class="section-title"><i>2</i><div><h3>投入多少、投放多久</h3><p>只填写整体预算，不需要先拆分到广告组</p></div></div><div class="quick-grid"><div class="wide"><label>投放名称 *</label><input id="qname" value="${quick.name}"></div><div><label>${quickPeriod==='long'?'每日预算':'总预算'}（USD）*</label><input id="qbudget" type="number" min="100" value="${quick.budget}" placeholder="不低于 100"></div><div><label>投放周期 *</label><div class="inline-options"><button class="${quickPeriod==='long'?'on':''}" onclick="setQuickPeriod('long')">长期投放</button><button class="${quickPeriod==='fixed'?'on':''}" onclick="setQuickPeriod('fixed')">固定周期</button></div></div><div><label>开始日期 *</label><input id="qstart" type="date" value="${quick.start}"></div>${quickPeriod==='fixed'?`<div><label>结束日期 *</label><input id="qend" type="date" value="${quick.end}"></div>`:''}</div></div><div class="section-block"><div class="section-title"><i>3</i><div><h3>希望触达哪些用户</h3><p>先完成必要选择，更细设置可以之后在专业管理中调整</p></div></div><div class="quick-grid"><div><label>投放地区 *</label><select id="qgeo"><option value="">请选择</option>${['美国','德国、法国','巴西','全球'].map(x=>`<option ${quick.geo===x?'selected':''}>${x}</option>`).join('')}</select></div><div><label>流量选择</label><select id="qinventory"><option>自动选择优质流量</option><option>App 流量</option><option>Web / H5 流量</option></select></div></div></div><div class="section-block"><div class="section-title"><i>4</i><div><h3>用户最终看到什么</h3><p>上传素材并填写落地页</p></div></div><div class="quick-grid"><div class="wide"><label>广告素材 *</label><div class="upload" onclick="quickUpload()">${quickUploaded?'<div><b style="color:#14825e">✓ summer-feed-1200x628.png</b><small>规格校验通过</small></div>':'<div><b>上传素材或从素材库选择</b><small>系统会根据流量范围检查规格</small></div>'}</div></div><div><label>落地页链接 *</label><input id="qlanding" value="${quick.landing}" placeholder="https://"></div><div><label>广告标题</label><input id="qheadline" value="${quick.headline}" placeholder="请输入标题"></div></div></div><div class="quick-actions"><button class="outline" onclick="list()">取消</button><button class="primary" onclick="submitQuick()">确认并提交审核</button></div></div>${quickSummary()}</div></div>`;
+}
+
+function captureManaged(){managed.name=val('mname');managed.goal=val('mgoal');managed.budget=val('mbudget');managed.date=val('mdate');managed.note=val('mnote');managed.contact=val('mcontact')||managed.contact}
+function startManaged(){view='managed';managedSubmitted=false;Object.assign(managed,{name:'',goal:'',budget:'',date:'',note:'',contact:'Victor Wang'});render()}
+function submitManaged(){captureManaged();for(const [id,message] of [['mname','请输入项目名称'],['mgoal','请选择投放目标'],['mbudget','请输入预算范围'],['mcontact','请输入联系人']])if(!val(id))return invalid(id,message);managedSubmitted=true;render()}
+function managedHTML(){
+  if(managedSubmitted)return `<div class="adaptive-page"><div class="success">代投需求已提交，运营将在 1 个工作日内联系你。</div><div class="card"><div class="panel-body"><h2>${managed.name}</h2><p>需求编号 RQ-${compact}-01 · 当前状态：待运营确认</p><div class="success-detail"><div><small>下一步</small><b>运营确认方案</b></div><div><small>客户可做</small><b>查看进度、补充素材</b></div><div><small>投放后</small><b>查看数据、修改创意</b></div></div></div><div class="quick-actions"><button class="primary" onclick="list()">返回广告投放</button></div></div></div>`;
+  return `<div class="adaptive-page"><div class="top"><div><h1>运营代投</h1><p>先说明业务目标，专业配置由运营完成</p></div><button class="outline" onclick="list()">返回广告投放</button></div><div class="mode-banner"><i>◇</i><div><b>当前使用运营代投</b><small>你无需填写出价、频控或技术定向，确认方案后可在线查看和协作</small></div><button onclick="openCreateChoice()">切换方式</button></div><div class="card quick-form"><div class="section-block"><div class="section-title"><i>1</i><div><h3>告诉我们你想做什么</h3><p>运营会根据目标准备投放方案</p></div></div><div class="quick-grid"><div><label>项目名称 *</label><input id="mname" value="${managed.name}" placeholder="例如：新车上市推广"></div><div><label>投放目标 *</label><select id="mgoal"><option value="">请选择</option><option>品牌曝光</option><option>活动引流</option><option>应用拉新</option><option>销售转化</option></select></div><div><label>预算范围 *</label><input id="mbudget" value="${managed.budget}" placeholder="例如：$10,000–$20,000"></div><div><label>期望上线时间</label><input id="mdate" type="date" value="${managed.date}"></div><div class="wide"><label>补充说明</label><textarea id="mnote" rows="4" placeholder="可以说明目标地区、受众、已有素材或其他要求">${managed.note}</textarea></div></div></div><div class="managed-value"><div><b>运营负责</b><small>库存、排期、预算拆分和投放策略</small></div><div><b>你可以在线完成</b><small>确认信息、补充素材、查看状态和结果</small></div><div><b>投放开始后</b><small>查看数据，并提交创意修改</small></div></div><div class="section-block"><div class="quick-grid"><div><label>联系人 *</label><input id="mcontact" value="${managed.contact}"></div><div><label>联系邮箱</label><input value="victor@example.com"></div></div></div><div class="quick-actions"><button class="outline" onclick="list()">取消</button><button class="primary" onclick="submitManaged()">提交代投需求</button></div></div></div>`;
+}
+
+const adaptiveRender=render;
+render=function(){
+  if(view==='quick'||view==='managed'){
+    A.classList.remove('list-page','platform-page');
+    A.innerHTML=view==='quick'?quickHTML():managedHTML();
+    setGlobalMeta();
+    document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('input',()=>el.classList.remove('invalid'),{once:true}));
+    return;
+  }
+  adaptiveRender();
+};
+render();
