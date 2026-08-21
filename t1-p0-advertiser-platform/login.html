@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>T1 Ads · 登录</title>
-<link rel="stylesheet" href="assets/app.css?v=2026081403" />
+<link rel="stylesheet" href="assets/app.css?v=2026082101" />
 <style>
   body.auth-page{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(900px 520px at 55% -10%,#e9eafe 0%,var(--bg) 58%)}
   .auth-shell{width:100%;max-width:1080px;min-height:650px;display:grid;grid-template-columns:1.08fr 1fr;background:var(--surface);border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow-lg);overflow:hidden}
@@ -76,26 +76,27 @@
         <div class="field"><label>确认密码</label><input class="input" id="registerPassword2" type="password" placeholder="再次输入密码" autocomplete="new-password"></div>
         <div class="auth-error" id="registerError"></div>
         <button class="btn btn-primary auth-submit" onclick="Auth.register()">注册并进入 T1</button>
-        <div class="auth-terms">开始真实投放时，需另行提交广告主创建或绑定申请。</div>
+        <div class="auth-terms">开始真实投放或查看历史投放数据前，需完成广告主开户或关联。</div>
       </div>
 
       <div class="auth-view" id="auth-application">
         <button class="auth-back" onclick="Auth.show('register')">← 返回注册信息</button>
-        <div class="auth-head"><h1>申请开通广告主</h1><p>运营人员将根据实际业务确认新建或关联已有广告主</p></div>
-        <div class="application-note">你不需要判断广告主是否已经存在，提交后由运营人员联系确认。</div>
-        <div class="field"><label>广告主名称</label><input class="input" id="advertiserName" placeholder="请输入品牌、公司或业务名称"></div>
-        <div class="field"><label>所属行业</label><select class="select" id="advertiserIndustry"><option value="">请选择行业</option><option>游戏</option><option>电商零售</option><option>互联网服务</option><option>金融</option><option>教育</option><option>其他</option></select></div>
-        <div class="field"><label>销售人员</label><select class="select" id="advertiserSales"><option value="">请选择或由运营确认</option><option>销售 A · S001</option><option>销售 B · S002</option><option>不清楚，由运营确认</option></select></div>
-        <div class="field"><label>联系电话</label><input class="input" id="advertiserPhone" placeholder="便于运营人员与你联系" autocomplete="tel"></div>
+        <div class="auth-head"><h1>申请开通或关联广告主</h1><p>商务人员将核验客户信息，并在 SSP 完成建档或关联</p></div>
+        <div class="application-note">你只需说明自己的情况，不需要判断 SSP 中是否已存在广告主。</div>
+        <div class="field"><label>你的情况</label><select class="select" id="advertiserIntent"><option value="">请选择</option><option value="history">我有历史投放账户</option><option value="new">我是首次开户的新客户</option><option value="invite">我收到了邀请链接或邀请码</option></select></div>
+        <div class="field"><label>产品名称或历史广告主名称（选填）</label><input class="input" id="advertiserName" placeholder="用于辅助商务核验"></div>
+        <div class="field"><label>产品链接或历史广告主 ID（选填）</label><input class="input" id="advertiserProduct" placeholder="提供任一可识别线索即可"></div>
+        <div class="field"><label>邀请码（邀请用户填写）</label><input class="input" id="advertiserInvite" placeholder="没有可留空"></div>
+        <div class="field"><label>联系方式 / TG</label><input class="input" id="advertiserPhone" placeholder="便于商务人员与你联系" autocomplete="tel"></div>
         <div class="auth-error" id="applicationError"></div>
         <button class="btn btn-primary auth-submit" onclick="Auth.apply()">提交开通申请</button>
       </div>
 
       <div class="auth-view auth-success" id="auth-pending">
         <div class="success-icon">✓</div>
-        <div class="auth-head"><h1>申请已提交</h1><p>当前状态：待运营确认</p></div>
-        <p style="color:var(--text-2);line-height:1.8">运营人员将通过你填写的邮箱或电话联系你，确认新建广告主或关联已有广告主。</p>
-        <button class="btn btn-primary auth-submit" onclick="Auth.previewApproval()">演示：完成运营确认并进入平台</button>
+        <div class="auth-head"><h1>申请已提交</h1><p>当前状态：待商务核验</p></div>
+        <p style="color:var(--text-2);line-height:1.8">商务人员将根据现有信息核验客户身份和广告主归属；如信息不足，会通过联系方式与你确认。</p>
+        <button class="btn btn-primary auth-submit" onclick="Auth.previewApproval()">演示：完成商务核验并进入平台</button>
         <button class="btn btn-ghost auth-submit" onclick="Auth.show('login')">返回登录</button>
       </div>
 
@@ -108,7 +109,7 @@
       </div>
     </section>
   </main>
-<script src="assets/auth.js?v=2026081403"></script>
-<script src="assets/theme.js?v=2026081403"></script>
+<script src="assets/auth.js?v=2026082101"></script>
+<script src="assets/theme.js?v=2026082101"></script>
 </body>
 </html>

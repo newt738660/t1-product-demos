@@ -35,15 +35,15 @@
       var profile={name:'评审用户',email:'review@t1.demo',advertiserBound:state==='empty'||state==='active'};
       localStorage.setItem(PROFILE_KEY,JSON.stringify(profile)); localStorage.setItem(SESSION_KEY,profile.name); localStorage.removeItem(APPLICATION_KEY);
       if(state==='pending') localStorage.setItem(APPLICATION_KEY,JSON.stringify({type:'create',advertiser:'星海互动',status:'pending'}));
-      if(state==='rejected') localStorage.setItem(APPLICATION_KEY,JSON.stringify({type:'create',advertiser:'星海互动',status:'rejected',rejectReason:'运营未能确认本次申请与目标广告主的关系'}));
+      if(state==='rejected') localStorage.setItem(APPLICATION_KEY,JSON.stringify({type:'history',advertiser:'星海互动',status:'rejected',rejectReason:'现有信息不足以确认客户与目标广告主的关系'}));
       location.href='dsp.html?preview=1&state='+encodeURIComponent(state);
     },
     apply:function(){
-      var advertiser=value('advertiserName'), industry=value('advertiserIndustry'), phone=value('advertiserPhone');
-      if(!advertiser||!industry||!phone){ error('applicationError','请填写广告主名称、所属行业和联系电话'); return; }
+      var intent=value('advertiserIntent'), advertiser=value('advertiserName'), phone=value('advertiserPhone');
+      if(!intent||!phone){ error('applicationError','请选择你的情况并填写联系方式 / TG'); return; }
       var profile=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');
       localStorage.setItem(APPLICATION_KEY,JSON.stringify({
-        advertiser:advertiser,industry:industry,sales:value('advertiserSales')||'待运营确认',phone:phone,
+        type:intent,advertiser:advertiser||'待商务确认',product:value('advertiserProduct'),inviteCode:value('advertiserInvite'),phone:phone,
         contact:profile.name||'',email:profile.email||'',status:'pending',submittedAt:new Date().toISOString()
       }));
       Auth.show('pending');
