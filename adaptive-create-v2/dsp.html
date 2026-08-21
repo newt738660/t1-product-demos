@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>T1 Ads · 广告投放平台</title>
+<link rel="stylesheet" href="assets/app.css?v=2026081915" />
+<link rel="stylesheet" href="assets/adaptive-create.css?v=2026082101" />
+<script src="assets/session.js?v=2026081403"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="dsp">
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">T1</div>
+      <div>
+        <div class="name">T1<span> Ads</span></div>
+        <div class="tag">Advertiser Workspace</div>
+      </div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sidebar-foot">
+      <div class="user-card">
+        <div class="avatar">VW</div>
+        <div class="meta">
+          <b>Victor Wang</b>
+          <small>advertiser · ID 70285</small>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="page-title" id="topTitle" hidden>首页</div>
+      <div class="page-sub" id="topSub" hidden>投放表现、异常与待处理事项</div>
+      <div class="workspace-chip" id="workspaceChip"><span class="workspace-dot"></span>演示广告主</div>
+      <div class="spacer"></div>
+      <button class="icon-btn" id="bellBtn" onclick="App.toggleNotif(event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span class="dot"></span>
+      </button>
+      <div class="flex" id="financeBox" style="gap:8px;padding:0 6px;border-left:1px solid var(--border);margin-left:4px">
+        <div style="text-align:right;line-height:1.1"><div class="cell-sub">账户余额</div><b style="font-size:14px" id="balTop">$8,420.50</b></div>
+        <button class="btn btn-primary" onclick="App.openDeposit()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>充值
+        </button>
+      </div>
+    </header>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+
+<div class="modal-mask" id="modalMask"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="assets/dsp.js?v=2026081920"></script>
+<script src="assets/adaptive-create.js?v=2026082101"></script>
+<script src="assets/theme.js?v=2026081403"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>T1 Ads · CPD / RTB 信息架构方案对比</title>
+<link rel="stylesheet" href="assets/app.css?v=2026081403">
+<link rel="stylesheet" href="assets/compare.css?v=2026081403">
+</head>
+<body class="compare-body">
+<header class="compare-top"><div class="compare-brand"><span>T1</span><div><b>CPD / RTB 方案对比</b><small>内部评审 Demo · 三种信息架构</small></div></div><a class="btn btn-ghost" href="dsp.html">返回当前产品 Demo</a></header>
+<main class="compare-main">
+  <div class="compare-intro"><div><div class="section-kicker">DECISION LAB</div><h1>同一业务，三种组织方式</h1><p>重点比较菜单结构、列表字段冗余和“新建投放”交互。点击方案即可切换完整预览。</p></div><div class="decision-note"><b>本轮不预设结论</b><span>用可操作 Demo 观察认知成本、字段密度和后续扩展性。</span></div></div>
+  <div class="scheme-tabs" id="schemeTabs"></div>
+  <section class="preview-shell">
+    <aside class="preview-sidebar" id="previewSidebar"></aside>
+    <div class="preview-main"><div class="preview-toolbar"><div><b id="previewTitle"></b><small id="previewSub"></small></div><div class="spacer"></div><button class="btn btn-primary" id="createBtn" onclick="Compare.openCreate()">＋ 新建投放</button></div><div id="previewContent"></div></div>
+  </section>
+  <div class="compare-analysis" id="compareAnalysis"></div>
+</main>
+<div class="modal-mask" id="modalMask"></div><div class="toast-wrap" id="toastWrap"></div>
+<script src="assets/compare.js?v=2026081403"></script>
+</body>
+</html>
