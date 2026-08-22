@@ -49,7 +49,7 @@
           <li>查看投放数据与审核进度</li>
           <li>注册与广告主开通相互独立</li>
         </ul>
-        <div class="auth-demo"><b>首页状态预览</b><div class="auth-demo-grid"><button onclick="Auth.previewState('unbound')">未绑定</button><button onclick="Auth.previewState('pending')">审核中</button><button onclick="Auth.previewState('rejected')">已驳回</button><button onclick="Auth.previewState('empty')">已绑定未投放</button><button onclick="Auth.previewState('active')">已有投放</button></div></div>
+        <div class="auth-demo"><b>首页状态预览</b><div class="auth-demo-grid"><button onclick="Auth.previewState('unbound')">未绑定</button><button onclick="Auth.previewState('pending')">审核中</button><button onclick="Auth.previewState('rejected')">已驳回</button><button onclick="Auth.previewState('empty')">已绑定未投放</button><button onclick="Auth.previewState('active')">已有投放</button><button style="grid-column:1/-1;text-align:center" onclick="location.href='login.html?invite=T1-BIZ-70285#register'">体验商务邀请注册链接</button></div></div>
       </div>
     </aside>
 
@@ -69,14 +69,24 @@
 
       <div class="auth-view" id="auth-register">
         <button class="auth-back" onclick="Auth.show('login')">← 返回登录</button>
-        <div class="auth-head"><h1>创建 T1 账号</h1><p>账号用于登录 T1；注册不会自动创建或绑定广告主</p></div>
+        <div class="auth-head"><h1>创建 T1 账号</h1><p>创建登录账号；有商务邀请码时可同时绑定广告主</p></div>
         <div class="field"><label>姓名</label><input class="input" id="registerName" placeholder="请输入姓名" autocomplete="name"></div>
         <div class="field"><label>邮箱</label><input class="input" id="registerEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
         <div class="field"><label>密码</label><input class="input" id="registerPassword" type="password" placeholder="至少 6 位" autocomplete="new-password"></div>
         <div class="field"><label>确认密码</label><input class="input" id="registerPassword2" type="password" placeholder="再次输入密码" autocomplete="new-password"></div>
+        <div class="field"><label>广告主邀请码（选填）</label><input class="input" id="registerInvite" placeholder="如有商务邀请码，可在注册时直接填写"><div class="hint" id="registerInviteNote">也可以注册后在平台内使用邀请码。</div></div>
         <div class="auth-error" id="registerError"></div>
         <button class="btn btn-primary auth-submit" onclick="Auth.register()">注册并进入 T1</button>
         <div class="auth-terms">开始真实投放或查看历史投放数据前，需完成广告主开户或关联。</div>
+      </div>
+
+      <div class="auth-view" id="auth-invite-confirm">
+        <button class="auth-back" onclick="Auth.show('register')">← 返回修改注册信息</button>
+        <div class="auth-head"><h1>确认绑定广告主</h1><p>账号已创建，请确认邀请码对应的广告主是否正确</p></div>
+        <div class="application-note">该邀请码由商务创建，确认后将直接绑定，无需再次提交商务审核。</div>
+        <div class="summary-list"><div><span>广告主名称</span><b>星海互动</b></div><div><span>SSP 广告主 ID</span><b class="mono">ADV-70285</b></div><div><span>产品应用 / 官网</span><b>StarWave · starwave.example</b></div><div><span>所属行业</span><b>游戏</b></div><div><span>对接商务</span><b>Victor Chen</b></div><div><span>邀请码</span><b class="mono" id="registerInvitePreview">—</b></div></div>
+        <div class="auth-error" id="inviteConfirmError"></div>
+        <button class="btn btn-primary auth-submit" onclick="Auth.confirmRegistrationInvite()">确认绑定并进入 T1</button>
       </div>
 
       <div class="auth-view" id="auth-application">
@@ -109,7 +119,7 @@
       </div>
     </section>
   </main>
-<script src="assets/auth.js?v=2026082201"></script>
-<script src="assets/theme.js?v=2026082201"></script>
+<script src="assets/auth.js?v=2026082202"></script>
+<script src="assets/theme.js?v=2026082202"></script>
 </body>
 </html>

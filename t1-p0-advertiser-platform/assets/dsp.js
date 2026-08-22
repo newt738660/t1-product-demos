@@ -318,9 +318,9 @@ const App = {
     this.load(); if(window.Branding) Branding.apply(DB.profile); this.renderNav();
     const previewState=new URLSearchParams(location.search).get('state'); if(previewState)this.homeState=previewState;
     this.syncAccountContext();
-    const requestedNew=new URLSearchParams(location.search).get('new')==='rtb';
+    const query=new URLSearchParams(location.search),requestedNew=query.get('new')==='rtb',welcome=query.get('welcome')==='1';
     if(this.isDemoMode()) DB.uiState.planListView='all';
-    this.go(requestedNew?'newplan':((this.isDemoMode()||this.isPreviewMode())?'dash':(DB.uiState?.lastPage||'dash')));
+    this.go(requestedNew?'newplan':((welcome||this.isDemoMode()||this.isPreviewMode())?'dash':(DB.uiState?.lastPage||'dash')));
     document.getElementById('balTop').textContent = fmtMoney(DB.balance); this.syncBell();
   },
 
