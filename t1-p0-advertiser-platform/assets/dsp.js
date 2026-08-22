@@ -320,7 +320,7 @@ const App = {
     this.syncAccountContext();
     const requestedNew=new URLSearchParams(location.search).get('new')==='rtb';
     if(this.isDemoMode()) DB.uiState.planListView='all';
-    this.go(requestedNew?'newplan':(this.isDemoMode()?'dash':(DB.uiState?.lastPage||'dash')));
+    this.go(requestedNew?'newplan':((this.isDemoMode()||this.isPreviewMode())?'dash':(DB.uiState?.lastPage||'dash')));
     document.getElementById('balTop').textContent = fmtMoney(DB.balance); this.syncBell();
   },
 
@@ -426,37 +426,51 @@ const App = {
     this.modal(`<div class="modal-head"><div><h3>开始投放前，请先关联广告主</h3><p>T1 账号已注册完成；广告主用于承载真实投放、数据和资金权限</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div>
       <div class="modal-body"><div class="notice info" style="margin-bottom:16px">你可以继续浏览平台能力和帮助文档。开始真实投放前，需要完成广告主关联。</div>
       <div class="choice-grid" style="grid-template-columns:repeat(3,1fr)">
-        <button class="choice" data-gate="history" style="text-align:left" onclick="App.pickAdvertiserGate(this,'history')"><div class="c-body"><b>我有历史投放账户</b><small>申请关联原 SSP 广告主和历史投放数据</small></div></button>
-        <button class="choice" data-gate="new" style="text-align:left" onclick="App.pickAdvertiserGate(this,'new')"><div class="c-body"><b>我是首次开户客户</b><small>提交基础信息，由商务协助完成 SSP 建档</small></div></button>
-        <button class="choice" data-gate="invite" style="text-align:left" onclick="App.pickAdvertiserGate(this,'invite')"><div class="c-body"><b>我收到了邀请</b><small>通过邀请链接或邀请码简化开户或关联</small></div></button>
+        <button class="choice" data-gate="new" style="text-align:left" onclick="App.pickAdvertiserGate(this,'new')"><div class="c-body"><b>新创建广告主</b><small>首次使用 T1，由商务协助完成 SSP 建档</small></div></button>
+        <button class="choice" data-gate="invite" style="text-align:left" onclick="App.pickAdvertiserGate(this,'invite')"><div class="c-body"><b>使用邀请码</b><small>输入邀请码，确认对应广告主后完成绑定</small></div></button>
+        <button class="choice" data-gate="bind" style="text-align:left" onclick="App.pickAdvertiserGate(this,'bind')"><div class="c-body"><b>绑定已有广告主</b><small>申请关联尚未绑定 T1 的 SSP 广告主</small></div></button>
       </div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">暂不投放，继续浏览</button><div class="spacer"></div><button class="btn btn-primary" id="gateNext" disabled onclick="App.continueAdvertiserGate()">下一步</button></div>`,true);
   },
   pickAdvertiserGate(btn,type){this.advertiserGateType=type;document.querySelectorAll('[data-gate]').forEach(x=>x.classList.toggle('sel',x===btn));const next=document.getElementById('gateNext');if(next)next.disabled=false;},
-  continueAdvertiserGate(){if(this.advertiserGateType==='history')this.openAdvertiserApplication('history');else if(this.advertiserGateType==='new')this.openAdvertiserApplication('new');else if(this.advertiserGateType==='invite')this.openJoinAdvertiser();},
+  continueAdvertiserGate(){if(this.advertiserGateType==='new')this.openAdvertiserApplication('new');else if(this.advertiserGateType==='invite')this.openJoinAdvertiser();else if(this.advertiserGateType==='bind')this.openAdvertiserApplication('bind');},
   openAdvertiserApplication(type='new'){
     const p=this.profile()||{};
-    const historical=type==='history';
-    this.modal(`<div class="modal-head"><div><h3>${historical?'关联历史广告主':'申请首次开户'}</h3><p>${historical?'提供你知道的线索即可，商务将核验并匹配原 SSP 广告主':'商务将核验客户信息，并在确认无重复后创建 SSP 广告主'}</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body">
-      <div class="notice info" style="margin-bottom:16px">${historical?'无需提供全部历史资料；若暂时无法唯一匹配，商务会再联系你补充。':'多数业务资料可后续补充，先留下联系方式即可启动开户。'}</div>
+    const binding=type==='bind';
+    this.modal(`<div class="modal-head"><div><h3>${binding?'绑定已有广告主':'新创建广告主'}</h3><p>${binding?'提交绑定人信息，由商务核验后关联已有 SSP 广告主':'提交创建人信息，由商务核验后完成 SSP 建档'}</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body">
       <input type="hidden" id="gateApplicationType" value="${type}">
-      <div class="input-row"><div class="field"><label>${historical?'历史广告主名称或 ID（选填）':'产品或业务名称（选填）'}</label><input class="input" id="gateAdvertiserName" placeholder="${historical?'提供任一可识别线索':'品牌、公司或产品名称'}"></div><div class="field"><label>产品/投放链接（选填）</label><input class="input" id="gateProductLink" placeholder="https://"></div></div>
-      <div class="input-row"><div class="field"><label>产品类型/行业（选填）</label><select class="select" id="gateIndustry"><option value="">请选择</option><option>游戏</option><option>电商零售</option><option>互联网服务</option><option>金融</option><option>教育</option><option>其他</option></select></div><div class="field"><label>对接商务（选填）</label><input class="input" id="gateSales" placeholder="姓名或工号"></div></div>
-      <div class="input-row"><div class="field"><label>联系人</label><input class="input" id="gateContact" value="${this.accountEsc(p.name||'')}"></div><div class="field"><label>联系方式 / TG<span class="req">*</span></label><input class="input" id="gateContactWay" value="${this.accountEsc(p.email||'')}"></div></div>
+      <div class="input-row"><div class="field"><label>${binding?'绑定人':'创建人'}<span class="req">*</span></label><input class="input" id="gateApplicant" value="${this.accountEsc(p.name||'')}" placeholder="请输入姓名"></div><div class="field"><label>${binding?'绑定人':'创建人'}邮箱地址</label><input class="input" id="gateEmail" type="email" value="${this.accountEsc(p.email||'')}" placeholder="name@example.com"></div></div>
+      <div class="field"><label>${binding?'绑定人':'创建人'}联系方式<span class="req">*</span></label><div class="segment" id="gateContactMethods" style="width:max-content;margin-bottom:10px"><button class="active" data-contact-method="tg" onclick="App.pickAdvertiserContactMethod(this,'tg')">Telegram</button><button data-contact-method="other" onclick="App.pickAdvertiserContactMethod(this,'other')">其他联系应用</button></div><div class="input-row"><div class="field" id="gateContactAppField" style="display:none;margin-bottom:0"><input class="input" id="gateContactApp" placeholder="请输入联系应用，如 WhatsApp"></div><div class="field" style="margin-bottom:0"><input class="input" id="gateContactNumber" placeholder="请输入 TG 号"></div></div></div>
+      <div class="input-row"><div class="field"><label>产品应用名或官网链接</label><input class="input" id="gateProduct" placeholder="应用名称或 https://"></div><div class="field"><label>所属行业</label><select class="select" id="gateIndustry"><option value="">请选择</option><option>游戏</option><option>电商零售</option><option>互联网服务</option><option>金融</option><option>教育</option><option>其他</option></select></div></div>
+      <div class="field"><label>对接商务（如已有，选填）</label><input class="input" id="gateSales" placeholder="商务姓名或工号"></div>
       </div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.openAdvertiserGate()">上一步</button><div class="spacer"></div><button class="btn btn-primary" onclick="App.submitAdvertiserApplication()">提交申请</button></div>`,true);
   },
+  pickAdvertiserContactMethod(btn,method){
+    this.advertiserContactMethod=method;
+    document.querySelectorAll('[data-contact-method]').forEach(x=>x.classList.toggle('active',x===btn));
+    const appField=document.getElementById('gateContactAppField'),number=document.getElementById('gateContactNumber');
+    if(appField)appField.style.display=method==='other'?'':'none';
+    if(number)number.placeholder=method==='other'?'请输入对应账号或号码':'请输入 TG 号';
+  },
   submitAdvertiserApplication(){
-    const name=document.getElementById('gateAdvertiserName'),contact=document.getElementById('gateContactWay'),type=document.getElementById('gateApplicationType').value;
-    if(!this.validateRequired([[contact,'联系方式 / TG']])) return;
-    localStorage.setItem('t1_advertiser_application',JSON.stringify({type,advertiser:name.value.trim()||'待商务确认',productLink:document.getElementById('gateProductLink').value.trim(),industry:document.getElementById('gateIndustry').value,sales:document.getElementById('gateSales').value.trim()||'待商务确认',contact:document.getElementById('gateContact').value.trim(),contactWay:contact.value.trim(),status:'pending',submittedAt:new Date().toISOString()}));
-    this.showApplicationSubmitted(type==='history'?'历史广告主关联申请已提交':'新客户开户申请已提交','商务将核验客户信息，并在 SSP 完成匹配或建档。');
+    const type=document.getElementById('gateApplicationType').value,applicant=document.getElementById('gateApplicant'),number=document.getElementById('gateContactNumber'),method=this.advertiserContactMethod||'tg',app=document.getElementById('gateContactApp');
+    const required=[[applicant,type==='bind'?'绑定人':'创建人'],[number,type==='bind'?'绑定人联系方式':'创建人联系方式']]; if(method==='other')required.splice(1,0,[app,'联系应用']);
+    if(!this.validateRequired(required)) return;
+    const product=document.getElementById('gateProduct').value.trim();
+    localStorage.setItem('t1_advertiser_application',JSON.stringify({type,advertiser:product||'待商务确认',applicant:applicant.value.trim(),contactMethod:method,contactApp:method==='tg'?'Telegram':app.value.trim(),contactNumber:number.value.trim(),email:document.getElementById('gateEmail').value.trim(),product,industry:document.getElementById('gateIndustry').value,sales:document.getElementById('gateSales').value.trim()||'待商务确认',status:'pending',submittedAt:new Date().toISOString()}));
+    this.advertiserContactMethod='tg';
+    this.showApplicationSubmitted(type==='bind'?'已有广告主绑定申请已提交':'新广告主创建申请已提交',type==='bind'?'商务将核验绑定人信息，并完成已有 SSP 广告主关联。':'商务将核验创建人信息，并完成 SSP 广告主建档。');
   },
   openJoinAdvertiser(){
-    this.modal(`<div class="modal-head"><div><h3>通过邀请继续</h3><p>邀请可用于识别商务归属，也可辅助定位历史 SSP 广告主</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body"><div class="notice info" style="margin-bottom:16px">邀请会减少重复填写，但不会直接授予广告主数据访问权限。</div><div class="field"><label>邀请码<span class="req">*</span></label><input class="input" id="gateInviteCode" placeholder="请输入邀请码，例如 T1-SSP-2026"></div><div class="field"><label>联系方式 / TG<span class="req">*</span></label><input class="input" id="gateInviteContact" value="${this.accountEsc((this.profile()||{}).email||'')}" placeholder="便于商务核验"></div><div class="hint">Demo 中输入任意非空邀请码均可继续；邀请码失效时可返回普通申请。</div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.openAdvertiserGate()">改用普通申请</button><div class="spacer"></div><button class="btn btn-primary" onclick="App.joinAdvertiser()">提交申请</button></div>`);
+    this.modal(`<div class="modal-head"><div><h3>使用邀请码</h3><p>输入商务提供的邀请码，查询对应的广告主信息</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body"><div class="field"><label>邀请码<span class="req">*</span></label><input class="input" id="gateInviteCode" placeholder="请输入邀请码，例如 T1-SSP-2026"></div><div class="hint">提交后将先展示邀请码对应的广告主信息，由你确认后才会绑定。</div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.openAdvertiserGate()">上一步</button><div class="spacer"></div><button class="btn btn-primary" onclick="App.joinAdvertiser()">查询广告主</button></div>`);
   },
   joinAdvertiser(){
-    const code=document.getElementById('gateInviteCode'),contact=document.getElementById('gateInviteContact'); if(!this.validateRequired([[code,'邀请码'],[contact,'联系方式 / TG']])) return;
-    localStorage.setItem('t1_advertiser_application',JSON.stringify({type:'invite',inviteCode:code.value.trim(),contactWay:contact.value.trim(),advertiser:'邀请对应的客户或广告主',status:'pending',submittedAt:new Date().toISOString()}));
-    this.showApplicationSubmitted('邀请申请已提交','商务将结合邀请来源核验客户归属，并完成开户或关联。');
+    const code=document.getElementById('gateInviteCode'); if(!this.validateRequired([[code,'邀请码']])) return;
+    this.pendingInviteCode=code.value.trim();
+    this.modal(`<div class="modal-head"><div><h3>确认绑定广告主</h3><p>请确认邀请码对应的广告主是否正确</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body"><div class="notice warning" style="margin-bottom:16px">确认绑定后，你将进入该广告主的投放空间并获得相应数据权限。</div><div class="summary-list"><div><span>广告主名称</span><b>星海互动</b></div><div><span>SSP 广告主 ID</span><b class="mono">ADV-70285</b></div><div><span>产品应用 / 官网</span><b>StarWave · starwave.example</b></div><div><span>所属行业</span><b>游戏</b></div><div><span>对接商务</span><b>Victor Chen</b></div></div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.openJoinAdvertiser()">返回修改</button><div class="spacer"></div><button class="btn btn-primary" onclick="App.confirmInviteBinding()">确认绑定</button></div>`,true);
+  },
+  confirmInviteBinding(){
+    const p=this.profile()||{};p.advertiserBound=true;p.advertiserName='星海互动';localStorage.setItem('t1_demo_profile',JSON.stringify(p));
+    localStorage.removeItem('t1_advertiser_application');this.pendingInviteCode='';this.syncAccountContext();this.closeModal();this.toast('已绑定广告主「星海互动」');this.go('dash');
   },
   showApplicationSubmitted(title,desc){this.modal(`<div class="modal-body" style="text-align:center;padding:42px"><div style="width:58px;height:58px;border-radius:50%;background:#eef0ff;color:var(--accent);display:grid;place-items:center;margin:0 auto 18px;font-size:26px">✓</div><h3>${title}</h3><p class="muted" style="margin-top:8px">${desc}</p><div class="notice info" style="margin-top:20px;text-align:left">当前状态：<b>审核中</b><br>审核完成前不能再次创建或绑定广告主。</div></div><div class="modal-foot"><div class="spacer"></div><button class="btn btn-primary" onclick="App.closeModal();App.go('dash')">返回首页</button></div>`);},
   cancelAdvertiserApplication(){const app=this.advertiserApplication();if(!app||app.status!=='pending'||app.type!=='new')return;this.modal(`<div class="modal-head"><div><h3>撤销开户申请？</h3><p>撤销后商务将不再处理本次申请，你可以重新提交。</p></div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">暂不撤销</button><div class="spacer"></div><button class="btn btn-danger" onclick="App.confirmCancelAdvertiserApplication()">确认撤销</button></div>`);},
@@ -602,8 +616,8 @@ const App = {
     this.homeState=state;
     if(this.isPreviewMode()){
       const p=this.profile()||{name:'评审用户',email:'review@t1.demo'};p.advertiserBound=state==='empty'||state==='active';localStorage.setItem('t1_demo_profile',JSON.stringify(p));
-      if(state==='pending')localStorage.setItem('t1_advertiser_application',JSON.stringify({type:'create',advertiser:'星海互动',status:'pending'}));
-      else if(state==='rejected')localStorage.setItem('t1_advertiser_application',JSON.stringify({type:'history',advertiser:'星海互动',status:'rejected',rejectReason:'现有信息不足以确认客户与目标广告主的关系'}));
+      if(state==='pending')localStorage.setItem('t1_advertiser_application',JSON.stringify({type:'new',advertiser:'星海互动',status:'pending'}));
+      else if(state==='rejected')localStorage.setItem('t1_advertiser_application',JSON.stringify({type:'bind',advertiser:'星海互动',status:'rejected',rejectReason:'现有信息不足以确认客户与目标广告主的关系'}));
       else localStorage.removeItem('t1_advertiser_application');
       this.syncAccountContext();
     }
@@ -662,7 +676,7 @@ const App = {
     const rejected=forcedState==='rejected'||app?.status==='rejected';
     const ready=forcedState==='empty';
     const demoActions=pending?`<div class="flex" style="gap:8px;margin-left:auto"><button class="btn btn-subtle btn-sm" onclick="App.demoReviewApplication('rejected')">模拟驳回</button><button class="btn btn-primary btn-sm" onclick="App.demoReviewApplication('approved')">模拟通过</button></div>`:'';
-    const applicationLabel=app?.type==='history'?'历史广告主关联申请':app?.type==='new'?'新客户开户申请':app?.type==='invite'?'邀请开户/关联申请':'广告主申请';
+    const applicationLabel=app?.type==='bind'?'已有广告主绑定申请':app?.type==='new'?'新广告主创建申请':app?.type==='invite'?'邀请码绑定申请':'广告主申请';
     const stateStrip=pending?`<div class="application-strip"><span class="badge amber">审核中</span><div><b>${applicationLabel}审核中</b><p>商务正在核验「${app?.advertiser||'客户信息'}」；完成前不能再次提交广告主申请。</p></div>${app?.type==='new'?'<button class="btn btn-ghost btn-sm" onclick="App.cancelAdvertiserApplication()">撤销开户申请</button>':''}${demoActions}</div>`:rejected?`<div class="application-strip"><span class="badge red">需补充</span><div><b>现有信息暂不足</b><p>${app?.rejectReason||'商务暂时无法完成客户与广告主关系核验。'} 你可以补充信息后重新申请。</p></div><button class="btn btn-primary btn-sm" onclick="App.openAdvertiserGate()">补充并重新申请</button></div>`:ready?`<div class="application-strip ready"><div><b>广告主已绑定，可以开始第一条投放</b><p>绑定事件已结束，你可以直接使用投放功能。</p></div><button class="btn btn-primary btn-sm" onclick="App.startRtbCreate()">创建第一条 RTB 投放</button></div>`:'';
     const primary=pending?`<button class="btn btn-primary" disabled>审核完成后开始投放</button>`:`<button class="btn btn-primary" onclick="App.startRtbCreate()">${svg(I.plus)}${ready?'创建第一条 RTB 投放':'开始 RTB 自助投放'}</button>`;
     const foot=pending?'审核期间仍可浏览平台能力、案例和帮助内容。':ready?'广告主已绑定，可直接创建投放。':rejected?'本次申请已结束，可重新创建或绑定广告主。':'浏览平台无需绑定广告主；开始真实投放时再提交创建或绑定申请。';

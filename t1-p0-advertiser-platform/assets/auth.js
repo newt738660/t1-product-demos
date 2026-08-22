@@ -34,8 +34,12 @@
     previewState:function(state){
       var profile={name:'评审用户',email:'review@t1.demo',advertiserBound:state==='empty'||state==='active'};
       localStorage.setItem(PROFILE_KEY,JSON.stringify(profile)); localStorage.setItem(SESSION_KEY,profile.name); localStorage.removeItem(APPLICATION_KEY);
-      if(state==='pending') localStorage.setItem(APPLICATION_KEY,JSON.stringify({type:'create',advertiser:'星海互动',status:'pending'}));
-      if(state==='rejected') localStorage.setItem(APPLICATION_KEY,JSON.stringify({type:'history',advertiser:'星海互动',status:'rejected',rejectReason:'现有信息不足以确认客户与目标广告主的关系'}));
+      if(state==='pending') localStorage.setItem(APPLICATION_KEY,JSON.stringify({type:'new',advertiser:'星海互动',status:'pending'}));
+      if(state==='rejected') localStorage.setItem(APPLICATION_KEY,JSON.stringify({type:'bind',advertiser:'星海互动',status:'rejected',rejectReason:'现有信息不足以确认客户与目标广告主的关系'}));
+      try{
+        var store=JSON.parse(localStorage.getItem('t1-p0-demo-store')||'null');
+        if(store&&store.data&&store.data.uiState){store.data.uiState.lastPage='dash';localStorage.setItem('t1-p0-demo-store',JSON.stringify(store));}
+      }catch(e){}
       location.href='dsp.html?preview=1&state='+encodeURIComponent(state);
     },
     apply:function(){
