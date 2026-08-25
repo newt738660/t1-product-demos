@@ -35,6 +35,15 @@
       <div class="page-title" id="topTitle" hidden>首页</div>
       <div class="page-sub" id="topSub" hidden>投放表现、异常与待处理事项</div>
       <div class="workspace-chip" id="workspaceChip"><span class="workspace-dot"></span>演示广告主</div>
+      <div class="role-simulator" id="roleSimulator">
+        <span>体验角色</span>
+        <select id="demoRole" onchange="App.switchDemoRole(this.value)">
+          <option value="owner">管理员</option>
+          <option value="operator">投放成员</option>
+          <option value="finance">财务成员</option>
+          <option value="viewer">只读成员</option>
+        </select>
+      </div>
       <div class="spacer"></div>
       <button class="icon-btn" id="bellBtn" onclick="App.toggleNotif(event)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
@@ -54,7 +63,7 @@
 <div class="modal-mask" id="modalMask"></div>
 <div class="toast-wrap" id="toastWrap"></div>
 
-<script src="assets/dsp.js?v=2026082501"></script>
+<script src="assets/dsp.js?v=2026082502"></script>
 <script src="assets/theme.js?v=2026081403"></script>
 </body>
 </html>

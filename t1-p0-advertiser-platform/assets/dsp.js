@@ -266,6 +266,13 @@ const NAV = [
   ]},
 ];
 
+const ROLE_EXPERIENCE = {
+  owner:{name:'管理员',desc:'管理广告主空间、投放、资金和成员',nav:['dash','plans','creatives','report','help','billing','settings'],mutate:true},
+  operator:{name:'投放成员',desc:'管理投放与创意，查看效果数据',nav:['dash','plans','creatives','report','help','settings'],mutate:true},
+  finance:{name:'财务成员',desc:'处理充值、账单和财务对账',nav:['dash','report','help','billing','settings'],mutate:false},
+  viewer:{name:'只读成员',desc:'查看广告与效果，不执行修改操作',nav:['dash','plans','creatives','report','help','settings'],mutate:false},
+};
+
 // 非导航的独立页面（顶栏标题 + 高亮的归属导航项）
 const PAGES = {
   campdetail: { label:'广告计划详情', sub:'广告计划概览与下属广告组', nav:'plans' },
@@ -286,7 +293,7 @@ const SCOPE_FMT = {
 };
 
 const App = {
-  cur:'dash', charts:{}, wizStep:1, wiz:{}, PER_PAGE:8, pages:{},
+  cur:'dash', charts:{}, wizStep:1, wiz:{}, PER_PAGE:8, pages:{}, demoRole:'owner',
 
   // 分页助手
   pageSlice(arr, key){
@@ -315,9 +322,9 @@ const App = {
   },
 
   init(){
-    this.load(); if(window.Branding) Branding.apply(DB.profile); this.renderNav();
+    this.load();this.demoRole=localStorage.getItem('t1-demo-role')||'owner';if(window.Branding) Branding.apply(DB.profile); this.renderNav();
     const previewState=new URLSearchParams(location.search).get('state'); if(previewState)this.homeState=previewState;
-    this.syncAccountContext();
+    this.syncAccountContext();this.syncRoleSimulator();
     const query=new URLSearchParams(location.search),requestedNew=query.get('new')==='rtb',welcome=query.get('welcome')==='1';
     if(this.isDemoMode()) DB.uiState.planListView='all';
     this.go(requestedNew?'newplan':((welcome||this.isDemoMode()||this.isPreviewMode())?'dash':(DB.uiState?.lastPage||'dash')));
@@ -332,8 +339,14 @@ const App = {
   syncAccountContext(){
     const bound=this.isAdvertiserBound(), chip=document.getElementById('workspaceChip'), finance=document.getElementById('financeBox');
     if(chip) chip.innerHTML=bound||this.isDemoMode()?'<span class="workspace-dot"></span>演示广告主':'<span class="workspace-dot" style="background:#94a3b8"></span>尚未绑定广告主';
-    if(finance) finance.style.display=(bound||this.isDemoMode())?'':'none';
+    if(finance) finance.style.display=(bound||this.isDemoMode())&&['owner','finance'].includes(this.demoRole)?'':'none';
   },
+  role(){return ROLE_EXPERIENCE[this.demoRole]||ROLE_EXPERIENCE.owner;},
+  syncRoleSimulator(){const box=document.getElementById('roleSimulator'),sel=document.getElementById('demoRole');if(box)box.style.display=this.isDemoMode()?'flex':'none';if(sel)sel.value=this.demoRole;},
+  switchDemoRole(role){this.demoRole=ROLE_EXPERIENCE[role]?role:'owner';localStorage.setItem('t1-demo-role',this.demoRole);this.renderNav();this.syncAccountContext();this.syncRoleSimulator();this.go('dash');this.toast(`已切换为${this.role().name}`);},
+  canOpen(id){const base=(PAGES[id]?.nav)||id;return this.role().nav.includes(base);},
+  isMutationPage(id){return ['newplan','newgroup','newad'].includes(id);},
+  showPermissionDenied(action='访问该页面'){const r=this.role();this.modal(`<div class="modal-head"><div><h3>当前角色没有此权限</h3><p>${r.name} · ${r.desc}</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body"><div class="notice warning">你不能${action}。这不是页面故障，而是当前广告主空间的权限限制。</div><div style="margin-top:16px"><b>如何处理</b><p class="cell-sub" style="margin-top:6px;line-height:1.7">如工作职责发生变化，请联系广告主管理员调整权限模板。系统不会仅凭前端隐藏按钮，提交操作时仍会再次鉴权。</p></div></div><div class="modal-foot"><div class="spacer"></div><button class="btn btn-primary" onclick="App.closeModal()">我知道了</button></div>`,true);},
 
   load(){
     try{ const s=JSON.parse(localStorage.getItem('t1-p0-demo-store')); if(s && s.__v===14) Object.assign(DB, s.data); }catch(e){}
@@ -363,13 +376,15 @@ const App = {
   },
 
   renderNav(){
-    document.getElementById('nav').innerHTML = NAV.map(g=>`
+    document.getElementById('nav').innerHTML = NAV.map(g=>{const items=g.items.filter(it=>this.role().nav.includes(it.id));return items.length?`
       <div class="nav-group-label">${g.group}</div>
-      ${g.items.map(it=>`<button class="nav-item" data-id="${it.id}" onclick="App.go('${it.id}')">${svg(it.ico)}<span>${it.label}</span>${it.badge?`<span class="badge-dot">${it.badge}</span>`:''}</button>`).join('')}
-    `).join('');
+      ${items.map(it=>`<button class="nav-item" data-id="${it.id}" onclick="App.go('${it.id}')">${svg(it.ico)}<span>${it.label}</span>${it.badge?`<span class="badge-dot">${it.badge}</span>`:''}</button>`).join('')}
+    `:''}).join('');
   },
 
   go(id){
+    if(this.isDemoMode()&&!this.canOpen(id)){this.showPermissionDenied('访问该能力');return;}
+    if(this.isDemoMode()&&this.isMutationPage(id)&&!this.role().mutate){this.showPermissionDenied('创建或修改投放');return;}
     if(id==='newplan' && !this.isAdvertiserBound() && !this.isDemoMode()){
       this.pendingAction='newplan';
       const app=this.advertiserApplication();
@@ -387,7 +402,13 @@ const App = {
     document.getElementById('topSub').textContent = meta.sub;
     document.getElementById('content').innerHTML = `<div class="view active">${this['view_'+id]()}</div>`;
     if(this['after_'+id]) this['after_'+id]();
+    this.applyRoleGuards(id);
     window.scrollTo(0,0);
+  },
+  applyRoleGuards(id){
+    if(!this.isDemoMode()||this.role().mutate||id==='billing')return;
+    const pattern=/(beginNew|openNew|open.*Edit|toggle|pause|resume|submit|saveCampaign|saveGroup|saveRtb|editRejected)/i;
+    document.querySelectorAll('#content button[onclick]').forEach(btn=>{if(pattern.test(btn.getAttribute('onclick')||'')){btn.disabled=true;btn.title=`${this.role().name}仅可查看，不能执行此操作`;}});
   },
 
   toast(msg, type='ok'){
@@ -2799,14 +2820,18 @@ const App = {
 
   /* ============ 设置 ============ */
   view_settings(){
+    const admin=this.demoRole==='owner';
+    const tabs=admin?[['basic','基本信息'],['accounts','成员与权限'],['roles','权限模板'],['mine','我的权限'],['audit','操作日志'],['security','安全设置']]:[['mine','我的权限'],['security','安全设置']];
     return `
     <div class="page-head"><div><h1>账户设置</h1><p>广告主资料、成员协作与账号安全</p></div></div>
+    ${this.roleBanner()}
     <div class="segment" id="setTabs" style="margin-bottom:18px">
-      ${[['basic','基本信息'],['accounts','成员与权限'],['roles','权限模板'],['mine','我的权限'],['audit','操作日志'],['security','安全设置']].map((t,i)=>`<button class="${i===0?'active':''}" onclick="App.setSettingsTab(this,'${t[0]}')">${t[1]}</button>`).join('')}
+      ${tabs.map((t,i)=>`<button class="${i===0?'active':''}" onclick="App.setSettingsTab(this,'${t[0]}')">${t[1]}</button>`).join('')}
     </div>
     <div id="setContent"></div>`;
   },
-  after_settings(){ this.setTab = this.setTab || 'basic'; this.renderSetTab(this.setTab); },
+  after_settings(){this.setTab=this.demoRole==='owner'?(this.setTab||'basic'):'mine';this.renderSetTab(this.setTab);},
+  roleBanner(){const r=this.role();return `<div class="role-mode-banner"><span class="badge blue">角色体验</span><div><b>${r.name}</b><div class="cell-sub">${r.desc}</div></div><div class="spacer"></div><span class="cell-sub">顶部可切换角色</span></div>`;},
   setSettingsTab(btn, tab){
     btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
@@ -2886,8 +2911,8 @@ const App = {
     </div><div class="notice info" style="margin-top:16px">权限模板是前台易懂的授权方式；底层仍按权限码鉴权，为后续扩展保留空间。RTB、退款等未上线能力暂不展示入口。</div>`;
   },
   setView_mine(){
-    const me=DB.accounts.find(a=>a.current)||DB.accounts[0],role=DB.roles.find(r=>r.name===me.role)||DB.roles[0];
-    return `<div class="member-summary"><div class="card"><div class="card-pad"><span class="badge green">已生效</span><h3 style="margin:12px 0 5px">星海互动</h3><div class="cell-sub">SSP 广告主 ID：ADV-70285</div><div class="divider" style="margin:18px 0"></div><div class="kv-row"><span class="kv-k">当前成员</span><span class="kv-v">${me.name}</span></div><div class="kv-row"><span class="kv-k">权限模板</span><span class="kv-v">${me.role}</span></div><div class="kv-row"><span class="kv-k">授权来源</span><span class="kv-v">${me.source}</span></div></div></div><div class="card"><div class="card-head"><h3>我可以做什么</h3></div><div class="card-pad"><div class="perm-tags">${role.perms.map(p=>`<span class="badge blue">${p}</span>`).join('')}</div>${role.limits?.length?`<div class="divider" style="margin:18px 0"></div><b>权限边界</b><div class="perm-tags">${role.limits.map(p=>`<span class="badge gray">${p}</span>`).join('')}</div>`:''}<div class="notice info" style="margin-top:18px">如需调整权限，请联系广告主管理员。接口会按 User、Advertiser 和 Permission Code 联合鉴权。</div></div></div></div>`;
+    const me=DB.accounts.find(a=>a.current)||DB.accounts[0],exp=this.role(),role=DB.roles.find(r=>r.name===exp.name)||DB.roles[0];
+    return `<div class="member-summary"><div class="card"><div class="card-pad"><span class="badge green">角色体验中</span><h3 style="margin:12px 0 5px">星海互动</h3><div class="cell-sub">SSP 广告主 ID：ADV-70285</div><div class="divider" style="margin:18px 0"></div><div class="kv-row"><span class="kv-k">体验成员</span><span class="kv-v">${me.name}</span></div><div class="kv-row"><span class="kv-k">当前权限模板</span><span class="kv-v">${exp.name}</span></div><div class="kv-row"><span class="kv-k">授权来源</span><span class="kv-v">管理员邀请 / 业务核验</span></div></div></div><div class="card"><div class="card-head"><h3>我可以做什么</h3></div><div class="card-pad"><div class="perm-tags">${role.perms.map(p=>`<span class="badge blue">${p}</span>`).join('')}</div>${role.limits?.length?`<div class="divider" style="margin:18px 0"></div><b>权限边界</b><div class="perm-tags">${role.limits.map(p=>`<span class="badge gray">${p}</span>`).join('')}</div>`:''}<div class="notice info" style="margin-top:18px">如需调整权限，请联系广告主管理员。接口会按 User、Advertiser 和 Permission Code 联合鉴权。</div></div></div></div>`;
   },
   setView_security(){
     return `

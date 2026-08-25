@@ -308,6 +308,10 @@ body.dark .icon-btn .dot { border-color: var(--surface); }
 .role-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
 .perm-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .member-summary { display: grid; grid-template-columns: minmax(260px, .75fr) minmax(360px, 1.25fr); gap: 18px; align-items: start; }
+.role-simulator { display:flex; align-items:center; gap:8px; margin-left:10px; padding:5px 6px 5px 11px; border:1px solid var(--border); border-radius:10px; background:var(--surface); color:var(--text-3); font-size:12px; }
+.role-simulator select { border:0; outline:0; background:var(--accent-soft); color:var(--accent-strong); border-radius:7px; padding:6px 26px 6px 9px; font-weight:700; cursor:pointer; }
+.role-mode-banner { display:flex; align-items:center; gap:12px; margin-bottom:18px; padding:12px 15px; border:1px solid rgba(91,91,240,.22); border-radius:12px; background:var(--accent-soft); }
+.role-mode-banner b { color:var(--accent-strong); }
 @media (max-width: 900px){ .member-summary { grid-template-columns: 1fr; } }
 @media (max-width: 900px){ .org-layout { grid-template-columns: 1fr; } .org-tree { position: static; } }
 
