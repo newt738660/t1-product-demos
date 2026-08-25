@@ -307,6 +307,8 @@ body.dark .icon-btn .dot { border-color: var(--surface); }
 .org-node.sel svg { color: var(--accent); }
 .role-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
 .perm-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.member-summary { display: grid; grid-template-columns: minmax(260px, .75fr) minmax(360px, 1.25fr); gap: 18px; align-items: start; }
+@media (max-width: 900px){ .member-summary { grid-template-columns: 1fr; } }
 @media (max-width: 900px){ .org-layout { grid-template-columns: 1fr; } .org-tree { position: static; } }
 
 /* ===================== 内容区 ===================== */

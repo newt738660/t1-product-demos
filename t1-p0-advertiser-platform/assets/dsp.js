@@ -78,6 +78,7 @@ I.folder = '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a
 I.image = '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>';
 I.film = '<rect x="2" y="3" width="20" height="18" rx="2"/><path d="M7 3v18M17 3v18M2 9h5M2 15h5M17 9h5M17 15h5"/>';
 I.music = '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>';
+I.x = '<path d="M18 6 6 18M6 6l12 12"/>';
 I.doc = '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/>';
 I.upload = '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 9l5-5 5 5M12 4v12"/>';
 const KIND = {
@@ -185,22 +186,21 @@ const DB = {
     {id:'F-4',folder:'brand',name:'t1_brand_splash_v2_1080x1920.png',type:'image',size:'438 KB',dim:'1080×1920',updated:'2026-08-14',impressions:0,ctr:0,createdAt:'2026-08-14'},
     {id:'F-5',folder:'drafts',name:'brazil_market_feed_1200x628.png',type:'image',size:'192 KB',dim:'1200×628',updated:'2026-08-14',impressions:0,ctr:0,createdAt:'2026-08-14'},
   ],
-  // 角色（RBAC）
+  // 广告主成员权限模板（角色是预设权限集合，不开放任意自定义）
   roles: [
-    {id:'admin',  name:'超级管理员', desc:'全部权限，含成员与角色管理', perms:['仪表盘','广告计划','广告创意','数据报表','充值账单','成员管理','角色配置']},
-    {id:'op',     name:'投放运营',   desc:'广告计划 / 创意 / 报表管理',   perms:['广告计划','广告创意','数据报表']},
-    {id:'finance',name:'财务',       desc:'充值账单与报表只读',           perms:['充值账单','数据报表(只读)']},
-    {id:'viewer', name:'只读',       desc:'仅查看仪表盘与报表',           perms:['仪表盘','数据报表(只读)']},
+    {id:'owner',name:'管理员',desc:'管理广告主空间、成员及全部业务能力',perms:['查看全部业务数据','管理投放与创意','管理资金与账单','邀请及管理成员','交接管理员']},
+    {id:'operator',name:'投放成员',desc:'负责日常投放、创意修改和效果查看',perms:['查看投放数据','管理投放与创意','提交审核'],limits:['不能管理成员','不能查看充值凭证与退款资料']},
+    {id:'finance',name:'财务成员',desc:'负责充值、账单和财务对账',perms:['查看余额与汇总消耗','查看充值记录和账单','发起充值'],limits:['不能创建或修改广告','不能管理成员']},
+    {id:'viewer',name:'只读成员',desc:'查看广告与效果，不执行修改操作',perms:['查看广告与效果数据'],limits:['不能修改投放','不能查看敏感财务资料','不能管理成员']},
   ],
-  // 账号
+  // 广告主成员（每位成员使用自己的 T1 User 登录）
   accounts: [
-    {user:'victor',   role:'超级管理员', post:'管理岗', status:'active',  created:'2025-11-08', dept:'品牌广告部'},
-    {user:'amy.op',   role:'投放运营',   post:'普通岗', status:'active',  created:'2026-01-12', dept:'效果广告部'},
-    {user:'ken.g',    role:'投放运营',   post:'普通岗', status:'active',  created:'2026-02-20', dept:'游戏推广部'},
-    {user:'mia.fin',  role:'财务',       post:'普通岗', status:'active',  created:'2026-03-05', dept:'品牌广告部'},
-    {user:'rex.read', role:'只读',       post:'普通岗', status:'active',  created:'2026-04-18', dept:'电商增长部'},
-    {user:'sun.op',   role:'投放运营',   post:'普通岗', status:'paused',  created:'2026-05-02', dept:'金融获客部'},
-    {user:'tina.e',   role:'投放运营',   post:'普通岗', status:'active',  created:'2026-05-22', dept:'应用分发部'},
+    {user:'victor@mail.com',name:'Victor Wang',role:'管理员',status:'active',joined:'2025-11-08',source:'业务核验',lastSeen:'刚刚',current:true},
+    {user:'amy@starwave.com',name:'Amy Chen',role:'投放成员',status:'active',joined:'2026-01-12',source:'管理员邀请',lastSeen:'今天 09:42'},
+    {user:'ken@starwave.com',name:'Ken Guo',role:'投放成员',status:'active',joined:'2026-02-20',source:'管理员邀请',lastSeen:'昨天 18:21'},
+    {user:'finance@starwave.com',name:'Mia Li',role:'财务成员',status:'active',joined:'2026-03-05',source:'管理员邀请',lastSeen:'8 月 22 日'},
+    {user:'observer@starwave.com',name:'Rex Zhou',role:'只读成员',status:'pending',joined:'—',source:'管理员邀请',lastSeen:'尚未加入'},
+    {user:'former@starwave.com',name:'Sun Yu',role:'投放成员',status:'paused',joined:'2026-05-02',source:'管理员邀请',lastSeen:'8 月 12 日'},
   ],
   // 消息通知
   notifications: [
@@ -336,10 +336,9 @@ const App = {
   },
 
   load(){
-    try{ const s=JSON.parse(localStorage.getItem('t1-p0-demo-store')); if(s && s.__v===13) Object.assign(DB, s.data); }catch(e){}
+    try{ const s=JSON.parse(localStorage.getItem('t1-p0-demo-store')); if(s && s.__v===14) Object.assign(DB, s.data); }catch(e){}
     DB.uiState=DB.uiState||{lastPage:'dash',updatedAt:null};
     DB.auditLogs=DB.auditLogs||[];
-    this.migrateAccountPosts();
     this.save();
   },
   migrateAccountPosts(){
@@ -353,7 +352,7 @@ const App = {
     try{
       DB.uiState=DB.uiState||{};
       DB.uiState.updatedAt=new Date().toISOString();
-      localStorage.setItem('t1-p0-demo-store', JSON.stringify({__v:13,savedAt:DB.uiState.updatedAt,data:DB}));
+      localStorage.setItem('t1-p0-demo-store', JSON.stringify({__v:14,savedAt:DB.uiState.updatedAt,data:DB}));
     }catch(e){ this.toast?.('演示数据保存失败，请检查浏览器存储空间','warn'); }
   },
   resetData(){
@@ -2801,9 +2800,9 @@ const App = {
   /* ============ 设置 ============ */
   view_settings(){
     return `
-    <div class="page-head"><div><h1>账户设置</h1><p>基本信息、角色配置与账号管理</p></div></div>
+    <div class="page-head"><div><h1>账户设置</h1><p>广告主资料、成员协作与账号安全</p></div></div>
     <div class="segment" id="setTabs" style="margin-bottom:18px">
-      ${[['basic','基本信息'],['roles','角色配置'],['accounts','账号配置'],['audit','操作日志'],['security','安全设置']].map((t,i)=>`<button class="${i===0?'active':''}" onclick="App.setSettingsTab(this,'${t[0]}')">${t[1]}</button>`).join('')}
+      ${[['basic','基本信息'],['accounts','成员与权限'],['roles','权限模板'],['mine','我的权限'],['audit','操作日志'],['security','安全设置']].map((t,i)=>`<button class="${i===0?'active':''}" onclick="App.setSettingsTab(this,'${t[0]}')">${t[1]}</button>`).join('')}
     </div>
     <div id="setContent"></div>`;
   },
@@ -2818,6 +2817,7 @@ const App = {
     document.getElementById('setContent').innerHTML =
       tab==='roles' ? this.setView_roles() :
       tab==='accounts' ? this.setView_accounts() :
+      tab==='mine' ? this.setView_mine() :
       tab==='audit' ? this.setView_audit() :
       tab==='security' ? this.setView_security() :
       this.setView_basic();
@@ -2872,18 +2872,22 @@ const App = {
     const count = id => { const r=DB.roles.find(x=>x.id===id); return DB.accounts.filter(a=>a.role===(r&&r.name)).length; };
     return `
     <div class="card">
-      <div class="card-head"><h3>角色配置（RBAC）</h3><div class="spacer"></div><button class="btn btn-primary btn-sm" onclick="App.openRole()">${svg(I.plus)}新建角色</button></div>
+      <div class="card-head"><div><h3>预设权限模板</h3><div class="cell-sub">首版不开放自定义角色与逐项权限配置</div></div><div class="spacer"></div><span class="badge blue">平台预设</span></div>
       <div class="card-pad flex-col" style="gap:12px">
         ${DB.roles.map(r=>`
           <div class="role-card">
             <div class="flex between">
               <div><b style="font-size:14px">${r.name}</b> <span class="badge gray">${count(r.id)} 名成员</span><div class="cell-sub" style="margin-top:3px">${r.desc}</div></div>
-              <button class="icon-btn btn-sm" title="编辑" onclick="App.openRole('${r.id}')">${svg(I.edit)}</button>
             </div>
             <div class="perm-tags">${r.perms.map(p=>`<span class="badge blue">${p}</span>`).join('')}</div>
+            ${r.limits?.length?`<div class="perm-tags">${r.limits.map(p=>`<span class="badge gray">${p}</span>`).join('')}</div>`:''}
           </div>`).join('')}
       </div>
-    </div>`;
+    </div><div class="notice info" style="margin-top:16px">权限模板是前台易懂的授权方式；底层仍按权限码鉴权，为后续扩展保留空间。RTB、退款等未上线能力暂不展示入口。</div>`;
+  },
+  setView_mine(){
+    const me=DB.accounts.find(a=>a.current)||DB.accounts[0],role=DB.roles.find(r=>r.name===me.role)||DB.roles[0];
+    return `<div class="member-summary"><div class="card"><div class="card-pad"><span class="badge green">已生效</span><h3 style="margin:12px 0 5px">星海互动</h3><div class="cell-sub">SSP 广告主 ID：ADV-70285</div><div class="divider" style="margin:18px 0"></div><div class="kv-row"><span class="kv-k">当前成员</span><span class="kv-v">${me.name}</span></div><div class="kv-row"><span class="kv-k">权限模板</span><span class="kv-v">${me.role}</span></div><div class="kv-row"><span class="kv-k">授权来源</span><span class="kv-v">${me.source}</span></div></div></div><div class="card"><div class="card-head"><h3>我可以做什么</h3></div><div class="card-pad"><div class="perm-tags">${role.perms.map(p=>`<span class="badge blue">${p}</span>`).join('')}</div>${role.limits?.length?`<div class="divider" style="margin:18px 0"></div><b>权限边界</b><div class="perm-tags">${role.limits.map(p=>`<span class="badge gray">${p}</span>`).join('')}</div>`:''}<div class="notice info" style="margin-top:18px">如需调整权限，请联系广告主管理员。接口会按 User、Advertiser 和 Permission Code 联合鉴权。</div></div></div></div>`;
   },
   setView_security(){
     return `
@@ -2915,20 +2919,16 @@ const App = {
     this.toast('密码已修改成功');
   },
   setView_accounts(){
-    this.orgSel = this.orgSel || ORG.name;
     return `
-    <div class="org-layout">
-      <aside class="card org-tree"><div class="card-head"><h3>公司目录</h3></div>
-        <div class="card-pad">${this.renderOrgNode(ORG)}</div>
-      </aside>
+      <div class="notice info" style="margin-bottom:16px">成员使用各自的 T1 账号登录。邀请只建立其与当前广告主的成员关系，不创建“子账号”。</div>
       <div class="card">
-        <div class="card-head"><h3 id="acctScope">${this.orgSel}</h3><div class="spacer"></div><button class="btn btn-primary btn-sm" onclick="App.openAccount()">${svg(I.plus)}新建账号</button></div>
+        <div class="card-head"><div><h3>星海互动 · 成员</h3><div class="cell-sub">每位成员只获得完成职责所需的权限</div></div><div class="spacer"></div><button class="btn btn-subtle btn-sm" onclick="App.openOwnerTransfer()">交接管理员</button><button class="btn btn-primary btn-sm" onclick="App.openInviteMember()">${svg(I.plus)}邀请成员</button></div>
         <div class="table-wrap"><table>
-          <thead><tr><th>用户名</th><th>角色</th><th>岗位类型</th><th>状态</th><th>创建时间</th><th class="act">操作</th></tr></thead>
+          <thead><tr><th>成员</th><th>权限模板</th><th>状态</th><th>加入方式</th><th>最近访问</th><th class="act">操作</th></tr></thead>
           <tbody id="acctBody"></tbody>
         </table></div>
       </div>
-    </div>`;
+      <div class="notice warning" style="margin-top:16px"><b>待 SSP 确认：</b>同一 SSP Advertiser 是否允许多个 User 授权，以及多广告主场景的最终关联与切换规则。</div>`;
   },
   renderOrgNode(node, depth=0){
     const leaf = !node.children;
@@ -2950,17 +2950,20 @@ const App = {
     return null;
   },
   renderAccounts(){
-    const node = this.findOrg(ORG, this.orgSel) || ORG;
-    const leaves = orgLeaves(node);
-    const rows = DB.accounts.filter(a=>leaves.includes(a.dept));
-    const st = s => s==='active'
-      ? '<span class="badge green"><span class="dot-status green"></span>启用</span>'
-      : '<span class="badge gray"><span class="dot-status gray"></span>禁用</span>';
-    document.getElementById('acctBody').innerHTML = rows.map(a=>`
-      <tr><td class="cell-main">${a.user}</td><td><span class="badge blue">${a.role}</span></td><td>${a.post}</td><td>${st(a.status)}</td><td class="mono cell-sub">${a.created}</td>
-      <td class="act"><div class="t-actions"><button class="icon-btn btn-sm" title="编辑" onclick="App.openAccount('${a.user}')">${svg(I.edit)}</button></div></td></tr>`).join('')
-      || `<tr><td colspan="6"><div class="empty">${svg(I.cog)}<div>该部门下暂无账号</div></div></td></tr>`;
+    const st = s => s==='active'?'<span class="badge green">已生效</span>':s==='pending'?'<span class="badge amber">待接受</span>':'<span class="badge gray">已暂停</span>';
+    document.getElementById('acctBody').innerHTML = DB.accounts.map(a=>`
+      <tr><td><div class="cell-main">${a.name}${a.current?' <span class="badge blue">我</span>':''}</div><div class="cell-sub">${a.user}</div></td><td><span class="badge blue">${a.role}</span></td><td>${st(a.status)}</td><td>${a.source}</td><td class="cell-sub">${a.lastSeen}</td>
+      <td class="act"><div class="t-actions">${a.current?'<span class="cell-sub">当前账号</span>':`<button class="btn btn-subtle btn-sm" onclick="App.openMember('${a.user}')">管理</button>`}</div></td></tr>`).join('');
   },
+  openInviteMember(){
+    this.modal(`<div class="modal-head"><div><h3>邀请成员</h3><p>邀请指定用户加入「星海互动」</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body"><div class="field"><label>邮箱或手机号 <span class="req">*</span></label><input class="input" id="inviteUser" placeholder="成员将使用自己的 T1 账号接受邀请"></div><div class="field"><label>权限模板</label><select class="select" id="inviteRole" onchange="App.previewInviteRole(this.value)">${DB.roles.filter(r=>r.id!=='owner').map(r=>`<option value="${r.name}">${r.name}</option>`).join('')}</select></div><div id="invitePreview"></div><div class="notice info">邀请定向发送、限时有效且可撤销；接受邀请前不会展示广告主资产。</div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><button class="btn btn-primary" onclick="App.saveInviteMember()">发送邀请</button></div>`,true);this.previewInviteRole('投放成员');
+  },
+  previewInviteRole(name){const r=DB.roles.find(x=>x.name===name),el=document.getElementById('invitePreview');if(el&&r)el.innerHTML=`<div class="role-card" style="margin-bottom:14px"><b>${r.name}</b><div class="cell-sub" style="margin:5px 0 9px">${r.desc}</div><div class="perm-tags">${r.perms.map(p=>`<span class="badge blue">${p}</span>`).join('')}</div>${r.limits?.length?`<div class="perm-tags">${r.limits.map(p=>`<span class="badge gray">${p}</span>`).join('')}</div>`:''}</div>`;},
+  saveInviteMember(){const user=(document.getElementById('inviteUser').value||'').trim(),role=document.getElementById('inviteRole').value;if(!user){this.toast('请填写成员邮箱或手机号','info');return;}if(DB.accounts.some(a=>a.user===user)){this.toast('该用户已在成员列表中','info');return;}DB.accounts.push({user,name:user.split('@')[0],role,status:'pending',joined:'—',source:'管理员邀请',lastSeen:'尚未加入'});DB.auditLogs.unshift({time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'Victor Wang',action:'邀请成员',target:user,result:'待接受'});this.save();this.closeModal();this.renderAccounts();this.toast('邀请已发送');},
+  openMember(user){const a=DB.accounts.find(x=>x.user===user);if(!a)return;this.modal(`<div class="modal-head"><div><h3>管理成员</h3><p>${a.name} · ${a.user}</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body"><div class="field"><label>权限模板</label><select class="select" id="memberRole">${DB.roles.filter(r=>r.id!=='owner').map(r=>`<option ${r.name===a.role?'selected':''}>${r.name}</option>`).join('')}</select></div><div class="field"><label>成员状态</label><select class="select" id="memberStatus"><option value="active" ${a.status==='active'?'selected':''}>已生效</option><option value="paused" ${a.status==='paused'?'selected':''}>已暂停</option>${a.status==='pending'?'<option value="pending" selected>待接受</option>':''}</select></div><div class="notice warning">暂停后应立即撤销该成员的有效会话；其创建的广告资产和历史记录仍归广告主。</div></div><div class="modal-foot"><button class="btn btn-danger" onclick="App.removeMember('${a.user}')">移除成员</button><div class="spacer"></div><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><button class="btn btn-primary" onclick="App.saveMember('${a.user}')">保存</button></div>`,true);},
+  saveMember(user){const a=DB.accounts.find(x=>x.user===user);if(!a)return;a.role=document.getElementById('memberRole').value;a.status=document.getElementById('memberStatus').value;DB.auditLogs.unshift({time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'Victor Wang',action:'调整成员权限',target:user,result:'成功'});this.save();this.closeModal();this.renderAccounts();this.toast('成员权限已更新');},
+  removeMember(user){const a=DB.accounts.find(x=>x.user===user);if(!a)return;DB.accounts=DB.accounts.filter(x=>x.user!==user);DB.auditLogs.unshift({time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'Victor Wang',action:'移除成员',target:user,result:'成功'});this.save();this.closeModal();this.renderAccounts();this.toast('成员已移除');},
+  openOwnerTransfer(){const targets=DB.accounts.filter(a=>!a.current&&a.status==='active');this.modal(`<div class="modal-head"><div><h3>交接管理员</h3><p>目标成员确认后生效</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body"><div class="notice warning" style="margin-bottom:14px">管理员交接会改变成员治理权限，不能只通过修改角色直接完成。</div><div class="field"><label>新管理员</label><select class="select" id="ownerTarget">${targets.map(a=>`<option value="${a.user}">${a.name} · ${a.user}</option>`).join('')}</select></div><div class="field"><label>交接后我的权限</label><select class="select"><option>保留共同管理员</option><option>调整为投放成员</option><option>退出广告主</option></select></div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><button class="btn btn-primary" onclick="App.closeModal();App.toast('交接确认已发送')">发起交接确认</button></div>`,true);},
   openRole(id){
     const ALL = ['仪表盘','广告计划','广告创意','数据报表','数据报表(只读)','充值账单','成员管理','角色配置'];
     const r = id ? DB.roles.find(x=>x.id===id) : {id:'', name:'', desc:'', perms:[]};
