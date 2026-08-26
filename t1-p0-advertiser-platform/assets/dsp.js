@@ -985,6 +985,7 @@ const App = {
   },
   openCampaignEdit(id,returnToList=false){
     const cp=DB.campaigns.find(c=>c.id===id);if(!cp)return;
+    if(cp.mode==='cpd'){this.toast('CPD 广告计划由运营管理，广告主不可修改','info');return;}
     this.editFlow={type:'campaign',id,returnPage:returnToList?'plans':'campdetail'};
     this.curCamp=id;this.go('newplan');
   },
@@ -1088,7 +1089,7 @@ const App = {
     <div class="card group-setting-summary">
       <div class="group-summary-head">
         <div><b>投放设置</b><span class="badge ${groupIssue.cls}">${groupIssue.label}</span>${groupIssue.key!=='ready'?`<span class="group-issue-reason">${deliveryText}</span>`:''}</div>
-        <button class="text-link" onclick="App.openGroupEdit('${group.id}')">查看或修改投放设置</button>
+        ${isRtb?`<button class="text-link" onclick="App.openGroupEdit('${group.id}')">查看或修改投放设置</button>`:'<span class="cell-sub">投放设置由运营管理</span>'}
       </div>
       <dl class="group-setting-grid">
         <div class="group-setting-period"><dt>投放周期</dt><dd>${group.start||cp.start||'—'} 至 ${group.end||cp.end||'长期投放'}</dd></div>
@@ -1102,18 +1103,20 @@ const App = {
   },
   toggleGroupStatus(id,returnPage='groupdetail'){
     const group=(DB.adGroups||[]).find(g=>g.id===id);if(!group||!['active','paused'].includes(group.status))return;
+    const cp=DB.campaigns.find(c=>c.id===group.camp);if(cp?.mode==='cpd'){this.toast('CPD 广告组由运营管理，广告主不可启停','info');return;}
     const next=group.status==='paused'?'active':'paused';group.status=next;
     DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:next==='paused'?'暂停广告组':'恢复广告组',target:group.id,result:'成功'});
     this.save();this.go(returnPage);this.toast(next==='paused'?'广告组已暂停；下属创意自身状态保持不变':'广告组已恢复；符合条件的创意可继续投放');
   },
   toggleCreativeStatus(id){
     const creative=DB.creatives.find(a=>a.id===id);if(!creative||!['active','paused'].includes(creative.status))return;
+    const cp=DB.campaigns.find(c=>c.id===creative.camp);if(cp?.mode==='cpd'){this.toast('CPD 广告创意的启停由运营管理','info');return;}
     const next=creative.status==='paused'?'active':'paused';creative.status=next;creative.updated=new Date().toISOString().slice(0,10);
     DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:next==='paused'?'暂停广告创意':'恢复广告创意',target:creative.id,result:'成功'});
     this.save();this.go('groupdetail');this.toast(next==='paused'?'广告创意已暂停':'广告创意已恢复；是否实际投放仍取决于上级状态');
   },
-  openNewCreativeForGroup(id){const group=(DB.adGroups||[]).find(g=>g.id===id);if(!group)return;this.curGroup=id;this.curCamp=group.camp;this.editRejectedId=null;this.go('newad');},
-  openGroupEdit(id,returnPage='groupdetail'){const g=(DB.adGroups||[]).find(x=>x.id===id);if(!g)return;this.editFlow={type:'group',id,returnPage};this.curGroup=id;this.curCamp=g.camp;this.go('newplan');},
+  openNewCreativeForGroup(id){const group=(DB.adGroups||[]).find(g=>g.id===id);if(!group)return;const cp=DB.campaigns.find(c=>c.id===group.camp);if(cp?.mode==='cpd'){this.toast('CPD 创意由运营创建，广告主只能修改允许的创意内容','info');return;}this.curGroup=id;this.curCamp=group.camp;this.editRejectedId=null;this.go('newad');},
+  openGroupEdit(id,returnPage='groupdetail'){const g=(DB.adGroups||[]).find(x=>x.id===id);if(!g)return;const cp=DB.campaigns.find(c=>c.id===g.camp);if(cp?.mode==='cpd'){this.toast('CPD 广告组由运营管理，广告主不可修改','info');return;}this.editFlow={type:'group',id,returnPage};this.curGroup=id;this.curCamp=g.camp;this.go('newplan');},
   saveGroupEdit(){const g=(DB.adGroups||[]).find(x=>x.id===this.editGroupId);if(!g)return;const old=g.name,name=document.getElementById('editGroupName').value.trim(),bid=Number(document.getElementById('editGroupBid').value||0);if(!name||!bid){this.toast('请填写广告组名称和出价','warn');return;}g.name=name;g.bidType=document.getElementById('editGroupBidType').value;g.bid=bid;g.inventory=document.getElementById('editGroupInventory').value;DB.creatives.filter(a=>a.groupId===g.id||a.group===old).forEach(a=>a.group=name);this.save();this.closeModal();this.go(this.editGroupReturnPage||'groupdetail');this.editGroupReturnPage=null;this.toast('广告组已更新');},
   openGroupCreatives(group){
     const btn=document.querySelectorAll('#campaignTabs button')[3];
@@ -1384,6 +1387,7 @@ const App = {
   },
   initUnifiedEditFlow(){
     const flow=this.editFlow,cp=DB.campaigns.find(c=>c.id===this.curCamp);if(!flow||!cp){this.editFlow=null;this.toast('未找到需要编辑的投放对象','warn');this.go('plans');return;}
+    if(cp.mode==='cpd'&&flow.type!=='creative'){this.editFlow=null;this.toast('CPD 广告计划和广告组由运营管理，广告主不可修改','info');this.go(flow.returnPage||'plans');return;}
     const labels={campaign:'广告计划',group:'广告组',creative:'广告创意'},target=labels[flow.type];
     document.getElementById('topTitle').textContent=`编辑${target}`;
     document.getElementById('topSub').textContent='复用 RTB 三级投放结构，当前仅修改所在层级';
