@@ -1555,10 +1555,10 @@ const App = {
     const heading=section.querySelector('.level-heading p');if(heading)heading.textContent='修改允许客户提交的素材、文案和目标链接';
     const nameInput=document.getElementById('ufCreativeName'),nameField=nameInput?.closest('.field');if(nameField)nameField.innerHTML=`<label>广告创意名称</label><div class="readonly-value"><b>${creative.name}</b><span>${creative.id} · 内部识别信息，不向终端用户展示</span></div>`;
     const jump=document.getElementById('ufJump'),jumpField=jump?.closest('.field');if(jumpField)jumpField.innerHTML='<label>跳转类型</label><div class="readonly-value"><b>外部跳转</b><span>由当前投放配置确定</span></div>';
-    const headline=document.getElementById('ufHeadline')?.closest('.field');if(headline&&!document.getElementById('ufDescription'))headline.insertAdjacentHTML('afterend','<div class="field"><label>补充文案</label><textarea class="textarea" id="ufDescription" rows="3" maxlength="200" placeholder="填写需要随本次创意一并审核的补充文案"></textarea></div>');
+    const headline=document.getElementById('ufHeadline')?.closest('.field');if(headline&&!document.getElementById('ufDescription'))headline.insertAdjacentHTML('afterend','<div class="field"><label>补充文案</label><textarea class="input" id="ufDescription" rows="3" maxlength="200" placeholder="填写需要随本次创意一并审核的补充文案"></textarea></div>');
     this.setUfValue('ufDescription',(creative.pendingVersion||creative).description||creative.description||'');
     const block=section.querySelector('.paper-block');if(block)block.insertAdjacentHTML('afterbegin','<div class="notice info" style="margin-bottom:16px">广告计划、广告组、创意名称及投放设置由运营管理；本次只提交创意内容变更。</div>');
-    const action=section.querySelector('.level-actions');if(action)action.innerHTML='';
+    section.querySelector('.level-actions')?.remove();
   },
   editUfLevel(target){ document.getElementById(target)?.classList.remove('completed'); this.jumpUnified(target); },
   saveUfCampaign(){
