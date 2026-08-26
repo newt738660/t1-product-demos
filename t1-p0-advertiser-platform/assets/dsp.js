@@ -1015,7 +1015,7 @@ const App = {
       <dl class="group-setting-grid plan-setting-grid">
         <div><dt>投放类型</dt><dd>${cp.mode==='cpd'?'CPD 运营代投':'RTB 自助投放'}</dd></div>
         <div class="group-setting-period"><dt>投放周期</dt><dd>${cp.period||'—'}</dd></div>
-        ${cp.mode==='rtb'?`<div><dt>花费 / 预算</dt><dd>${fmtMoney(spend)} / ${fmtMoney(budget||0)}</dd></div><div><dt>每日上限</dt><dd>${cp.dailyCap?fmtMoney(cp.dailyCap):'未单独设置'}</dd></div>`:`<div><dt>开始时间</dt><dd>${cp.start||'—'}</dd></div><div><dt>结束时间</dt><dd>${cp.end||'长期投放'}</dd></div>`}
+        ${cp.mode==='rtb'?`<div><dt>花费 / 预算</dt><dd>${fmtMoney(spend)} / ${fmtMoney(budget||0)}</dd></div><div><dt>每日上限</dt><dd>${cp.dailyCap?fmtMoney(cp.dailyCap):'未单独设置'}</dd></div>`:''}
       </dl>
     </div>
     ${cp.mode==='cpd'?`<div class="notice info" style="margin-bottom:14px">该计划由运营创建并管理。价格、库存、投放周期、时段和启停状态不可修改；你可以查看数据并提交创意图片、文案或落地页变更。</div>`:''}
