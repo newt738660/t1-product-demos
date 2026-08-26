@@ -833,6 +833,23 @@ body:has(.cpd-edit-actions) .unified-create{padding-bottom:78px}
 .plan-row-action:hover{text-decoration:underline}.plan-row-action:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
 .plan-bulk-bar{display:none;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--accent-soft)}
 .plan-bulk-bar.show{display:flex}
+
+/* 广告组宽表：CPD / RTB 均只冻结对象识别列，状态等业务字段随表格滚动。 */
+.campaign-group-table th:first-child,
+.campaign-group-table td:first-child{
+  position:sticky;
+  left:0;
+  z-index:4;
+  min-width:240px;
+  max-width:240px;
+  background:var(--surface);
+  box-shadow:8px 0 12px -12px rgba(15,27,45,.32);
+}
+.campaign-group-table thead th:first-child{
+  z-index:6;
+  background:var(--surface-2);
+}
+.campaign-group-table tbody tr:hover td:first-child{background:var(--surface-2)}
 .plan-bulk-bar span{font-size:12px;color:var(--text-3)}
 .plan-action-list{display:grid;gap:10px}
 .plan-action-list>button{display:flex;align-items:center;gap:13px;width:100%;padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);text-align:left;color:var(--text);cursor:pointer}
