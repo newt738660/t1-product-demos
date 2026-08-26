@@ -896,3 +896,9 @@ body.dsp .code-body { color: #d7d7fb; }
   #uf-campaign .hint{display:none}
   #uf-campaign .level-actions{padding-top:7px;padding-bottom:7px}
 }
+/* CPD 只读上下文与创意变更表单 */
+.campaign-group-table.cpd-readonly-table{min-width:1090px}
+.readonly-context-level .level-summary{background:var(--surface-2)}
+.readonly-value{display:flex;min-height:44px;box-sizing:border-box;flex-direction:column;justify-content:center;gap:3px;padding:10px 12px;border:1px solid var(--border);border-left:3px solid var(--text-3);border-radius:8px;background:var(--surface-2);color:var(--text)}
+.readonly-value b{font-size:13px}.readonly-value span{color:var(--text-3);font-size:11.5px}
+.form-toc button.locked.done{opacity:.72}.form-toc button.locked.done:hover{background:transparent}
