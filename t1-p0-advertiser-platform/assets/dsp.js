@@ -120,7 +120,7 @@ function creativeThumb(a){
 
 const DB = {
   balance: 8420.50,
-  meta: { schemaVersion:13, scenario:'T1 P0 全状态评审场景', seededAt:'2026-08-18' },
+  meta: { schemaVersion:14, scenario:'T1 P0 全状态评审场景', seededAt:'2026-08-26' },
   uiState: { lastPage:'dash', updatedAt:null },
   auditLogs: [
     {id:'LOG-1',time:'2026-08-14 09:15',actor:'Amy Chen',action:'提交充值凭证',target:'RC-4002',result:'待审核'},
@@ -142,13 +142,13 @@ const DB = {
   ],
   adGroups: [
     {id:'G-2001',scenario:'standard',camp:'C-1001',name:'德国与法国｜Web/H5 信息流',periodType:'fixed',start:'2026-08-01',end:'2026-08-31',pace:'even',budget:5000,spend:1560.80,dailyCap:200,bidType:'CPM',bid:2.40,geo:'德国、法国',device:'不限',format:'feed',inventory:'Web / H5 优质信息流',status:'active'},
-    {id:'G-2002',scenario:'standard',camp:'C-1002',name:'T1 News App｜首页开屏｜全天',periodType:'fixed',start:'2026-08-12',end:'2026-08-18',pace:'even',budget:0,dailyCap:0,bidType:'CPD',bid:0,geo:'全部',device:'Android、iOS',format:'splashimg',inventory:'T1 News App · 首页开屏',status:'active',managedBy:'Linda Zhao'},
-    {id:'G-2003',scenario:'state-case',camp:'C-1003',name:'信息流首刷｜新品预热',start:'2026-08-25',end:'2026-09-05',format:'feed',inventory:'T1 News App · 信息流首刷',status:'active',managedBy:'Kevin Wu'},
-    {id:'G-2004',scenario:'state-case',camp:'C-1004',name:'首页焦点图｜会员日',start:'2026-08-10',end:'2026-08-28',format:'bbanner',inventory:'T1 Video · 首页焦点图',status:'active',managedBy:'Linda Zhao'},
-    {id:'G-2005',scenario:'state-case',camp:'C-1005',name:'游戏开屏｜预约期',start:'2026-08-15',end:'2026-08-31',format:'splashimg',inventory:'T1 Games · 开屏',status:'active',managedBy:'Mia Sun'},
-    {id:'G-2006',scenario:'state-case',camp:'C-1006',name:'商品信息流｜暑促',start:'2026-08-15',end:'2026-08-31',format:'feed',inventory:'T1 Mall · 商品信息流',status:'active',managedBy:'Kevin Wu'},
-    {id:'G-2007',scenario:'state-case',camp:'C-1007',name:'文章页横幅｜同步异常',start:'2026-08-16',end:'2026-08-30',format:'mbanner',inventory:'T1 News App · 文章页横幅',status:'active',managedBy:'Linda Zhao'},
-    {id:'G-2008',scenario:'state-case',camp:'C-1008',name:'首页开屏｜春季品牌',start:'2026-04-01',end:'2026-04-15',format:'splashimg',inventory:'T1 News App · 首页开屏',status:'ended',managedBy:'Mia Sun'},
+    {id:'G-2002',scenario:'standard',camp:'C-1002',name:'T1 News App｜首页开屏｜全天',periodType:'fixed',start:'2026-08-12',end:'2026-08-18',contractAmount:15000,contractDuration:'7 天',contractNo:'CPD-202608-018',schedule:'2026-08-12 至 2026-08-18',bidType:'CPD',geo:'全部',device:'Android、iOS',frequency:'每用户每天 1 次',format:'splashimg',inventoryScope:'指定广告位',inventory:'T1 News App · 首页开屏',status:'active',managedBy:'Linda Zhao'},
+    {id:'G-2003',scenario:'state-case',camp:'C-1003',name:'信息流首刷｜新品预热',start:'2026-08-25',end:'2026-09-05',contractAmount:22000,contractDuration:'12 天',contractNo:'CPD-202608-025',schedule:'2026-08-25 至 2026-09-05',bidType:'CPD',geo:'全部',device:'Android、iOS',frequency:'每用户每天 3 次',format:'feed',inventoryScope:'指定广告位',inventory:'T1 News App · 信息流首刷',status:'active',managedBy:'Kevin Wu'},
+    {id:'G-2004',scenario:'state-case',camp:'C-1004',name:'首页焦点图｜会员日',start:'2026-08-10',end:'2026-08-28',contractAmount:18000,contractDuration:'19 天',contractNo:'CPD-202608-021',schedule:'2026-08-10 至 2026-08-28',bidType:'CPD',geo:'全部',device:'不限',frequency:'不限',format:'bbanner',inventoryScope:'指定广告位',inventory:'T1 Video · 首页焦点图',status:'active',managedBy:'Linda Zhao'},
+    {id:'G-2005',scenario:'state-case',camp:'C-1005',name:'游戏开屏｜预约期',start:'2026-08-15',end:'2026-08-31',contractAmount:26000,contractDuration:'17 天',contractNo:'CPD-202608-022',schedule:'2026-08-15 至 2026-08-31',bidType:'CPD',geo:'全部',device:'Android、iOS',frequency:'每用户每天 1 次',format:'splashimg',inventoryScope:'指定广告位',inventory:'T1 Games · 开屏',status:'active',managedBy:'Mia Sun'},
+    {id:'G-2006',scenario:'state-case',camp:'C-1006',name:'商品信息流｜暑促',start:'2026-08-15',end:'2026-08-31',contractAmount:16000,contractDuration:'17 天',contractNo:'CPD-202608-023',schedule:'2026-08-15 至 2026-08-31',bidType:'CPD',geo:'全部',device:'不限',frequency:'每用户每天 3 次',format:'feed',inventoryScope:'指定广告位',inventory:'T1 Mall · 商品信息流',status:'active',managedBy:'Kevin Wu'},
+    {id:'G-2007',scenario:'state-case',camp:'C-1007',name:'文章页横幅｜同步异常',start:'2026-08-16',end:'2026-08-30',contractAmount:14000,contractDuration:'15 天',contractNo:'CPD-202608-024',schedule:'2026-08-16 至 2026-08-30',bidType:'CPD',geo:'全部',device:'不限',frequency:'不限',format:'mbanner',inventoryScope:'指定广告位',inventory:'T1 News App · 文章页横幅',status:'active',managedBy:'Linda Zhao'},
+    {id:'G-2008',scenario:'state-case',camp:'C-1008',name:'首页开屏｜春季品牌',start:'2026-04-01',end:'2026-04-15',contractAmount:30000,contractDuration:'15 天',contractNo:'CPD-202604-006',schedule:'2026-04-01 至 2026-04-15',bidType:'CPD',geo:'全部',device:'Android、iOS',frequency:'每用户每天 1 次',format:'splashimg',inventoryScope:'指定广告位',inventory:'T1 News App · 首页开屏',status:'ended',managedBy:'Mia Sun'},
     {id:'G-2011',scenario:'state-case',camp:'C-1011',name:'巴西｜App/H5 信息流',start:'2026-08-18',end:'2026-09-18',format:'feed',inventory:'App / H5 图片信息流',status:'active',budget:3000,bidType:'CPM',bid:1.8,geo:'巴西',device:'不限'},
   ],
   creatives: [
@@ -349,7 +349,7 @@ const App = {
   showPermissionDenied(action='访问该页面'){const r=this.role();this.modal(`<div class="modal-head"><div><h3>当前角色没有此权限</h3><p>${r.name} · ${r.desc}</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body"><div class="notice warning">你不能${action}。这不是页面故障，而是当前广告主空间的权限限制。</div><div style="margin-top:16px"><b>如何处理</b><p class="cell-sub" style="margin-top:6px;line-height:1.7">如工作职责发生变化，请联系广告主管理员调整权限模板。系统不会仅凭前端隐藏按钮，提交操作时仍会再次鉴权。</p></div></div><div class="modal-foot"><div class="spacer"></div><button class="btn btn-primary" onclick="App.closeModal()">我知道了</button></div>`,true);},
 
   load(){
-    try{ const s=JSON.parse(localStorage.getItem('t1-p0-demo-store')); if(s && s.__v===14) Object.assign(DB, s.data); }catch(e){}
+    try{ const s=JSON.parse(localStorage.getItem('t1-p0-demo-store')); if(s && s.__v===15) Object.assign(DB, s.data); }catch(e){}
     DB.uiState=DB.uiState||{lastPage:'dash',updatedAt:null};
     DB.auditLogs=DB.auditLogs||[];
     this.save();
@@ -365,7 +365,7 @@ const App = {
     try{
       DB.uiState=DB.uiState||{};
       DB.uiState.updatedAt=new Date().toISOString();
-      localStorage.setItem('t1-p0-demo-store', JSON.stringify({__v:14,savedAt:DB.uiState.updatedAt,data:DB}));
+      localStorage.setItem('t1-p0-demo-store', JSON.stringify({__v:15,savedAt:DB.uiState.updatedAt,data:DB}));
     }catch(e){ this.toast?.('演示数据保存失败，请检查浏览器存储空间','warn'); }
   },
   resetData(){
@@ -1408,7 +1408,6 @@ const App = {
       document.getElementById('topTitle').textContent='修改 CPD 广告创意';
       document.getElementById('topSub').textContent='复用三级投放结构，仅开放允许客户修改的创意内容';
       this.ufWorking={campaign:{...cp},group:{...group},existingCampaignId:cp.id};
-      this.fillUfGroup(group);
       this.lockUfContextLevel('uf-campaign',`${cp.name} · ${cp.id}`);
       this.lockUfContextLevel('uf-group',`${group.name} · ${group.id}`);
       this.unlockUf('uf-creative',3);this.fillUfCreative(creative);this.prepareCpdCreativeForm(creative);
@@ -1556,9 +1555,19 @@ const App = {
     let el=section.querySelector('.level-summary'); if(!el){el=document.createElement('div');el.className='level-summary';section.appendChild(el);} el.innerHTML=`<div><span class="badge green">已确认</span><b>${summary}</b></div><button class="btn btn-ghost btn-sm" onclick="App.editUfLevel('${target}')">编辑</button>`;
     const btn=document.querySelector(`#unifiedToc button[data-target="${target}"]`); btn.classList.add('done'); btn.classList.remove('active'); btn.querySelector('span').textContent='✓';
   },
+  cpdReadonlyField(label,value,wide=false){return `<div class="${wide?'wide':''}"><dt>${label}</dt><dd>${value??'—'}</dd></div>`;},
+  renderCpdReadonlyLevel(target){
+    const cp=DB.campaigns.find(c=>c.id===this.curCamp)||{},group=(DB.adGroups||[]).find(g=>g.id===this.curGroup)||{};
+    if(target==='uf-campaign'){
+      const budget=(cp.totalBudget||cp.budget)?fmtMoney(cp.totalBudget||cp.budget):'—',daily=cp.dailyCap?fmtMoney(cp.dailyCap):'—';
+      return `<div class="cpd-readonly-section"><h3>基础设置</h3><dl class="cpd-readonly-grid">${this.cpdReadonlyField('广告计划名称',cp.name,true)}${this.cpdReadonlyField('广告计划 ID',cp.id)}${this.cpdReadonlyField('周期类型',cp.duration==='ongoing'?'长期投放':'固定周期')}${this.cpdReadonlyField('开始日期',cp.start)}${this.cpdReadonlyField('结束日期',cp.duration==='ongoing'?'—':cp.end)}</dl></div><div class="cpd-readonly-section"><h3>预算设置</h3><dl class="cpd-readonly-grid">${this.cpdReadonlyField('活动总预算（USD）',budget)}${this.cpdReadonlyField('每日上限',daily)}</dl></div>`;
+    }
+    return `<div class="cpd-readonly-section"><h3>基础设置</h3><dl class="cpd-readonly-grid">${this.cpdReadonlyField('广告组名称',group.name,true)}${this.cpdReadonlyField('广告组 ID',group.id)}</dl></div><div class="cpd-readonly-section"><h3>预算与出价</h3><dl class="cpd-readonly-grid">${this.cpdReadonlyField('合同金额',group.contractAmount?fmtMoney(group.contractAmount):'—')}${this.cpdReadonlyField('合同时长',group.contractDuration||'—')}${this.cpdReadonlyField('合同编号',group.contractNo||cp.order||'—')}${this.cpdReadonlyField('排期投放时间',group.schedule||`${group.start||cp.start||'—'} 至 ${group.end||cp.end||'—'}`,true)}${this.cpdReadonlyField('计费方式','CPD')}</dl></div><div class="cpd-readonly-section"><h3>用户定向</h3><dl class="cpd-readonly-grid">${this.cpdReadonlyField('地区',group.geo||'不限')}${this.cpdReadonlyField('设备',group.device||'不限')}${this.cpdReadonlyField('频控',group.frequency||'不限')}</dl></div><div class="cpd-readonly-section"><h3>投放位置</h3><dl class="cpd-readonly-grid">${this.cpdReadonlyField('广告位类型',FMT[group.format]?.name||'—')}${this.cpdReadonlyField('投放范围',group.inventoryScope||'指定广告位')}${this.cpdReadonlyField('广告位',group.inventory||'—',true)}</dl></div>`;
+  },
   lockUfContextLevel(target,summary){
     const section=document.getElementById(target);if(!section)return;section.classList.remove('stage-hidden');section.classList.add('completed','readonly-context-level');
-    section.querySelectorAll('input,textarea,select,button').forEach(control=>{control.tabIndex=-1;control.setAttribute('aria-disabled','true');});
+    const heading=section.querySelector('.level-heading p');if(heading)heading.textContent=target==='uf-campaign'?'查看所属广告计划信息':'查看所属广告组与投放设置信息';
+    const blocks=[...section.querySelectorAll('.paper-block')];if(blocks[0]){blocks[0].classList.add('cpd-readonly-body');blocks[0].innerHTML=this.renderCpdReadonlyLevel(target);}blocks.slice(1).forEach(block=>block.remove());
     let el=section.querySelector('.level-summary');if(!el){el=document.createElement('div');el.className='level-summary';section.appendChild(el);}el.innerHTML=`<div><span class="badge gray">仅供查看</span><b>${summary}</b></div><button type="button" class="btn btn-ghost btn-sm readonly-level-toggle" aria-expanded="false" onclick="App.toggleCpdReadonlyLevel(event,'${target}',this)">展开详情</button>`;
     const btn=document.querySelector(`#unifiedToc button[data-target="${target}"]`);if(btn){btn.disabled=true;btn.onclick=null;btn.classList.add('done','locked');btn.classList.remove('active');btn.querySelector('span').textContent='✓';const hint=btn.querySelector('small');if(hint)hint.textContent='所属信息，不可修改';}
   },
