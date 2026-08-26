@@ -277,6 +277,7 @@ const ROLE_EXPERIENCE = {
 const PAGES = {
   campdetail: { label:'广告计划详情', sub:'广告计划概览与下属广告组', nav:'plans' },
   groupdetail:{ label:'广告组详情', sub:'广告组设置摘要与广告创意管理', nav:'plans' },
+  creativedetail:{ label:'广告创意详情', sub:'查看当前生效内容、版本与投放表现', nav:'plans' },
   newplan:    { label:'新建 RTB 广告计划', sub:'第一层：目标、周期与预算总控', nav:'plans' },
   newgroup:   { label:'新建广告组', sub:'第二层：执行策略、预算分配、定向与库存', nav:'plans' },
   newad:      { label:'新建广告创意', sub:'第三层：素材、文案与跳转', nav:'plans' },
@@ -1118,7 +1119,20 @@ const App = {
         <section><h3>投放位置</h3><dl class="group-setting-grid"><div><dt>广告位类型</dt><dd>${FMT[group.format]?.name||'—'}</dd></div><div><dt>投放范围</dt><dd>${group.inventoryScope||'指定广告位'}</dd></div><div class="group-setting-period"><dt>广告位</dt><dd>${group.inventory||'—'}</dd></div></dl></section>
       </div>
     </div>`:''}
-    <div class="card creative-priority-card"><div class="card-head"><div><b>广告创意</b><div class="cell-sub">审核状态说明内容是否可用；投放状态同时受计划、广告组和创意自身状态影响</div></div>${isRtb?`<div class="spacer"></div><button class="btn btn-primary btn-sm" onclick="App.openNewCreativeForGroup('${group.id}')">${svg(I.plus)}新建创意</button>`:''}</div><div class="table-wrap"><table><thead><tr><th>广告创意</th><th>素材规格</th><th>审核状态</th><th>投放状态</th><th class="num">曝光</th><th class="num">点击</th><th class="num">CTR</th><th>更新时间</th><th>操作</th></tr></thead><tbody>${ads.map(a=>{const ctr=a.imps?((a.clicks||0)/a.imps*100).toFixed(2)+'%':'—',creativeIssue=this.creativeDeliveryIssue(a,group,cp),reviewState=a.pendingVersion?'<span class="badge green">当前版本已通过</span><div class="cell-sub" style="margin-top:4px">新版本审核中</div>':this.statusBadge(a.status),canToggle=isRtb&&['active','paused'].includes(a.status),toggleLabel=a.status==='paused'?'恢复':'暂停',updated=a.pendingVersion?.submittedAt?new Date(a.pendingVersion.submittedAt).toLocaleDateString('zh-CN'):a.updated||a.created||'—';return `<tr><td><div class="cell-flex">${creativeThumb(a)}<div><button class="link-btn" onclick="App.openCreative('${a.id}')"><b>${a.name}</b></button><div class="cell-sub">${a.id} · ${a.headline||'未填写标题'}</div></div></div></td><td>${a.size||'—'}</td><td>${reviewState}</td><td><span class="badge ${creativeIssue.cls}">${creativeIssue.label}</span></td><td class="num">${fmtK(a.imps||0)}</td><td class="num">${fmtK(a.clicks||0)}</td><td class="num">${ctr}</td><td>${updated}</td><td><div class="cell-flex"><button class="plan-row-action" onclick="App.openCreative('${a.id}')">编辑</button>${canToggle?`<button class="plan-row-action" onclick="App.toggleCreativeStatus('${a.id}')">${toggleLabel}</button>`:''}</div></td></tr>`}).join('')||`<tr><td colspan="9"><div class="empty">${svg(I.creative)}<div>当前广告组还没有广告创意</div>${isRtb?`<button class="btn btn-primary btn-sm" onclick="App.openNewCreativeForGroup('${group.id}')">创建第一条创意</button>`:''}</div></td></tr>`}</tbody></table></div></div>`;
+    <div class="card creative-priority-card"><div class="card-head"><div><b>广告创意</b><div class="cell-sub">审核状态说明内容是否可用；投放状态同时受计划、广告组和创意自身状态影响</div></div>${isRtb?`<div class="spacer"></div><button class="btn btn-primary btn-sm" onclick="App.openNewCreativeForGroup('${group.id}')">${svg(I.plus)}新建创意</button>`:''}</div><div class="table-wrap"><table><thead><tr><th>广告创意</th><th>素材规格</th><th>审核状态</th><th>投放状态</th><th class="num">曝光</th><th class="num">点击</th><th class="num">CTR</th><th>更新时间</th><th>操作</th></tr></thead><tbody>${ads.map(a=>{const ctr=a.imps?((a.clicks||0)/a.imps*100).toFixed(2)+'%':'—',creativeIssue=this.creativeDeliveryIssue(a,group,cp),reviewState=a.pendingVersion?'<span class="badge green">当前版本已通过</span><div class="cell-sub" style="margin-top:4px">新版本审核中</div>':this.statusBadge(a.status),canToggle=isRtb&&['active','paused'].includes(a.status),toggleLabel=a.status==='paused'?'恢复':'暂停',updated=a.pendingVersion?.submittedAt?new Date(a.pendingVersion.submittedAt).toLocaleDateString('zh-CN'):a.updated||a.created||'—';return `<tr><td><div class="cell-flex">${creativeThumb(a)}<div><button class="link-btn" onclick="App.openCreativeDetail('${a.id}','groupdetail')"><b>${a.name}</b></button><div class="cell-sub">${a.id} · ${a.headline||'未填写标题'}</div></div></div></td><td>${a.size||'—'}</td><td>${reviewState}</td><td><span class="badge ${creativeIssue.cls}">${creativeIssue.label}</span></td><td class="num">${fmtK(a.imps||0)}</td><td class="num">${fmtK(a.clicks||0)}</td><td class="num">${ctr}</td><td>${updated}</td><td><div class="cell-flex"><button class="plan-row-action" onclick="App.openCreative('${a.id}')">编辑</button>${canToggle?`<button class="plan-row-action" onclick="App.toggleCreativeStatus('${a.id}')">${toggleLabel}</button>`:''}</div></td></tr>`}).join('')||`<tr><td colspan="9"><div class="empty">${svg(I.creative)}<div>当前广告组还没有广告创意</div>${isRtb?`<button class="btn btn-primary btn-sm" onclick="App.openNewCreativeForGroup('${group.id}')">创建第一条创意</button>`:''}</div></td></tr>`}</tbody></table></div></div>`;
+  },
+  openCreativeDetail(id,returnPage='groupdetail'){
+    const a=DB.creatives.find(x=>x.id===id);if(!a)return;const group=(DB.adGroups||[]).find(g=>g.id===a.groupId)||{};
+    this.curCreative=id;this.creativeReturnPage=returnPage;this.curCamp=a.camp;this.curGroup=group.id||this.curGroup;this.go('creativedetail');
+  },
+  view_creativedetail(){
+    const a=DB.creatives.find(x=>x.id===this.curCreative)||{},cp=DB.campaigns.find(c=>c.id===a.camp)||{},group=(DB.adGroups||[]).find(g=>g.id===a.groupId)||{},asset=DB.assetFiles.find(f=>f.id===a.assetId)||{};
+    const issue=this.creativeDeliveryIssue(a,group,cp),ctr=a.imps?((a.clicks||0)/a.imps*100).toFixed(2)+'%':'—',review=a.pendingVersion?'<span class="badge green">当前版本已通过</span><span class="cell-sub">另有新版本审核中</span>':this.statusBadge(a.status),back=this.creativeReturnPage||'groupdetail';
+    return `<div class="cell-sub creative-detail-crumb"><button class="text-link" onclick="App.go('${back}')">${back==='groupdetail'?(group.name||'广告组'):(cp.name||'广告计划')}</button><span>/</span>广告创意详情</div>
+    <div class="page-head campaign-detail-head"><div><div class="detail-title-line"><h1>${a.name||'广告创意'}</h1><span class="badge ${issue.cls}">${issue.label}</span></div><p>${a.id||'—'} · 当前生效版本 V${a.version||1}</p></div><div class="spacer"></div><button class="btn btn-ghost" onclick="App.go('${back}')">← 返回${back==='groupdetail'?'广告组':'广告计划'}</button>${this.role().mutate?`<button class="btn btn-primary" onclick="App.openCreative('${a.id}','creativedetail')">${svg(I.edit)}修改创意</button>`:''}</div>
+    ${a.pendingVersion?`<div class="notice info creative-version-notice"><b>新版本审核中</b><span>当前页面展示的是仍在投放的 V${a.version||1}；新版本审核通过后才会替换当前内容。</span></div>`:''}
+    <div class="campaign-summary creative-metric-summary"><div><span>所属广告计划</span><b>${cp.name||'—'}</b></div><div><span>所属广告组</span><b>${group.name||a.group||'—'}</b></div><div><span>审核状态</span><b class="creative-review-value">${review}</b></div><div><span>素材规格</span><b>${a.size||asset.dim||'—'}</b></div><div><span>曝光</span><b>${fmtK(a.imps||0)}</b></div><div><span>点击 / CTR</span><b>${fmtK(a.clicks||0)} / ${ctr}</b></div></div>
+    <div class="card creative-content-detail"><div class="card-head"><div><b>当前生效内容</b><div class="cell-sub">仅供查看；修改后将生成新的待审核版本</div></div></div><div class="creative-content-layout"><div class="creative-preview-large">${creativeThumb(a)}<span>${asset.name||a.size||'当前素材'}</span></div><dl class="cpd-readonly-grid"><div><dt>广告创意名称</dt><dd>${a.name||'—'}</dd></div><div><dt>创意版本</dt><dd>V${a.version||1}</dd></div><div><dt>广告形式</dt><dd>${FMT[a.fmt]?.name||'—'}</dd></div><div class="wide"><dt>标题 / 文案</dt><dd>${a.headline||'—'}</dd></div><div class="wide"><dt>补充文案</dt><dd>${a.description||'—'}</dd></div><div><dt>跳转类型</dt><dd>外部跳转</dd></div><div class="wide"><dt>目标链接</dt><dd class="mono">${a.landing||'—'}</dd></div></dl></div></div>`;
   },
   toggleGroupStatus(id,returnPage='groupdetail'){
     const group=(DB.adGroups||[]).find(g=>g.id===id);if(!group||!['active','paused'].includes(group.status))return;
@@ -1167,7 +1181,7 @@ const App = {
       const cp = DB.campaigns.find(c=>c.id===a.camp)||{};
       const ctr = a.imps ? (a.clicks/a.imps*100).toFixed(2)+'%' : '—';
       return `<tr>
-        <td><div class="cell-flex">${creativeThumb(a)}<div><div class="cell-main"><a href="javascript:void(0)" onclick="App.openCreative('${a.id}')" style="color:var(--primary);text-decoration:none;cursor:pointer">${a.name}</a></div><div class="cell-sub">${a.id} · ${a.headline||'未填写文案'}</div></div></div></td>
+        <td><div class="cell-flex">${creativeThumb(a)}<div><div class="cell-main"><a href="javascript:void(0)" onclick="App.openCreativeDetail('${a.id}','campdetail')" style="color:var(--primary);text-decoration:none;cursor:pointer">${a.name}</a></div><div class="cell-sub">${a.id} · ${a.headline||'未填写文案'}</div></div></div></td>
         <td><div class="cell-main">${a.group||'默认广告组'}</div><div class="cell-sub">默认折叠，可按组筛选</div></td>
         <td class="cell-sub">${K.name}</td>
         <td>${this.statusBadge(a.status)}</td>
@@ -1194,18 +1208,18 @@ const App = {
     this.save(); this.renderAds(this.adFilter||'');
     this.toast(a.status==='active'?'广告创意已启用':'广告创意已暂停');
   },
-  openCreative(id){
+  openCreative(id,returnPage){
     const a=DB.creatives.find(x=>x.id===id); if(!a) return;
     const cp=DB.campaigns.find(c=>c.id===a.camp)||{};
-    if(cp.mode==='cpd'){ this.openCpdCreativeEdit(id); return; }
-    this.openRtbCreativeEdit(id);
+    if(cp.mode==='cpd'){ this.openCpdCreativeEdit(id,returnPage); return; }
+    this.openRtbCreativeEdit(id,returnPage);
   },
-  openRtbCreativeEdit(id){const a=DB.creatives.find(x=>x.id===id);if(!a)return;const g=(DB.adGroups||[]).find(x=>x.id===a.groupId)||{};this.editFlow={type:'creative',id,returnPage:this.curGroup?'groupdetail':'campdetail'};this.curGroup=g.id||this.curGroup;this.curCamp=a.camp;this.go('newplan');},
+  openRtbCreativeEdit(id,returnPage){const a=DB.creatives.find(x=>x.id===id);if(!a)return;const g=(DB.adGroups||[]).find(x=>x.id===a.groupId)||{};this.editFlow={type:'creative',id,returnPage:returnPage||(this.curGroup?'groupdetail':'campdetail')};this.curGroup=g.id||this.curGroup;this.curCamp=a.camp;this.go('newplan');},
   saveRtbCreativeEdit(){const a=DB.creatives.find(x=>x.id===this.editCreativeId);if(!a)return;const name=document.getElementById('editCreativeName').value.trim(),landing=document.getElementById('editCreativeLanding').value.trim();if(!name||!landing){this.toast('请填写创意名称和目标链接','warn');return;}a.pendingVersion={version:(a.version||1)+1,name,headline:document.getElementById('editCreativeHeadline').value.trim(),landing,status:'review',submittedAt:new Date().toISOString()};a.changeStatus='review';this.save();this.closeModal();if(this.curGroup)this.go('groupdetail');else this.go('campdetail');this.toast('新版本已提交审核，当前线上版本保持投放');},
-  openCpdCreativeEdit(id){
+  openCpdCreativeEdit(id,returnPage){
     const a=DB.creatives.find(x=>x.id===id);if(!a)return;
     const g=(DB.adGroups||[]).find(x=>x.id===a.groupId)||{};
-    this.editFlow={type:'creative',id,cpd:true,returnPage:this.curGroup?'groupdetail':'campdetail'};
+    this.editFlow={type:'creative',id,cpd:true,returnPage:returnPage||(this.curGroup?'groupdetail':'campdetail')};
     this.curGroup=g.id||this.curGroup;this.curCamp=a.camp;this.go('newplan');
   },
   pickCpdCreativeFile(input){
