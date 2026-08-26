@@ -847,11 +847,11 @@ const App = {
     const showType=type==='all',table=document.querySelector('.plan-list-table'),cpdHint=document.getElementById('unifiedCpdHint');
     table?.classList.toggle('show-type',showType);table?.classList.toggle('type-hidden',!showType);table?.classList.toggle('cpd-mode',type==='cpd');if(cpdHint)cpdHint.classList.toggle('show',type==='cpd');
     if(type==='cpd'){
-      const heads=[['广告计划','plan-name-col'],['状态','status-col'],['投放情况','issue-col'],['广告位 / 资源位','placement-col'],['曝光','num metric-col'],['点击','num metric-col'],['CTR','num metric-col'],['开始日期','date-col'],['结束日期','date-col'],['订单编号','order-col'],['代投运营','owner-col']];
+      const heads=[['广告计划','plan-name-col'],['状态','status-col'],['投放情况','issue-col'],['曝光','num metric-col'],['点击','num metric-col'],['CTR','num metric-col'],['开始日期','date-col'],['结束日期','date-col'],['订单编号','order-col'],['代投运营','owner-col']];
       document.getElementById('unifiedPlanHead').innerHTML=heads.map(([h,cls])=>`<th class="${cls}">${h}</th>`).join('');
       document.getElementById('unifiedPlanBody').innerHTML=list.map(cp=>{
         const creatives=DB.creatives.filter(a=>a.camp===cp.id),imps=creatives.reduce((s,a)=>s+(a.imps||0),0),clicks=creatives.reduce((s,a)=>s+(a.clicks||0),0),ctr=imps?(clicks/imps*100).toFixed(2)+'%':'—',issue=this.unifiedPlanIssue(cp,creatives);
-        return `<tr><td class="plan-name-col"><button class="link-btn" title="进入广告计划详情" onclick="App.openPlan('${cp.id}')"><b>${cp.name}</b></button><div class="cell-sub">${cp.alias?cp.alias+' · ':''}${cp.id}</div></td><td class="status-col">${this.statusBadge(cp.status)}</td><td class="issue-col"><span class="badge ${issue.cls}" title="${this.deliveryIssueDescription(issue,cp)}">${issue.label}</span></td><td class="placement-col">${cp.placement||'—'}</td><td class="num metric-col">${fmtK(imps)}</td><td class="num metric-col">${fmtK(clicks)}</td><td class="num metric-col">${ctr}</td><td class="date-col">${cp.start||'—'}</td><td class="date-col">${cp.end||'长期投放'}</td><td class="mono order-col">${cp.order||'—'}</td><td class="owner-col">${cp.operator||'待分配'}</td></tr>`;
+        return `<tr><td class="plan-name-col"><button class="link-btn" title="进入广告计划详情" onclick="App.openPlan('${cp.id}')"><b>${cp.name}</b></button><div class="cell-sub">${cp.alias?cp.alias+' · ':''}${cp.id}</div></td><td class="status-col">${this.statusBadge(cp.status)}</td><td class="issue-col"><span class="badge ${issue.cls}" title="${this.deliveryIssueDescription(issue,cp)}">${issue.label}</span></td><td class="num metric-col">${fmtK(imps)}</td><td class="num metric-col">${fmtK(clicks)}</td><td class="num metric-col">${ctr}</td><td class="date-col">${cp.start||'—'}</td><td class="date-col">${cp.end||'长期投放'}</td><td class="mono order-col">${cp.order||'—'}</td><td class="owner-col">${cp.operator||'待分配'}</td></tr>`;
       }).join('')||`<tr><td colspan="${heads.length}"><div class="empty">暂无符合条件的 CPD 广告计划</div></td></tr>`;
       document.getElementById('unifiedPlanPager').innerHTML=this.pagerHTML('unifiedPlan',all.length);
       const bulk=document.getElementById('unifiedBulkBar');if(bulk)bulk.classList.remove('show');
@@ -917,10 +917,10 @@ const App = {
           <option value="h5">H5</option>
         </select>
         <div class="spacer"></div>
-        <input class="input" id="planSearch" style="width:250px" placeholder="搜索名称 / 备注 / 广告位 / ID" oninput="App.renderPlans()">
+        <input class="input" id="planSearch" style="width:250px" placeholder="搜索名称 / 备注 / ID" oninput="App.renderPlans()">
       </div>
       <div class="table-wrap"><table>
-        <thead><tr><th>广告计划</th><th>投放模式</th><th>广告位 / 投放周期</th><th>状态</th><th class="num">创意数</th><th class="num">展示</th><th class="num">点击</th><th class="num">CTR</th><th class="act">操作</th></tr></thead>
+        <thead><tr><th>广告计划</th><th>投放模式</th><th>投放周期</th><th>状态</th><th class="num">创意数</th><th class="num">展示</th><th class="num">点击</th><th class="num">CTR</th>${isCpd?'':'<th class="act">操作</th>'}</tr></thead>
         <tbody id="planBody"></tbody>
       </table></div>
       <div id="planPager"></div>
@@ -955,17 +955,15 @@ const App = {
       return `<tr>
         <td><div class="cell-flex"><span class="row-ico" style="color:${F.color};width:42px;height:42px">${svg(F.ico)}</span><div><div class="cell-main" style="cursor:pointer;color:var(--accent)" onclick="App.openPlan('${cp.id}')">${cp.name}</div><div class="cell-sub">${cp.alias||'未设置客户备注'} · ${cp.id}</div></div></div></td>
         <td><span class="badge ${cp.mode==='cpd'?'amber':'green'}">${cp.mode==='cpd'?'CPD 运营代投':'RTB 自助投放'}</span></td>
-        <td><div class="cell-main">${cp.placement||'—'}</div><div class="cell-sub">${cp.period||'—'}</div></td>
+        <td><div class="cell-main">${cp.start||'—'} 至 ${cp.end||'长期投放'}</div></td>
         <td>${this.statusBadge(cp.status)}</td>
         <td class="num">${creatives.length ? `<a href="javascript:void(0)" style="color:var(--accent);cursor:pointer" onclick="App.openPlan('${cp.id}')">${creatives.length}</a>` : '0'}</td>
         <td class="num">${fmtK(imps)}</td>
         <td class="num">${fmtK(clks)}</td>
         <td class="num">${ctr}</td>
-        <td class="act"><div class="t-actions">
-          ${cp.mode==='rtb'?`<button class="icon-btn btn-sm" title="${cp.status==='active'?'暂停':'开始'}" onclick="App.togglePlan('${cp.id}',event)">${svg(cp.status==='active'?I.pause:I.play)}</button>`:''}
-        </div></td>
+        ${cp.mode==='rtb'?`<td class="act"><div class="t-actions"><button class="icon-btn btn-sm" title="${cp.status==='active'?'暂停':'开始'}" onclick="App.togglePlan('${cp.id}',event)">${svg(cp.status==='active'?I.pause:I.play)}</button></div></td>`:''}
       </tr>`;
-    }).join('') || `<tr><td colspan="9"><div class="empty">${svg(I.camp)}<div>暂无广告计划</div></div></td></tr>`;
+    }).join('') || `<tr><td colspan="${modeF==='cpd'?8:9}"><div class="empty">${svg(I.camp)}<div>暂无广告计划</div></div></td></tr>`;
     document.getElementById('planPager').innerHTML = this.pagerHTML('plan', all.length);
   },
   openPlan(id){
@@ -1017,13 +1015,12 @@ const App = {
       <dl class="group-setting-grid plan-setting-grid">
         <div><dt>投放类型</dt><dd>${cp.mode==='cpd'?'CPD 运营代投':'RTB 自助投放'}</dd></div>
         <div class="group-setting-period"><dt>投放周期</dt><dd>${cp.period||'—'}</dd></div>
-        <div><dt>${cp.mode==='cpd'?'广告位 / 库存':'花费 / 预算'}</dt><dd>${cp.mode==='cpd'?(cp.placement||'—'):`${fmtMoney(spend)} / ${fmtMoney(budget||0)}`}</dd></div>
-        <div><dt>${cp.mode==='cpd'?'管理方式':'每日上限'}</dt><dd>${cp.mode==='cpd'?'由运营管理':(cp.dailyCap?fmtMoney(cp.dailyCap):'未单独设置')}</dd></div>
+        ${cp.mode==='rtb'?`<div><dt>花费 / 预算</dt><dd>${fmtMoney(spend)} / ${fmtMoney(budget||0)}</dd></div><div><dt>每日上限</dt><dd>${cp.dailyCap?fmtMoney(cp.dailyCap):'未单独设置'}</dd></div>`:`<div><dt>开始时间</dt><dd>${cp.start||'—'}</dd></div><div><dt>结束时间</dt><dd>${cp.end||'长期投放'}</dd></div>`}
       </dl>
     </div>
     ${cp.mode==='cpd'?`<div class="notice info" style="margin-bottom:14px">该计划由运营创建并管理。价格、库存、投放周期、时段和启停状态不可修改；你可以查看数据并提交创意图片、文案或落地页变更。</div>`:''}
     <div class="card group-list-card"><div class="card-head"><div><b>广告组</b><div class="cell-sub">共 <span id="visibleGroupCount">${groups.length}</span> 个广告组；点击名称进入广告组详情</div></div><div class="spacer"></div>${groups.length?`<input class="input group-search" id="campaignGroupSearch" placeholder="搜索广告组名称 / ID" oninput="App.filterCampaignGroups()"><select class="select group-status-filter" id="campaignGroupStatus" style="box-sizing:border-box;flex:0 0 200px;width:200px;min-width:200px;max-width:200px;padding-left:16px;padding-right:44px" onchange="App.filterCampaignGroups()"><option value="">全部状态</option><option value="active">投放中</option><option value="draft">草稿</option><option value="review">审核中</option><option value="needs-creative">待创建创意</option></select>`:''}</div>
-      <div class="table-wrap"><table class="campaign-group-table ${cp.mode==='cpd'?'cpd-readonly-table':''}"><thead><tr><th>广告组</th><th>状态</th><th>投放情况</th><th>排期</th><th>${cp.mode==='cpd'?'广告形式 / 库存':'预算 / 竞价'}</th><th class="num">创意</th><th class="num">曝光</th><th class="num">点击</th><th class="num">CTR</th>${cp.mode==='rtb'?'<th class="act">操作</th>':''}</tr></thead><tbody id="campaignGroupRows">
+      <div class="table-wrap"><table class="campaign-group-table ${cp.mode==='cpd'?'cpd-readonly-table':''}"><thead><tr><th>广告组</th><th>状态</th><th>投放情况</th><th>排期</th><th>${cp.mode==='cpd'?'广告形式 / 投放位置':'预算 / 竞价'}</th><th class="num">创意</th><th class="num">曝光</th><th class="num">点击</th><th class="num">CTR</th>${cp.mode==='rtb'?'<th class="act">操作</th>':''}</tr></thead><tbody id="campaignGroupRows">
       ${groups.map(g=>{const ga=ads.filter(a=>a.groupId===g.id||a.group===g.name),gi=ga.reduce((s,a)=>s+(a.imps||0),0),gc=ga.reduce((s,a)=>s+(a.clicks||0),0),gctr=gi?(gc/gi*100).toFixed(2)+'%':'—',needsCreative=ga.length===0,groupIssue=this.groupDeliveryIssue(g,cp,ga),canToggle=['active','paused'].includes(g.status),toggleLabel=g.status==='paused'?'恢复':'暂停',actions=`<div class="plan-row-actions"><button class="plan-row-action" onclick="App.openGroupEdit('${g.id}','campdetail')">编辑</button>${canToggle?`<button class="plan-row-action" onclick="App.toggleGroupStatus('${g.id}','campdetail')">${toggleLabel}</button>`:''}</div>`;return `<tr data-group-row data-search="${(g.name+' '+g.id).toLowerCase()}" data-status="${needsCreative?'needs-creative':g.status}"><td><button class="link-btn" onclick="App.openGroupDetail('${g.id}','${g.name.replaceAll("'","&#39;")}')"><b>${g.name}</b></button><div class="cell-sub">${g.id}</div></td><td>${this.statusBadge(g.status)}</td><td><span class="badge ${groupIssue.cls}">${groupIssue.label}</span></td><td>${g.start||cp.start||'—'}<div class="cell-sub">${g.end?'至 '+g.end:'长期投放'}</div></td><td>${cp.mode==='cpd'?`${FMT[g.format]?.name||'—'}<div class="cell-sub">${g.inventory||cp.placement||'—'}</div>`:`${fmtMoney(g.budget||0)}<div class="cell-sub">${g.bidType||'CPM'} · ${fmtMoney(g.bid||0)}</div>`}</td><td class="num">${needsCreative?(cp.mode==='rtb'?`<button class="text-link" onclick="App.openNewCreativeForGroup('${g.id}')">创建创意</button>`:'<span class="badge amber">0 · 待补充</span>'):ga.length}</td><td class="num">${fmtK(gi)}</td><td class="num">${fmtK(gc)}</td><td class="num">${gctr}</td>${cp.mode==='rtb'?`<td class="act">${actions}</td>`:''}</tr>`}).join('')||`<tr><td colspan="${cp.mode==='rtb'?10:9}"><div class="empty">${svg(I.group||I.camp)}<div>当前广告计划还没有广告组</div>${cp.mode==='rtb'?`<button class="btn btn-primary btn-sm" onclick="App.startNewGroup('${cp.id}')">创建第一个广告组</button>`:''}</div></td></tr>`}
       </tbody></table></div></div>`;
   },
@@ -1091,13 +1088,18 @@ const App = {
         <div><b>投放设置</b><span class="badge ${groupIssue.cls}">${groupIssue.label}</span>${groupIssue.key!=='ready'?`<span class="group-issue-reason">${deliveryText}</span>`:''}</div>
         ${isRtb?`<button class="text-link" onclick="App.openGroupEdit('${group.id}')">查看或修改投放设置</button>`:'<span class="cell-sub">投放设置由运营管理</span>'}
       </div>
-      <dl class="group-setting-grid">
+      ${isRtb?`<dl class="group-setting-grid">
         <div class="group-setting-period"><dt>投放周期</dt><dd>${group.start||cp.start||'—'} 至 ${group.end||cp.end||'长期投放'}</dd></div>
-        <div><dt>${isRtb?'花费 / 预算':'预算'}</dt><dd>${isRtb?`${fmtMoney(groupSpend)} / ${fmtMoney(group.budget||0)}`:'由 CPD 订单管理'}</dd></div>
-        ${isRtb?`<div><dt>每日上限</dt><dd>${group.dailyCap?fmtMoney(group.dailyCap):'未单独设置'}</dd></div>`:''}
-        <div><dt>计费方式</dt><dd>${isRtb?(group.bidType||'CPM'):'CPD 代投'}</dd></div>
-        <div><dt>出价</dt><dd>${isRtb?fmtMoney(group.bid||0):'—'}</dd></div>
-      </dl>
+        <div><dt>花费 / 预算</dt><dd>${fmtMoney(groupSpend)} / ${fmtMoney(group.budget||0)}</dd></div>
+        <div><dt>每日上限</dt><dd>${group.dailyCap?fmtMoney(group.dailyCap):'未单独设置'}</dd></div>
+        <div><dt>计费方式</dt><dd>${group.bidType||'CPM'}</dd></div>
+        <div><dt>出价</dt><dd>${fmtMoney(group.bid||0)}</dd></div>
+      </dl>`:`<div class="cpd-group-sections">
+        <section><h3>基础设置</h3><dl class="group-setting-grid"><div><dt>广告组名称</dt><dd>${group.name||'—'}</dd></div></dl></section>
+        <section><h3>预算与出价</h3><dl class="group-setting-grid"><div><dt>合同金额</dt><dd>${group.contractAmount?fmtMoney(group.contractAmount):'—'}</dd></div><div><dt>合同时长</dt><dd>${group.contractDuration||`${group.start||cp.start||'—'} 至 ${group.end||cp.end||'—'}`}</dd></div><div><dt>合同编号</dt><dd>${group.contractNo||cp.order||'—'}</dd></div><div class="group-setting-period"><dt>排期投放时间</dt><dd>${group.schedule||`${group.start||cp.start||'—'} 至 ${group.end||cp.end||'长期投放'}`}</dd></div><div><dt>计费方式</dt><dd>CPD</dd></div></dl></section>
+        <section><h3>用户定向</h3><dl class="group-setting-grid"><div><dt>地区</dt><dd>${group.geo||'不限'}</dd></div><div><dt>设备</dt><dd>${group.device||'不限'}</dd></div><div><dt>频控</dt><dd>${group.frequency||'不限'}</dd></div></dl></section>
+        <section><h3>投放位置</h3><dl class="group-setting-grid"><div><dt>广告位类型</dt><dd>${FMT[group.format]?.name||'—'}</dd></div><div><dt>投放范围</dt><dd>${group.inventoryScope||'指定广告位'}</dd></div><div class="group-setting-period"><dt>广告位</dt><dd>${group.inventory||'—'}</dd></div></dl></section>
+      </div>`}
     </div>
     <div class="card"><div class="card-head"><div><b>广告创意</b><div class="cell-sub">审核状态说明内容是否可用；投放状态同时受计划、广告组和创意自身状态影响</div></div>${isRtb?`<div class="spacer"></div><button class="btn btn-primary btn-sm" onclick="App.openNewCreativeForGroup('${group.id}')">${svg(I.plus)}新建创意</button>`:''}</div><div class="table-wrap"><table><thead><tr><th>广告创意</th><th>素材规格</th><th>审核状态</th><th>投放状态</th><th class="num">曝光</th><th class="num">点击</th><th class="num">CTR</th><th>更新时间</th><th>操作</th></tr></thead><tbody>${ads.map(a=>{const ctr=a.imps?((a.clicks||0)/a.imps*100).toFixed(2)+'%':'—',creativeIssue=this.creativeDeliveryIssue(a,group,cp),reviewState=a.pendingVersion?'<span class="badge green">当前版本已通过</span><div class="cell-sub" style="margin-top:4px">新版本审核中</div>':this.statusBadge(a.status),canToggle=isRtb&&['active','paused'].includes(a.status),toggleLabel=a.status==='paused'?'恢复':'暂停',updated=a.pendingVersion?.submittedAt?new Date(a.pendingVersion.submittedAt).toLocaleDateString('zh-CN'):a.updated||a.created||'—';return `<tr><td><div class="cell-flex">${creativeThumb(a)}<div><button class="link-btn" onclick="App.openCreative('${a.id}')"><b>${a.name}</b></button><div class="cell-sub">${a.id} · ${a.headline||'未填写标题'}</div></div></div></td><td>${a.size||'—'}</td><td>${reviewState}</td><td><span class="badge ${creativeIssue.cls}">${creativeIssue.label}</span></td><td class="num">${fmtK(a.imps||0)}</td><td class="num">${fmtK(a.clicks||0)}</td><td class="num">${ctr}</td><td>${updated}</td><td><div class="cell-flex"><button class="plan-row-action" onclick="App.openCreative('${a.id}')">编辑</button>${canToggle?`<button class="plan-row-action" onclick="App.toggleCreativeStatus('${a.id}')">${toggleLabel}</button>`:''}</div></td></tr>`}).join('')||`<tr><td colspan="9"><div class="empty">${svg(I.creative)}<div>当前广告组还没有广告创意</div>${isRtb?`<button class="btn btn-primary btn-sm" onclick="App.openNewCreativeForGroup('${group.id}')">创建第一条创意</button>`:''}</div></td></tr>`}</tbody></table></div></div>`;
   },
