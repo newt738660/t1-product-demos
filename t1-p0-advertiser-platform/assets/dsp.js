@@ -1400,6 +1400,8 @@ const App = {
       this.lockUfContextLevel('uf-campaign',`${cp.name} · ${cp.id}`);
       this.lockUfContextLevel('uf-group',`${group.name} · ${group.id}`);
       this.unlockUf('uf-creative',3);this.fillUfCreative(creative);this.prepareCpdCreativeForm(creative);
+      const create=document.querySelector('.unified-create');
+      if(create&&!document.querySelector('.cpd-edit-actions'))create.insertAdjacentHTML('afterend',`<div class="cpd-edit-actions"><span>修改内容将生成待审核版本，审核通过前当前版本继续投放</span><button class="btn btn-ghost" onclick="App.cancelUnified()">取消编辑</button><button class="btn btn-primary" onclick="App.saveUnifiedCreativeEdit()">提交创意变更审核</button></div>`);
       document.getElementById('uf-review')?.classList.add('stage-hidden');
       this.setUfActiveStep('uf-creative');requestAnimationFrame(()=>this.setUfActiveStep('uf-creative'));return;
     }
