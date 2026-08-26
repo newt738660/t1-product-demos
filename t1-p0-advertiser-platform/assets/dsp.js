@@ -1568,7 +1568,7 @@ const App = {
     const section=document.getElementById(target);if(!section)return;section.classList.remove('stage-hidden');section.classList.add('completed','readonly-context-level');
     const heading=section.querySelector('.level-heading p');if(heading)heading.textContent=target==='uf-campaign'?'查看所属广告计划信息':'查看所属广告组与投放设置信息';
     const blocks=[...section.querySelectorAll('.paper-block')];if(blocks[0]){blocks[0].classList.add('cpd-readonly-body');blocks[0].innerHTML=this.renderCpdReadonlyLevel(target);}blocks.slice(1).forEach(block=>block.remove());
-    let el=section.querySelector('.level-summary');if(!el){el=document.createElement('div');el.className='level-summary';section.appendChild(el);}el.innerHTML=`<div><span class="badge gray">仅供查看</span><b>${summary}</b></div><button type="button" class="btn btn-ghost btn-sm readonly-level-toggle" aria-expanded="false" onclick="App.toggleCpdReadonlyLevel(event,'${target}',this)">展开详情</button>`;
+    let el=section.querySelector('.level-summary');if(!el){el=document.createElement('div');el.className='level-summary';section.appendChild(el);}el.innerHTML=`<div><span class="badge gray">仅供查看</span><b>${summary}</b></div><button type="button" class="settings-toggle-label readonly-level-toggle" aria-expanded="false" onclick="App.toggleCpdReadonlyLevel(event,'${target}',this)">展开详情</button>`;
     const btn=document.querySelector(`#unifiedToc button[data-target="${target}"]`);if(btn){btn.disabled=true;btn.onclick=null;btn.classList.add('done','locked');btn.classList.remove('active');btn.querySelector('span').textContent='✓';const hint=btn.querySelector('small');if(hint)hint.textContent='所属信息，不可修改';}
   },
   toggleCpdReadonlyLevel(event,target,button){
