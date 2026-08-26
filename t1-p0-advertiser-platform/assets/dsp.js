@@ -1558,7 +1558,7 @@ const App = {
     const headline=document.getElementById('ufHeadline')?.closest('.field');if(headline&&!document.getElementById('ufDescription'))headline.insertAdjacentHTML('afterend','<div class="field"><label>补充文案</label><textarea class="textarea" id="ufDescription" rows="3" maxlength="200" placeholder="填写需要随本次创意一并审核的补充文案"></textarea></div>');
     this.setUfValue('ufDescription',(creative.pendingVersion||creative).description||creative.description||'');
     const block=section.querySelector('.paper-block');if(block)block.insertAdjacentHTML('afterbegin','<div class="notice info" style="margin-bottom:16px">广告计划、广告组、创意名称及投放设置由运营管理；本次只提交创意内容变更。</div>');
-    const action=section.querySelector('.level-actions');if(action)action.innerHTML='<span>提交后生成待审核版本；审核生效前，当前版本继续投放</span><button class="btn btn-primary" onclick="App.saveUnifiedCreativeEdit()">提交创意变更审核</button>';
+    const action=section.querySelector('.level-actions');if(action)action.innerHTML='';
   },
   editUfLevel(target){ document.getElementById(target)?.classList.remove('completed'); this.jumpUnified(target); },
   saveUfCampaign(){
