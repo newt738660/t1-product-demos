@@ -1408,6 +1408,7 @@ const App = {
       document.getElementById('topTitle').textContent='修改 CPD 广告创意';
       document.getElementById('topSub').textContent='复用三级投放结构，仅开放允许客户修改的创意内容';
       this.ufWorking={campaign:{...cp},group:{...group},existingCampaignId:cp.id};
+      this.fillUfGroup(group);
       this.lockUfContextLevel('uf-campaign',`${cp.name} · ${cp.id}`);
       this.lockUfContextLevel('uf-group',`${group.name} · ${group.id}`);
       this.unlockUf('uf-creative',3);this.fillUfCreative(creative);this.prepareCpdCreativeForm(creative);
@@ -1557,8 +1558,13 @@ const App = {
   },
   lockUfContextLevel(target,summary){
     const section=document.getElementById(target);if(!section)return;section.classList.remove('stage-hidden');section.classList.add('completed','readonly-context-level');
-    let el=section.querySelector('.level-summary');if(!el){el=document.createElement('div');el.className='level-summary';section.appendChild(el);}el.innerHTML=`<div><span class="badge gray">仅供查看</span><b>${summary}</b></div>`;
+    section.querySelectorAll('input,textarea,select,button').forEach(control=>{control.tabIndex=-1;control.setAttribute('aria-disabled','true');});
+    let el=section.querySelector('.level-summary');if(!el){el=document.createElement('div');el.className='level-summary';section.appendChild(el);}el.innerHTML=`<div><span class="badge gray">仅供查看</span><b>${summary}</b></div><button type="button" class="btn btn-ghost btn-sm readonly-level-toggle" aria-expanded="false" onclick="App.toggleCpdReadonlyLevel(event,'${target}',this)">展开详情</button>`;
     const btn=document.querySelector(`#unifiedToc button[data-target="${target}"]`);if(btn){btn.disabled=true;btn.onclick=null;btn.classList.add('done','locked');btn.classList.remove('active');btn.querySelector('span').textContent='✓';const hint=btn.querySelector('small');if(hint)hint.textContent='所属信息，不可修改';}
+  },
+  toggleCpdReadonlyLevel(event,target,button){
+    event?.stopPropagation();const section=document.getElementById(target);if(!section)return;
+    const open=section.classList.toggle('readonly-expanded');button.setAttribute('aria-expanded',String(open));button.textContent=open?'收起详情':'展开详情';
   },
   prepareCpdCreativeForm(creative){
     const section=document.getElementById('uf-creative');if(!section)return;
