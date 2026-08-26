@@ -1394,6 +1394,7 @@ const App = {
     if(cp.mode==='cpd'&&flow.type==='creative'){
       const creative=DB.creatives.find(c=>c.id===flow.id);if(!creative){this.toast('未找到广告创意','warn');this.cancelUnified();return;}
       if(title)title.textContent='修改 CPD 广告创意';if(desc)desc.textContent='已定位到广告创意层；广告计划、广告组和创意名称仅供确认，不可修改';
+      if(cancel)cancel.style.display='none';
       document.getElementById('topTitle').textContent='修改 CPD 广告创意';
       document.getElementById('topSub').textContent='复用三级投放结构，仅开放允许客户修改的创意内容';
       this.ufWorking={campaign:{...cp},group:{...group},existingCampaignId:cp.id};
