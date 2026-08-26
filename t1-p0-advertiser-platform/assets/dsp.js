@@ -1074,6 +1074,16 @@ const App = {
     if(group){this.curGroup=group.id;this.curCamp=group.camp;}else{this.curGroup=null;this.curGroupName=name;}
     PAGES.groupdetail.nav='plans';this.go('groupdetail');
   },
+  toggleCpdGroupSettings(event,button){
+    event.preventDefault();
+    event.stopPropagation();
+    const card=button.closest('.group-settings-collapsible'),body=card?.querySelector('.cpd-group-sections');
+    if(!card||!body)return;
+    body.hidden=!body.hidden;
+    card.classList.toggle('is-open',!body.hidden);
+    button.setAttribute('aria-expanded',String(!body.hidden));
+    button.textContent=body.hidden?'展开详情':'收起详情';
+  },
   view_groupdetail(){
     const group=(DB.adGroups||[]).find(g=>g.id===this.curGroup)||{name:this.curGroupName||'默认广告组',camp:this.curCamp,status:'active'};
     const cp=DB.campaigns.find(c=>c.id===group.camp)||{},ads=DB.creatives.filter(a=>a.camp===cp.id&&(a.groupId===group.id||a.group===group.name));
@@ -1098,7 +1108,7 @@ const App = {
     </div>`:''}
     ${!isRtb?`<div class="card group-setting-summary group-settings-collapsible">
       <div class="cpd-settings-summary">
-        <div class="group-summary-head"><div><b>投放设置</b><span class="badge ${groupIssue.cls}">${groupIssue.label}</span>${groupIssue.key!=='ready'?`<span class="group-issue-reason">${deliveryText}</span>`:''}<span class="cell-sub">由运营管理，仅供查看</span></div><button type="button" class="settings-toggle-label" aria-expanded="false" onclick="const card=this.closest('.group-settings-collapsible'),body=card.querySelector('.cpd-group-sections');card.classList.toggle('is-open');body.hidden=!body.hidden;this.setAttribute('aria-expanded',String(!body.hidden));this.textContent=body.hidden?'展开详情':'收起详情'">展开详情</button></div>
+        <div class="group-summary-head"><div><b>投放设置</b><span class="badge ${groupIssue.cls}">${groupIssue.label}</span>${groupIssue.key!=='ready'?`<span class="group-issue-reason">${deliveryText}</span>`:''}<span class="cell-sub">由运营管理，仅供查看</span></div><button type="button" class="settings-toggle-label" aria-expanded="false" onclick="App.toggleCpdGroupSettings(event,this)">展开详情</button></div>
         <dl class="group-setting-grid cpd-settings-key-fields"><div class="group-setting-period"><dt>排期投放时间</dt><dd>${group.schedule||`${group.start||cp.start||'—'} 至 ${group.end||cp.end||'长期投放'}`}</dd></div><div><dt>合同编号</dt><dd>${group.contractNo||cp.order||'—'}</dd></div><div><dt>计费方式</dt><dd>CPD</dd></div><div><dt>广告位</dt><dd>${group.inventory||'—'}</dd></div></dl>
       </div>
       <div class="cpd-group-sections" hidden>
