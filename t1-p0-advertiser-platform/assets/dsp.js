@@ -1492,6 +1492,8 @@ const App = {
     if(title)title.textContent=`编辑${target}`;if(desc)desc.textContent=`已定位到${target}层；其他层级仅用于确认所属关系`;if(cancel)cancel.textContent='取消编辑';
     const working=this.fillUfCampaign(cp);this.ufWorking={campaign:working,existingCampaignId:cp.id};
     if(flow.type==='campaign'){
+      const campaignHint=document.querySelector('#unifiedToc [data-target="uf-campaign"] small');
+      if(campaignHint)campaignHint.textContent='修改周期、预算和计划名称';
       document.querySelector('#uf-campaign .level-actions')?.remove();
       this.mountUnifiedEditActions('保存后返回原页面；已有广告组仍受新的计划边界约束','保存广告计划','App.saveUnifiedCampaignEdit()');
       this.setUfActiveStep('uf-campaign');document.getElementById('uf-campaign')?.scrollIntoView({block:'start'});return;
@@ -1514,6 +1516,8 @@ const App = {
     this.lockUfContextLevel('uf-campaign',`${cp.name} · ${cp.id}`);
     this.unlockUf('uf-group',2);this.fillUfGroup(group);
     if(flow.type==='group'){
+      const groupHint=document.querySelector('#unifiedToc [data-target="uf-group"] small');
+      if(groupHint)groupHint.textContent='当前仅修改广告组设置';
       const hasCreatives=DB.creatives.some(a=>a.groupId===group.id||a.group===group.name);
       if(hasCreatives){
         const creativeNav=document.querySelector('#unifiedToc [data-target="uf-creative"]');
@@ -1526,6 +1530,8 @@ const App = {
     }
     const creative=DB.creatives.find(c=>c.id===flow.id);if(!creative){this.toast('未找到广告创意','warn');this.cancelUnified();return;}
     this.lockUfContextLevel('uf-group',`${group.name} · ${group.id}`);this.unlockUf('uf-creative',3);this.fillUfCreative(creative);
+    const creativeHint=document.querySelector('#unifiedToc [data-target="uf-creative"] small');
+    if(creativeHint)creativeHint.textContent='当前仅修改广告创意内容';
     document.querySelector('#uf-creative .level-actions')?.remove();
     this.mountUnifiedEditActions('修改后将生成新版本并重新提交审核','保存并提交审核','App.saveUnifiedCreativeEdit()');
     this.setUfActiveStep('uf-creative');requestAnimationFrame(()=>this.setUfActiveStep('uf-creative'));
@@ -1841,7 +1847,7 @@ const App = {
     const group=(DB.adGroups||[]).find(g=>g.id===this.curGroup)||{};
     const F=FMT[group.format]||FMT.feed;
     const compatible=DB.assetFiles.filter(f=>f.type==='image').slice(0,6);
-    return `<div class="page-head unified-head"><div><h1>新建 RTB 投放</h1><p>广告计划和广告组已完成，继续设置广告创意；提交前请确认素材与跳转信息</p></div></div>
+    return `<div class="page-head unified-head"><div><h1>新建广告创意</h1><p>广告计划和广告组已完成，继续设置广告创意；提交前请检查素材与跳转信息</p></div></div>
     <div class="unified-create standalone-creative-create">
       <aside class="form-toc creative-flow-toc" aria-label="创建进度">
         <div class="toc-title">创建进度</div>
@@ -1849,11 +1855,12 @@ const App = {
         <div class="toc-rule"></div>
         <button class="done" type="button"><span>✓</span><div><b>广告组</b><small>${group.name||'已完成设置'}</small></div></button>
         <div class="toc-rule"></div>
-        <button class="active" type="button" aria-current="step"><span>03</span><div><b>广告创意</b><small>选择素材并设置跳转</small></div></button>
+        <button class="active" id="standaloneCreativeNav" type="button" aria-current="step" onclick="App.backToNewCreativeForm()"><span>03</span><div><b>广告创意</b><small>选择素材并设置跳转</small></div></button>
         <div class="toc-rule"></div>
-        <button class="locked" type="button" disabled><span>🔒</span><div><b>检查与发布</b><small>完成创意后进入</small></div></button>
+        <button class="locked" id="standaloneReviewNav" type="button" disabled><span>🔒</span><div><b>检查与发布</b><small>完成创意后进入</small></div></button>
       </aside>
       <div class="addsite-main unified-paper creative-create-paper">
+      <div id="standaloneCreativeForm">
       <div class="card" style="margin-bottom:16px"><div class="card-pad"><div class="form-section-title">所属关系与规格</div>
         <div class="input-row"><div class="field"><label>所属广告计划</label><div class="readonly-value"><b>${cp.name||'—'}</b><span>${cp.id||'已确认的广告计划'}</span></div></div><div class="field"><label>所属广告组</label><div class="readonly-value"><b>${group.name||'—'}</b><span>${group.id||'已确认的广告组'}</span></div></div></div>
         <div class="spec-summary"><span class="row-ico" style="color:${F.color}">${svg(F.ico)}</span><div><b>${F.name}</b><small>广告形式与库存由广告组继承；这里只能选择兼容素材。</small></div><span class="badge blue">SSP 规格约束</span></div>
@@ -1867,8 +1874,33 @@ const App = {
         <div class="input-row"><div class="field"><label>跳转类型</label><select class="select" id="creativeJump"><option>外部跳转</option></select></div><div class="field"><label>目标链接<span class="req">*</span></label><input class="input mono" id="creativeLanding" placeholder="https://example.com/landing"></div></div>
         <div class="notice info">提交后进入审核。修改已投放创意时会生成新版本，旧版本在新版本通过前继续生效。</div>
       </div></div>
-      <div class="creative-create-actions"><span>提交后创意进入审核，不影响当前广告组的其他创意</span><button class="btn btn-ghost" onclick="App.cancelNewCreative()">取消创建</button><button class="btn btn-primary" onclick="App.submitCreativeV1()">${svg(I.check)}提交审核</button></div>
+      </div>
+      <div id="standaloneCreativeReview" style="display:none"><div class="card"><div class="card-pad"><div class="form-section-title">检查广告创意</div><div class="review-chain"><b>广告计划</b><i>→</i><b>广告组</b><i>→</i><b>广告创意</b></div><div class="group-setting-grid" id="standaloneCreativeSummary"></div><div class="notice info" style="margin-top:16px">提交后广告创意进入审核，不影响当前广告组中的其他创意。</div></div></div></div>
+      <div class="creative-create-actions"><span id="standaloneCreativeActionHint">确认创意内容后进入检查与发布</span><button class="btn btn-ghost" onclick="App.cancelNewCreative()">取消创建</button><button class="btn btn-primary" id="standaloneCreativePrimary" onclick="App.reviewNewCreative()">确认广告创意并检查</button></div>
     </div></div>`;
+  },
+  reviewNewCreative(){
+    const name=document.getElementById('creativeName')?.value.trim(),landing=document.getElementById('creativeLanding')?.value.trim(),asset=document.querySelector('#compatibleAssets .picked');
+    if(!name||!landing||!asset){this.toast('请填写创意名称、选择素材并填写目标链接','warn');return;}
+    const file=DB.assetFiles.find(f=>f.id===asset.dataset.id)||{},headline=document.getElementById('creativeHeadline')?.value.trim()||'未填写';
+    document.getElementById('standaloneCreativeSummary').innerHTML=`<div><dt>广告创意名称</dt><dd>${name}</dd></div><div><dt>主素材</dt><dd>${file.name||file.id||'—'}</dd></div><div><dt>标题 / 文案</dt><dd>${headline}</dd></div><div><dt>目标链接</dt><dd>${landing}</dd></div>`;
+    document.getElementById('standaloneCreativeForm').style.display='none';
+    document.getElementById('standaloneCreativeReview').style.display='';
+    const creativeNav=document.getElementById('standaloneCreativeNav'),reviewNav=document.getElementById('standaloneReviewNav');
+    creativeNav.className='done';creativeNav.removeAttribute('aria-current');creativeNav.querySelector('span').textContent='✓';
+    reviewNav.className='active';reviewNav.disabled=false;reviewNav.setAttribute('aria-current','step');reviewNav.querySelector('span').textContent='04';
+    document.getElementById('standaloneCreativeActionHint').textContent='确认设置无误后提交审核';
+    const primary=document.getElementById('standaloneCreativePrimary');primary.innerHTML=`${svg(I.check)}提交审核`;primary.setAttribute('onclick','App.submitCreativeV1()');
+    window.scrollTo({top:0,behavior:'smooth'});
+  },
+  backToNewCreativeForm(){
+    const form=document.getElementById('standaloneCreativeForm'),review=document.getElementById('standaloneCreativeReview');if(!form||!review||review.style.display==='none')return;
+    form.style.display='';review.style.display='none';
+    const creativeNav=document.getElementById('standaloneCreativeNav'),reviewNav=document.getElementById('standaloneReviewNav');
+    creativeNav.className='active';creativeNav.setAttribute('aria-current','step');creativeNav.querySelector('span').textContent='03';
+    reviewNav.className='locked';reviewNav.disabled=true;reviewNav.removeAttribute('aria-current');reviewNav.querySelector('span').textContent='🔒';
+    document.getElementById('standaloneCreativeActionHint').textContent='确认创意内容后进入检查与发布';
+    const primary=document.getElementById('standaloneCreativePrimary');primary.textContent='确认广告创意并检查';primary.setAttribute('onclick','App.reviewNewCreative()');
   },
   cancelNewCreative(){
     const group=(DB.adGroups||[]).find(g=>g.id===this.curGroup);
