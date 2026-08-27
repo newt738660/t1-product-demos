@@ -1038,10 +1038,10 @@ const App = {
     const spend=cp.spend||0,budget=cp.duration==='ongoing'?(cp.dailyBudget||cp.budget):(cp.totalBudget||cp.budget);
     const planIssue=this.unifiedPlanIssue(cp,ads),planIssueText=this.deliveryIssueDescription(planIssue,cp);
     return `
+    <nav class="detail-breadcrumb" aria-label="面包屑"><button onclick="App.go('plans')">广告投放</button><i>/</i><span aria-current="page">${cp.name}</span></nav>
     <div class="page-head campaign-detail-head">
       <div><div class="detail-title-line"><h1>${cp.name}</h1>${this.statusBadge(cp.status)}</div><p>${cp.id} · ${cp.mode==='cpd'?'CPD 运营代投':'RTB 自助投放'} · ${cp.alias||'未设置客户备注'}</p></div>
       <div class="spacer"></div>
-      <button class="btn btn-ghost" onclick="App.go('plans')">← 返回计划列表</button>
       ${cp.mode==='rtb'?`<button class="btn btn-ghost" onclick="App.openCampaignEdit('${cp.id}')">${svg(I.edit)}编辑广告计划</button><button class="btn btn-ghost" onclick="App.confirmPlanStatus('${cp.id}','${cp.status==='paused'?'active':'paused'}')">${svg(cp.status==='paused'?I.play:I.pause)}${cp.status==='paused'?'恢复广告计划':'暂停广告计划'}</button><button class="btn btn-ghost" onclick="App.confirmDeleteDeliveryObject('plan','${cp.id}')">${svg(I.trash)}删除</button><button class="btn btn-primary" onclick="App.startNewGroup('${cp.id}')">${svg(I.plus)}新建广告组</button>`:''}
     </div>
     <div class="card group-setting-summary" aria-label="广告计划概览">
@@ -1141,8 +1141,8 @@ const App = {
     const isRtb=cp.mode==='rtb',groupCanToggle=['active','paused'].includes(group.status),groupToggleLabel=group.status==='paused'?'恢复广告组':'暂停广告组';
     const groupImps=ads.reduce((sum,a)=>sum+(a.imps||0),0),groupSpend=group.spend??((cp.imps||0)>0?(cp.spend||0)*groupImps/cp.imps:0);
     const deliveryText=this.deliveryIssueDescription(groupIssue,cp);
-    return `<div class="cell-sub" style="margin-bottom:10px"><button class="text-link" onclick="App.openPlan('${cp.id}')">${cp.name||'广告计划'}</button><span style="margin:0 6px">/</span>广告组详情</div>
-    <div class="page-head"><div><div class="detail-title-line"><h1>${group.name}</h1>${this.statusBadge(group.status)}</div><p>${group.id||'SSP 同步广告组'} · 所属计划：${cp.name||'—'}</p></div><div class="spacer"></div><button class="btn btn-ghost" onclick="App.openPlan('${cp.id}')">← 返回广告计划</button>${isRtb?`<button class="btn btn-ghost" onclick="App.openGroupEdit('${group.id}')">${svg(I.edit)}编辑广告组</button>${groupCanToggle?`<button class="btn btn-ghost" onclick="App.confirmGroupStatus('${group.id}')">${svg(group.status==='paused'?I.play:I.pause)}${groupToggleLabel}</button>`:''}<button class="btn btn-ghost" onclick="App.confirmDeleteDeliveryObject('group','${group.id}')">${svg(I.trash)}删除</button><button class="btn btn-primary" onclick="App.openNewCreativeForGroup('${group.id}')">${svg(I.plus)}新建广告创意</button>`:''}</div>
+    return `<nav class="detail-breadcrumb" aria-label="面包屑"><button onclick="App.go('plans')">广告投放</button><i>/</i><button onclick="App.openPlan('${cp.id}')">${cp.name||'广告计划'}</button><i>/</i><span aria-current="page">${group.name}</span></nav>
+    <div class="page-head"><div><div class="detail-title-line"><h1>${group.name}</h1>${this.statusBadge(group.status)}</div><p>${group.id||'SSP 同步广告组'} · 所属计划：${cp.name||'—'}</p></div><div class="spacer"></div>${isRtb?`<button class="btn btn-ghost" onclick="App.openGroupEdit('${group.id}')">${svg(I.edit)}编辑广告组</button>${groupCanToggle?`<button class="btn btn-ghost" onclick="App.confirmGroupStatus('${group.id}')">${svg(group.status==='paused'?I.play:I.pause)}${groupToggleLabel}</button>`:''}<button class="btn btn-ghost" onclick="App.confirmDeleteDeliveryObject('group','${group.id}')">${svg(I.trash)}删除</button><button class="btn btn-primary" onclick="App.openNewCreativeForGroup('${group.id}')">${svg(I.plus)}新建广告创意</button>`:''}</div>
     ${isRtb?`<div class="card group-setting-summary">
       <div class="group-summary-head">
         <div><b>投放设置</b><span class="badge ${groupIssue.cls}">${groupIssue.label}</span>${groupIssue.key!=='ready'?`<span class="group-issue-reason">${deliveryText}</span>`:''}</div>
@@ -1390,8 +1390,7 @@ const App = {
   view_unifiednew(){
     const assets=DB.assetFiles.filter(f=>f.type==='image').slice(0,6);
     const advertiserName=this.profile()?.advertiserName||'T1演示广告主';
-    return `<div class="page-head unified-head"><div><h1>新建 RTB 投放</h1><p>按广告计划、广告组和广告创意三个层级完成设置；提交前不会创建投放对象</p></div></div>
-    <div class="unified-create">
+    return `<div class="unified-create">
       <aside class="form-toc" id="unifiedToc">
         <div class="toc-title">创建进度</div>
         <button class="active" data-target="uf-campaign" onclick="App.jumpUnified('uf-campaign')"><span>01</span><div><b>广告计划</b><small>周期与预算</small></div></button>
@@ -1400,6 +1399,8 @@ const App = {
         <div class="toc-rule"></div>
         <button class="locked" data-target="uf-review" disabled><span>🔒</span><div><b>检查与发布</b><small>完成创意后解锁</small></div></button>
       </aside>
+      <main class="unified-main">
+      <div class="page-head unified-head"><div><h1>新建广告计划</h1><p>设置当前层级，确认后继续创建广告组</p></div></div>
       <div class="unified-paper">
         <section class="paper-level" id="uf-campaign" data-level="01"><div class="level-heading"><span>01</span><div><h2>广告计划</h2><p>设置本次投放的周期、预算和计划名称</p></div><em>当前步骤</em></div>
           <div class="paper-block"><h3>投放周期与预算</h3><div class="pill-group" id="ufDuration"><label class="radio-pill sel" data-value="fixed" onclick="App.pickUfDuration(this)"><b>固定周期</b><small>总预算，可设每日上限</small></label><label class="radio-pill" data-value="ongoing" onclick="App.pickUfDuration(this)"><b>长期投放</b><small>只设置每日预算</small></label></div><div class="input-row" style="margin-top:14px"><div class="field"><label>开始日期<span class="req">*</span></label><input class="input" type="date" id="ufPlanStart" value="2026-08-12" onchange="App.updateUfPlanName()"></div><div class="field" id="ufPlanEndField"><label>结束日期<span class="req">*</span></label><input class="input" type="date" id="ufPlanEnd" value="2026-08-31" onchange="App.updateUfPlanName()"></div></div><div id="ufFixedBudget"><div class="input-row"><div class="field"><label>活动总预算（USD）<span class="req">*</span></label><input class="input" id="ufTotal" value="5000"></div><div class="field"><label>每日上限（选填）</label><input class="input" id="ufDailyCap" placeholder="如：300"></div></div></div><div id="ufOngoingBudget" style="display:none"><div class="field"><label>每日预算（USD）<span class="req">*</span></label><input class="input" id="ufDaily" value="150"></div></div></div>
@@ -1413,7 +1414,7 @@ const App = {
           <div class="paper-block"><h3>创意内容</h3><div class="field"><label>广告创意名称<span class="req">*</span></label><input class="input" id="ufCreativeName" placeholder="如：欧洲夏促信息流 A"></div><div class="field"><label>主素材<span class="req">*</span></label><div class="flex between" style="margin-bottom:8px"><span class="cell-sub">仅显示符合当前广告组规格的素材</span><button class="btn btn-ghost btn-sm" onclick="App.openUfUpload()">${svg(I.upload)}上传新素材</button></div><div class="asset-grid" id="ufAssets">${assets.map((f,i)=>`<div class="asset-cell ${i===0?'picked':''}" data-id="${f.id}" onclick="App.pickCompatibleAsset(this)"><div class="asset-thumb" style="height:64px">${svg(I.image)}</div><div class="asset-meta"><div class="asset-name">${f.name}</div><div class="asset-sub">${f.dim} · ${f.size}</div></div></div>`).join('')}</div></div><div class="field"><label>标题 / 文案</label><input class="input" id="ufHeadline" maxlength="50" placeholder="是否必填由广告形式决定"></div><div class="input-row"><div class="field"><label>跳转类型</label><select class="select" id="ufJump"><option>外部跳转</option></select></div><div class="field"><label>目标链接<span class="req">*</span></label><input class="input mono" id="ufLanding" placeholder="https://example.com/landing"></div></div></div><div class="level-actions"><span>确认后检查全部设置，数据将在最终提交时创建</span><button class="btn btn-ghost" onclick="App.cancelUnified()">取消创建</button><button class="btn btn-primary" onclick="App.saveUfCreative()">确认广告创意并检查 →</button></div>
         </section>
         <section class="paper-level review-level stage-hidden" id="uf-review" data-level="04"><div class="level-heading"><span>✓</span><div><h2>检查并提交</h2><p>确认三个层级的设置后提交创意审核</p></div></div><div class="review-chain"><b>广告计划</b><i>→</i><b>广告组</b><i>→</i><b>广告创意</b></div><div class="notice info">系统将检查：广告组的周期和预算不得超出广告计划；库存必须兼容广告形式；素材必须符合广告组规格。</div><div class="level-actions"><span>提交后将一次性创建三层对象，广告创意进入审核</span><button class="btn btn-ghost" onclick="App.cancelUnified()">取消创建</button><button class="btn btn-primary" onclick="App.submitUnified()">${svg(I.check)}创建投放并提交审核</button></div></section>
-      </div>
+      </div></main>
     </div>`;
   },
   after_newplan(){
@@ -1494,6 +1495,15 @@ const App = {
     const flow=this.editFlow,cp=DB.campaigns.find(c=>c.id===this.curCamp);if(!flow||!cp){this.editFlow=null;this.toast('未找到需要编辑的投放对象','warn');this.go('plans');return;}
     if(cp.mode==='cpd'&&flow.type!=='creative'){this.editFlow=null;this.toast('CPD 广告计划和广告组由运营管理，广告主不可修改','info');this.go(flow.returnPage||'plans');return;}
     const labels={campaign:'广告计划',group:'广告组',creative:'广告创意'},target=labels[flow.type];
+    const reviewNav=document.querySelector('#unifiedToc [data-target="uf-review"]');
+    if(reviewNav){const rule=reviewNav.previousElementSibling;if(rule?.classList.contains('toc-rule'))rule.remove();reviewNav.remove();}
+    document.getElementById('uf-review')?.classList.add('stage-hidden');
+    const editNavCopy={
+      campaign:{'uf-campaign':'当前编辑层级','uf-group':'下级广告组，本次不修改','uf-creative':'下级广告创意，本次不修改'},
+      group:{'uf-campaign':'所属广告计划，仅供确认','uf-group':'当前编辑层级','uf-creative':'下级广告创意，本次不修改'},
+      creative:{'uf-campaign':'所属广告计划，仅供确认','uf-group':'所属广告组，仅供确认','uf-creative':'当前编辑层级'}
+    }[flow.type];
+    Object.entries(editNavCopy||{}).forEach(([level,copy])=>{const hint=document.querySelector(`#unifiedToc [data-target="${level}"] small`);if(hint)hint.textContent=copy;});
     document.getElementById('topTitle').textContent=`编辑${target}`;
     document.getElementById('topSub').textContent='复用 RTB 三级投放结构，当前仅修改所在层级';
     const title=document.querySelector('.unified-head h1'),desc=document.querySelector('.unified-head p'),cancel=document.querySelector('.unified-head button');
@@ -1609,6 +1619,16 @@ const App = {
   },
   setUfActiveStep(target){
     document.querySelectorAll('#unifiedToc button').forEach(btn=>btn.classList.toggle('active',btn.dataset.target===target));
+    if(!this.editFlow){
+      const copy={
+        'uf-campaign':['新建广告计划','设置投放周期、预算和计划名称，确认后继续创建广告组'],
+        'uf-group':['新建广告组','设置出价、定向与库存，确认后继续创建广告创意'],
+        'uf-creative':['新建广告创意','选择素材并设置文案和目标链接，确认后进入检查'],
+        'uf-review':['检查与发布','检查三个层级的设置，确认后创建投放并提交审核']
+      }[target];
+      const title=document.querySelector('.unified-head h1'),desc=document.querySelector('.unified-head p');
+      if(copy&&title)title.textContent=copy[0];if(copy&&desc)desc.textContent=copy[1];
+    }
   },
   jumpUnified(id){ document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}); },
   ufPlanNameMode(){ return document.querySelector('#ufNameMode .sel')?.dataset?.value||'auto'; },
