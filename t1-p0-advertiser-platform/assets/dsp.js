@@ -580,9 +580,12 @@ const App = {
   },
 
   statusBadge(s){
-    const m={active:['green','投放中'],review:['amber','审核中'],paused:['gray','已暂停'],rejected:['red','审核驳回'],ended:['gray','已结束'],draft:['gray','草稿']};
+    const m={active:['green','投放中'],review:['amber','审核中'],paused:['gray','已暂停'],archived:['gray','已归档'],rejected:['red','审核驳回'],ended:['gray','已结束'],draft:['gray','草稿']};
     const [c,t]=m[s]||['gray',s];
     return `<span class="badge ${c}"><span class="dot-status ${c}"></span>${t}</span>`;
+  },
+  deliveryMoreMenu(type,id){
+    return `<details class="action-more"><summary class="plan-row-action">更多</summary><div class="action-more-menu"><button onclick="App.confirmArchiveDeliveryObject('${type}','${id}')">归档</button><button class="danger" onclick="App.confirmDeleteDeliveryObject('${type}','${id}')">删除</button></div></details>`;
   },
   mkChart(id,type,data,opts){
     const ctx=document.getElementById(id); if(!ctx) return;
@@ -793,6 +796,7 @@ const App = {
   },
   after_plans(){
     this.pages.unifiedPlan=1;this.unifiedSelected=new Set();
+    document.getElementById('unifiedStatusFilter')?.insertAdjacentHTML('beforeend','<option value="archived">已归档</option>');
     const remembered=DB.uiState?.planListView;
     this.unifiedType=['all','rtb','cpd'].includes(remembered)?remembered:'all';
     document.querySelector(`#unifiedTypeTabs [data-type="${this.unifiedType}"]`)?.classList.add('active');
@@ -841,7 +845,7 @@ const App = {
   },
   renderUnifiedPlans(){
     const type=this.unifiedType||'rtb',status=document.getElementById('unifiedStatusFilter')?.value||'',issueFilter=document.getElementById('unifiedIssueFilter')?.value||'',scheduleFilter=document.getElementById('unifiedScheduleFilter')?.value||'',kw=(document.getElementById('unifiedSearch')?.value||'').trim().toLowerCase(),today=new Date().toISOString().slice(0,10);
-    const all=DB.campaigns.filter(c=>{const creatives=DB.creatives.filter(a=>a.camp===c.id),issue=this.unifiedPlanIssue(c,creatives),running=(!c.start||c.start<=today)&&(!c.end||c.end>=today),upcoming=!!c.start&&c.start>today,ended=!!c.end&&c.end<today,scheduleMatch=!scheduleFilter||(scheduleFilter==='running'&&running)||(scheduleFilter==='upcoming'&&upcoming)||(scheduleFilter==='ended'&&ended);return (type==='all'||c.mode===type)&&(!status||c.status===status)&&(!issueFilter||issue.key===issueFilter)&&scheduleMatch&&(!kw||[c.name,c.id,c.alias,c.order].some(v=>(v||'').toLowerCase().includes(kw)));});
+    const all=DB.campaigns.filter(c=>{const creatives=DB.creatives.filter(a=>a.camp===c.id),issue=this.unifiedPlanIssue(c,creatives),running=(!c.start||c.start<=today)&&(!c.end||c.end>=today),upcoming=!!c.start&&c.start>today,ended=!!c.end&&c.end<today,scheduleMatch=!scheduleFilter||(scheduleFilter==='running'&&running)||(scheduleFilter==='upcoming'&&upcoming)||(scheduleFilter==='ended'&&ended);return (status==='archived'||c.status!=='archived')&&(type==='all'||c.mode===type)&&(!status||c.status===status)&&(!issueFilter||issue.key===issueFilter)&&scheduleMatch&&(!kw||[c.name,c.id,c.alias,c.order].some(v=>(v||'').toLowerCase().includes(kw)));});
     const list=this.pageSlice(all,'unifiedPlan');
     this.visibleUnifiedIds=list.filter(c=>c.mode==='rtb').map(c=>c.id);
     const selectable=this.visibleUnifiedIds.length>0&&this.visibleUnifiedIds.every(id=>this.unifiedSelected?.has(id));
@@ -863,7 +867,7 @@ const App = {
     document.getElementById('unifiedPlanBody').innerHTML=list.map(cp=>{
       const creatives=DB.creatives.filter(a=>a.camp===cp.id),imps=creatives.reduce((s,a)=>s+(a.imps||0),0),clicks=creatives.reduce((s,a)=>s+(a.clicks||0),0),ctr=imps?(clicks/imps*100).toFixed(2)+'%':'—',isCpd=cp.mode==='cpd',spend=cp.spend||0,budget=cp.budget||cp.totalBudget||cp.dailyBudget||0,remaining=Math.max(0,budget-spend),cpc=!isCpd&&clicks?spend/clicks:null,cpm=!isCpd&&imps?spend/imps*1000:null,issue=this.unifiedPlanIssue(cp,creatives);
       const statusAction=cp.status==='active'?'暂停投放':'恢复投放',nextStatus=cp.status==='active'?'paused':'active';
-      const action=isCpd?'<span class="na-value">—</span>':`<div class="plan-row-actions"><button class="plan-row-action" onclick="App.openCampaignEdit('${cp.id}',true)">编辑计划</button><button class="plan-row-action" onclick="App.confirmPlanStatus('${cp.id}','${nextStatus}')">${statusAction}</button></div>`;
+      const action=isCpd?'<span class="na-value">—</span>':cp.status==='archived'?'<span class="cell-sub">仅供查看</span>':`<div class="plan-row-actions"><button class="plan-row-action" onclick="App.openCampaignEdit('${cp.id}',true)">编辑</button><button class="plan-row-action" onclick="App.confirmPlanStatus('${cp.id}','${nextStatus}')">${statusAction.replace('投放','')}</button>${this.deliveryMoreMenu('plan',cp.id)}</div>`;
       const cannotSelect=isCpd,disabledReason='CPD 计划由运营管理，不支持批量启停';
       const typeCell=showType?`<td class="plan-type-col"><span class="badge ${isCpd?'amber':'blue'}">${isCpd?'CPD':'RTB'}</span></td>`:'';
       const cpdOnlyCells=showType?`<td class="mono order-col">${isCpd?(cp.order||'—'):'—'}</td><td class="owner-col">${isCpd?(cp.operator||'待分配'):'—'}</td>`:'';
@@ -1034,7 +1038,20 @@ const App = {
     rows.forEach(row=>{const show=(!keyword||row.dataset.search.includes(keyword))&&(!status||row.dataset.status===status);row.style.display=show?'':'none';if(show)visible++;});
     const count=document.getElementById('visibleGroupCount');if(count)count.textContent=visible;
   },
-  after_campdetail(){},
+  after_campdetail(){ this.enhanceDeliveryActionColumns(); },
+  after_groupdetail(){ this.enhanceDeliveryActionColumns(); },
+  enhanceDeliveryActionColumns(){
+    document.querySelectorAll('tbody tr').forEach(row=>{
+      if(row.textContent.includes('已归档')){ row.style.display='none'; return; }
+      const actions=[...row.querySelectorAll('.plan-row-actions,.cell-flex')].find(el=>[...el.querySelectorAll('button')].some(b=>/编辑/.test(b.textContent)));if(!actions)return;
+      const edit=[...actions.querySelectorAll('button')].find(b=>/编辑/.test(b.textContent));if(!edit)return;
+      const call=edit.getAttribute('onclick')||'';
+      const match=call.match(/open(GroupEdit|Creative)\('([^']+)'/);if(!match)return;
+      const type=match[1]==='GroupEdit'?'group':'creative',id=match[2];
+      [...actions.querySelectorAll('button')].filter(b=>/删除|归档/.test(b.textContent)).forEach(b=>b.remove());
+      if(!actions.querySelector('.action-more'))actions.insertAdjacentHTML('beforeend',this.deliveryMoreMenu(type,id));
+    });
+  },
   switchCampaignTab(btn, tab){
     document.querySelectorAll('#campaignTabs button').forEach(b=>b.classList.toggle('active',b===btn));
     const panel=document.getElementById('campaignTabPanel');
@@ -1151,6 +1168,18 @@ const App = {
     DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:next==='paused'?'暂停广告创意':'恢复广告创意',target:creative.id,result:'成功'});
     this.save();this.go('groupdetail');this.toast(next==='paused'?'广告创意已暂停':'广告创意已恢复；是否实际投放仍取决于上级状态');
   },
+  confirmArchiveDeliveryObject(type,id){
+    const labels={plan:'广告计划',group:'广告组',creative:'广告创意'},label=labels[type];if(!label)return;
+    const item=type==='plan'?DB.campaigns.find(x=>x.id===id):type==='group'?(DB.adGroups||[]).find(x=>x.id===id):DB.creatives.find(x=>x.id===id);if(!item)return;
+    const cp=type==='plan'?item:DB.campaigns.find(c=>c.id===item.camp);if(cp?.mode!=='rtb'){this.toast('CPD 投放对象由运营管理，广告主不可归档','info');return;}
+    this.modal(`<div class="modal-head"><div><h3>归档${label}</h3><p>${item.name||item.alias||item.id} · ${item.id}</p></div></div><div class="modal-body"><div class="notice warning"><b>归档后不可恢复投放</b><div style="margin-top:6px">对象将从默认列表移出，但详情、历史报表和审计记录会继续保留。${type!=='creative'?'<br>下级对象也将停止实际投放，但自身状态不会改变。':''}</div></div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><button class="btn btn-primary" onclick="App.archiveDeliveryObject('${type}','${id}')">确认归档</button></div>`,true);
+  },
+  archiveDeliveryObject(type,id){
+    const item=type==='plan'?DB.campaigns.find(x=>x.id===id):type==='group'?(DB.adGroups||[]).find(x=>x.id===id):DB.creatives.find(x=>x.id===id);if(!item)return;
+    item.status='archived';item.archivedAt=new Date().toISOString();
+    DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:`归档${type==='plan'?'广告计划':type==='group'?'广告组':'广告创意'}`,target:id,result:'成功'});
+    this.save();this.closeModal();this.go(type==='creative'?'groupdetail':type==='group'?'campdetail':'plans');this.toast('已归档；历史数据和审计记录继续保留');
+  },
   confirmDeleteDeliveryObject(type,id){
     const labels={plan:'广告计划',group:'广告组',creative:'广告创意'},label=labels[type];if(!label)return;
     const item=type==='plan'?DB.campaigns.find(x=>x.id===id):type==='group'?(DB.adGroups||[]).find(x=>x.id===id):DB.creatives.find(x=>x.id===id);if(!item)return;
@@ -1158,7 +1187,7 @@ const App = {
     const childGroups=type==='plan'?(DB.adGroups||[]).filter(g=>g.camp===id):[],childCreatives=type==='plan'?DB.creatives.filter(a=>a.camp===id):type==='group'?DB.creatives.filter(a=>a.groupId===id||a.group===item.name&&a.camp===item.camp):[];
     const hasDelivery=Number(item.spend||0)>0||Number(item.imps||0)>0||Number(item.clicks||0)>0;
     const blocked=hasDelivery||childGroups.length>0||childCreatives.length>0;
-    const reason=hasDelivery?'该对象已产生花费或投放数据。为保证报表和审计记录完整，只能暂停，不能删除。':childGroups.length||childCreatives.length?`请先删除下属的${childCreatives.length?'广告创意':'广告组'}；系统不会级联删除。`:'';
+    const reason=hasDelivery?'该对象已产生花费或投放数据。为保证报表和审计记录完整，不能删除；如确定不再使用，可以归档。':childGroups.length||childCreatives.length?`请先处理下属的${childCreatives.length?'广告创意':'广告组'}；系统不会级联删除。`:'';
     this.modal(`<div class="modal-head"><div><h3>${blocked?'无法删除':'删除'}${label}</h3><p>${item.name||item.alias||item.id} · ${item.id}</p></div></div><div class="modal-body">${blocked?`<div class="notice warning">${reason}</div>`:`<div class="notice warning"><b>删除后无法恢复</b><div style="margin-top:6px">仅从未产生投放数据的对象允许删除，历史审计日志仍会保留。</div></div>`}</div><div class="modal-foot"><button class="btn ${blocked?'btn-primary':'btn-ghost'}" onclick="App.closeModal()">${blocked?'我知道了':'取消'}</button>${blocked?'':`<button class="btn btn-danger" onclick="App.deleteDeliveryObject('${type}','${id}')">${svg(I.trash)}确认删除</button>`}</div>`,true);
   },
   deleteDeliveryObject(type,id){
