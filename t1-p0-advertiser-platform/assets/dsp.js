@@ -584,6 +584,10 @@ const App = {
     const [c,t]=m[s]||['gray',s];
     return `<span class="badge ${c}"><span class="dot-status ${c}"></span>${t}</span>`;
   },
+  deliveryImpact(level,title,description){
+    const icons={info:I.pause,warning:'<path d="M12 3 3 20h18L12 3z"/><path d="M12 9v4M12 17h.01"/>',danger:'<path d="M12 3 3 20h18L12 3z"/><path d="M12 9v4M12 17h.01"/>'};
+    return `<div class="delivery-impact ${level}"><div class="delivery-impact-icon">${svg(icons[level])}</div><div class="delivery-impact-copy"><b>${title}</b><p>${description}</p></div></div>`;
+  },
   deliveryMoreMenu(type,id){
     return `<button class="plan-row-action action-more-trigger" aria-haspopup="menu" aria-expanded="false" onclick="event.stopPropagation();App.toggleDeliveryMoreMenu(this,'${type}','${id}')">更多<span aria-hidden="true">⌄</span></button>`;
   },
@@ -912,7 +916,7 @@ const App = {
     const next=cp.status==='active'?'paused':'active',verb=next==='paused'?'暂停投放':'恢复投放';
     this.modal(`<div class="modal-head"><div><h3>管理广告计划</h3><p>${cp.alias||cp.name} · ${cp.id}</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg('<path d="M18 6 6 18M6 6l12 12"/>')}</button></div><div class="modal-body plan-action-list"><button onclick="App.closeModal();App.openCampaignEdit('${cp.id}',true)">${svg(I.edit)}<span><b>编辑广告计划</b><small>修改计划名称、投放周期和预算</small></span></button><button onclick="App.closeModal();App.confirmPlanStatus('${cp.id}','${next}')">${svg(next==='paused'?I.pause:I.play)}<span><b>${verb}</b><small>${next==='paused'?'下属广告组和创意将停止生效，但保留各自状态':'仅恢复原本启用且审核通过的下属对象'}</small></span></button></div>`,true);
   },
-  confirmPlanStatus(id,status){const cp=DB.campaigns.find(c=>c.id===id);if(!cp)return;const pause=status==='paused';this.modal(`<div class="modal-head"><div><h3>${pause?'暂停':'恢复'}广告计划</h3><p>${cp.alias||cp.name}</p></div></div><div class="modal-body"><p>${pause?'暂停后，计划下的广告组和创意将停止投放，但不会改变它们各自的启停和审核状态。':'恢复后，仅原本启用、审核通过且仍在投放周期内的广告组和创意会重新生效。'}</p></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><button class="btn btn-primary" onclick="App.applyPlanStatus(['${id}'],'${status}')">确认${pause?'暂停':'恢复'}</button></div>`,true);},
+  confirmPlanStatus(id,status){const cp=DB.campaigns.find(c=>c.id===id);if(!cp)return;const pause=status==='paused',content=pause?this.deliveryImpact('info','广告将暂时停止投放','计划下的广告组和创意会停止生效，但它们自身的启停和审核状态不会改变。之后可以恢复该计划。'):'<p>恢复后，仅原本启用、审核通过且仍在投放周期内的广告组和创意会重新生效。</p>';this.modal(`<div class="modal-head"><div><h3>${pause?'暂停':'恢复'}广告计划</h3><p>${cp.alias||cp.name}</p></div></div><div class="modal-body">${content}</div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><button class="btn btn-primary" onclick="App.applyPlanStatus(['${id}'],'${status}')">确认${pause?'暂停':'恢复'}</button></div>`,true);},
   confirmBulkPlanStatus(status){const ids=[...(this.unifiedSelected||[])],pause=status==='paused';if(!ids.length)return;this.pendingBulkPlanIds=ids;this.modal(`<div class="modal-head"><div><h3>批量${pause?'暂停':'恢复'}投放</h3><p>将处理 ${ids.length} 条 RTB 广告计划</p></div></div><div class="modal-body"><p>${pause?'所有选中计划及其下属广告组、创意将停止生效；子对象自身状态保持不变。':'仅恢复符合投放条件的计划；子对象仍需处于启用且审核通过状态。'}</p></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><button class="btn btn-primary" onclick="App.applyPlanStatus(App.pendingBulkPlanIds,'${status}')">确认${pause?'暂停':'恢复'} ${ids.length} 条计划</button></div>`,true);},
   applyPlanStatus(ids,status){let changed=0;ids.forEach(id=>{const cp=DB.campaigns.find(c=>c.id===id);if(cp?.mode==='rtb'&&cp.status!==status){cp.status=status;changed++;}});this.save();this.closeModal();this.unifiedSelected=new Set();if(this.cur==='campdetail')this.go('campdetail');else this.renderUnifiedPlans();this.toast(`${changed} 条广告计划已${status==='paused'?'暂停':'恢复'}`);},
   openUnifiedCreateChoice(){
@@ -1174,7 +1178,8 @@ const App = {
   confirmGroupStatus(id){
     const group=(DB.adGroups||[]).find(g=>g.id===id);if(!group||!['active','paused'].includes(group.status))return;
     const pause=group.status==='active';
-    this.modal(`<div class="modal-head"><div><h3>${pause?'暂停':'恢复'}广告组</h3><p>${group.name} · ${group.id}</p></div></div><div class="modal-body"><p>${pause?'暂停后，该广告组下的创意将停止投放，但不会改变创意自身的启停和审核状态。':'恢复后，仅审核通过、处于启用状态且满足计划约束的创意会重新投放。'}</p></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><button class="btn btn-primary" onclick="App.closeModal();App.toggleGroupStatus('${id}')">确认${pause?'暂停':'恢复'}</button></div>`,true);
+    const content=pause?this.deliveryImpact('info','广告将暂时停止投放','该广告组下的创意会停止生效，但创意自身的启停和审核状态不会改变。之后可以恢复该广告组。'):'<p>恢复后，仅审核通过、处于启用状态且满足计划约束的创意会重新投放。</p>';
+    this.modal(`<div class="modal-head"><div><h3>${pause?'暂停':'恢复'}广告组</h3><p>${group.name} · ${group.id}</p></div></div><div class="modal-body">${content}</div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><button class="btn btn-primary" onclick="App.closeModal();App.toggleGroupStatus('${id}')">确认${pause?'暂停':'恢复'}</button></div>`,true);
   },
   toggleGroupStatus(id,returnPage='groupdetail'){
     const group=(DB.adGroups||[]).find(g=>g.id===id);if(!group||!['active','paused'].includes(group.status))return;
@@ -1186,7 +1191,8 @@ const App = {
   confirmCreativeStatus(id){
     const creative=DB.creatives.find(a=>a.id===id);if(!creative||!['active','paused'].includes(creative.status))return;
     const pause=creative.status==='active';
-    this.modal(`<div class="modal-head"><div><h3>${pause?'暂停':'恢复'}广告创意</h3><p>${creative.name} · ${creative.id}</p></div></div><div class="modal-body"><p>${pause?'暂停后，该创意将立即停止参与投放，审核状态和历史数据不会改变。':'恢复后，该创意仍需满足计划、广告组状态及审核要求才会实际投放。'}</p></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><button class="btn btn-primary" onclick="App.closeModal();App.toggleCreativeStatus('${id}')">确认${pause?'暂停':'恢复'}</button></div>`,true);
+    const content=pause?this.deliveryImpact('info','创意将暂时停止参与投放','审核状态和历史数据不会改变，之后可以恢复。'):'<p>恢复后，该创意仍需满足计划、广告组状态及审核要求才会实际投放。</p>';
+    this.modal(`<div class="modal-head"><div><h3>${pause?'暂停':'恢复'}广告创意</h3><p>${creative.name} · ${creative.id}</p></div></div><div class="modal-body">${content}</div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><button class="btn btn-primary" onclick="App.closeModal();App.toggleCreativeStatus('${id}')">确认${pause?'暂停':'恢复'}</button></div>`,true);
   },
   toggleCreativeStatus(id){
     const creative=DB.creatives.find(a=>a.id===id);if(!creative||!['active','paused'].includes(creative.status))return;
@@ -1199,7 +1205,8 @@ const App = {
     const labels={plan:'广告计划',group:'广告组',creative:'广告创意'},label=labels[type];if(!label)return;
     const item=type==='plan'?DB.campaigns.find(x=>x.id===id):type==='group'?(DB.adGroups||[]).find(x=>x.id===id):DB.creatives.find(x=>x.id===id);if(!item)return;
     const cp=type==='plan'?item:DB.campaigns.find(c=>c.id===item.camp);if(cp?.mode!=='rtb'){this.toast('CPD 投放对象由运营管理，广告主不可归档','info');return;}
-    this.modal(`<div class="modal-head"><div><h3>归档${label}</h3><p>${item.name||item.alias||item.id} · ${item.id}</p></div></div><div class="modal-body"><div class="notice warning"><b>归档后不可恢复投放</b><div style="margin-top:6px">对象将从默认列表移出，但详情、历史报表和审计记录会继续保留。${type!=='creative'?'<br>下级对象也将停止实际投放，但自身状态不会改变。':''}</div></div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><button class="btn btn-primary" onclick="App.archiveDeliveryObject('${type}','${id}')">确认归档</button></div>`,true);
+    const impact=`对象将从默认列表移出，且不能恢复投放；详情、历史报表和审计记录仍会保留。${type!=='creative'?' 下级对象也会停止实际投放，但自身状态不变。':''}`;
+    this.modal(`<div class="modal-head"><div><h3>归档${label}</h3><p>${item.name||item.alias||item.id} · ${item.id}</p></div></div><div class="modal-body">${this.deliveryImpact('warning','归档后不可恢复投放',impact)}</div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><button class="btn btn-primary" onclick="App.archiveDeliveryObject('${type}','${id}')">确认归档</button></div>`,true);
   },
   archiveDeliveryObject(type,id){
     const item=type==='plan'?DB.campaigns.find(x=>x.id===id):type==='group'?(DB.adGroups||[]).find(x=>x.id===id):DB.creatives.find(x=>x.id===id);if(!item)return;
@@ -1215,7 +1222,8 @@ const App = {
     const hasDelivery=Number(item.spend||0)>0||Number(item.imps||0)>0||Number(item.clicks||0)>0;
     const blocked=hasDelivery||childGroups.length>0||childCreatives.length>0;
     const reason=hasDelivery?'该对象已产生花费或投放数据。为保证报表和审计记录完整，不能删除；如确定不再使用，可以归档。':childGroups.length||childCreatives.length?`请先处理下属的${childCreatives.length?'广告创意':'广告组'}；系统不会级联删除。`:'';
-    this.modal(`<div class="modal-head"><div><h3>${blocked?'无法删除':'删除'}${label}</h3><p>${item.name||item.alias||item.id} · ${item.id}</p></div></div><div class="modal-body">${blocked?`<div class="notice warning">${reason}</div>`:`<div class="notice warning"><b>删除后无法恢复</b><div style="margin-top:6px">仅从未产生投放数据的对象允许删除，历史审计日志仍会保留。</div></div>`}</div><div class="modal-foot"><button class="btn ${blocked?'btn-primary':'btn-ghost'}" onclick="App.closeModal()">${blocked?'我知道了':'取消'}</button>${blocked?'':`<button class="btn btn-danger" onclick="App.deleteDeliveryObject('${type}','${id}')">${svg(I.trash)}确认删除</button>`}</div>`,true);
+    const content=blocked?this.deliveryImpact('warning','当前对象不能删除',reason):this.deliveryImpact('danger','删除后无法恢复','该对象会被永久删除，不能恢复；仅历史审计日志会继续保留。');
+    this.modal(`<div class="modal-head"><div><h3>${blocked?'无法删除':'删除'}${label}</h3><p>${item.name||item.alias||item.id} · ${item.id}</p></div></div><div class="modal-body">${content}</div><div class="modal-foot"><button class="btn ${blocked?'btn-primary':'btn-ghost'}" onclick="App.closeModal()">${blocked?'我知道了':'取消'}</button>${blocked?'':`<button class="btn btn-danger" onclick="App.deleteDeliveryObject('${type}','${id}')">${svg(I.trash)}确认删除</button>`}</div>`,true);
   },
   deleteDeliveryObject(type,id){
     const item=type==='plan'?DB.campaigns.find(x=>x.id===id):type==='group'?(DB.adGroups||[]).find(x=>x.id===id):DB.creatives.find(x=>x.id===id);if(!item)return;

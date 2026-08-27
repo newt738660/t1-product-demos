@@ -543,6 +543,14 @@ textarea.input { resize: vertical; min-height: 84px; }
 .modal-head .spacer { flex: 1; }
 .modal-body { padding: 24px; overflow-y: auto; }
 .modal-foot { display: flex; gap: 10px; justify-content: flex-end; padding: 16px 24px; border-top: 1px solid var(--border); background: var(--surface-2); }
+.delivery-impact { display: grid; grid-template-columns: 42px minmax(0,1fr); gap: 14px; align-items: start; }
+.delivery-impact-icon { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; }
+.delivery-impact-icon svg { width: 21px; height: 21px; }
+.delivery-impact-copy b { display: block; margin-bottom: 6px; font-size: 14px; }
+.delivery-impact-copy p { color: var(--text-2); font-size: 13px; line-height: 1.7; }
+.delivery-impact.info .delivery-impact-icon { color: var(--info); background: color-mix(in srgb,var(--info) 12%,transparent); }
+.delivery-impact.warning .delivery-impact-icon { color: #b77900; background: #fff4d6; }
+.delivery-impact.danger .delivery-impact-icon { color: var(--danger); background: color-mix(in srgb,var(--danger) 11%,transparent); }
 .summary-list { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
 .summary-list > div { display: grid; grid-template-columns: 145px 1fr; gap: 18px; padding: 13px 16px; border-top: 1px solid var(--border); align-items: center; }
 .summary-list > div:first-child { border-top: 0; }
