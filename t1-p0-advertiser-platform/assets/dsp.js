@@ -1918,6 +1918,9 @@ const App = {
     document.getElementById('topTitle').textContent='新建广告创意';
     document.getElementById('topSub').textContent='第三层：素材、文案与跳转';
     document.querySelector('.unified-create')?.classList.add('standalone-creative-create');
+    const reviewNav=document.querySelector('#unifiedToc [data-target="uf-review"]');
+    if(reviewNav){const rule=reviewNav.previousElementSibling;if(rule?.classList.contains('toc-rule'))rule.remove();reviewNav.remove();}
+    document.getElementById('uf-review')?.remove();
     this.ufWorking={campaign:{...cp},group:{...group},existingCampaignId:cp.id,existingGroupId:group.id};
     this.fillUfGroup(group);
     this.lockUfContextLevel('uf-campaign',`${cp.name} · ${cp.id}`);
@@ -1928,17 +1931,11 @@ const App = {
     });
     this.unlockUf('uf-creative',3);
     const creativeHint=document.querySelector('#unifiedToc button[data-target="uf-creative"] small');if(creativeHint)creativeHint.textContent='选择素材并设置跳转';
-    const reviewNavHint=document.querySelector('#unifiedToc button[data-target="uf-review"] small');if(reviewNavHint)reviewNavHint.textContent='完成创意后进入';
-    const creative=document.getElementById('uf-creative'),review=document.getElementById('uf-review');
-    creative?.querySelector('.level-actions span')?.replaceChildren(document.createTextNode('确认后进入检查与发布'));
+    const creative=document.getElementById('uf-creative');
+    creative?.querySelector('.level-actions span')?.replaceChildren(document.createTextNode('提交后当前广告创意进入审核'));
     const creativeButtons=creative?.querySelectorAll('.level-actions button');
     if(creativeButtons?.[0]){creativeButtons[0].textContent='取消创建';creativeButtons[0].setAttribute('onclick','App.cancelNewCreative()');}
-    if(creativeButtons?.[1]){creativeButtons[1].textContent='确认广告创意并检查';creativeButtons[1].setAttribute('onclick','App.saveUfCreative()');}
-    const reviewHeading=review?.querySelector('.level-heading p');if(reviewHeading)reviewHeading.textContent='确认当前广告创意设置后提交审核';
-    const reviewHint=review?.querySelector('.level-actions span');if(reviewHint)reviewHint.textContent='提交后只创建当前广告组下的广告创意';
-    const reviewButtons=review?.querySelectorAll('.level-actions button');
-    if(reviewButtons?.[0]){reviewButtons[0].textContent='取消创建';reviewButtons[0].setAttribute('onclick','App.cancelNewCreative()');}
-    if(reviewButtons?.[1]){reviewButtons[1].innerHTML=`${svg(I.check)}提交审核`;reviewButtons[1].setAttribute('onclick','App.submitStandaloneUnifiedCreative()');}
+    if(creativeButtons?.[1]){creativeButtons[1].innerHTML=`${svg(I.check)}提交审核`;creativeButtons[1].setAttribute('onclick','App.submitStandaloneUnifiedCreative()');}
     this.setUfActiveStep('uf-creative');
   },
   submitStandaloneUnifiedCreative(){
