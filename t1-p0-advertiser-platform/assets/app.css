@@ -787,12 +787,14 @@ body.dsp .code-body { color: #d7d7fb; }
 
 /* P0 PC 信息层级收敛：全局操作保持克制，创建页只突出当前步骤。 */
 .btn-primary{box-shadow:none}
-.unified-create{padding-bottom:24px}
+.unified-create{padding-bottom:78px}
 .unified-actions{display:none}
+body:not(:has(.unified-edit-actions)) .unified-create .paper-level:not(.completed):not(.stage-hidden)>.level-actions{position:fixed;z-index:24;left:var(--sidebar-w);right:0;bottom:0;padding:12px 26px;background:color-mix(in srgb,var(--surface) 96%,transparent);border-top:1px solid var(--border);box-shadow:0 -8px 24px rgba(15,23,42,.08);backdrop-filter:blur(12px)}
 .unified-edit-actions{position:fixed;z-index:24;left:var(--sidebar-w);right:0;bottom:0;display:flex;align-items:center;gap:10px;padding:12px 26px;background:color-mix(in srgb,var(--surface) 96%,transparent);border-top:1px solid var(--border);backdrop-filter:blur(12px);box-shadow:0 -8px 24px rgba(15,23,42,.08)}
 .unified-edit-actions>span{margin-right:auto;color:var(--text-3);font-size:12px}
 body:has(.unified-edit-actions) .unified-create{padding-bottom:78px}
 @media(max-width:800px){.unified-edit-actions{left:0;padding:10px 14px}.unified-edit-actions>span{display:none}}
+@media(max-width:800px){body:not(:has(.unified-edit-actions)) .unified-create .paper-level:not(.completed):not(.stage-hidden)>.level-actions{left:0;padding:10px 14px}body:not(:has(.unified-edit-actions)) .unified-create .paper-level:not(.completed):not(.stage-hidden)>.level-actions>span{display:none}}
 .paper-level.stage-hidden{display:none}
 .paper-level.completed{display:block}
 .paper-level.completed .level-heading{background:var(--surface)}
