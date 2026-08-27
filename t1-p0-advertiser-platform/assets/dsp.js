@@ -1391,6 +1391,7 @@ const App = {
     const assets=DB.assetFiles.filter(f=>f.type==='image').slice(0,6);
     const advertiserName=this.profile()?.advertiserName||'T1演示广告主';
     return `<div class="unified-create">
+      <div class="page-head unified-head"><div><h1>新建广告计划</h1><p>设置当前层级，确认后继续创建广告组</p></div></div>
       <aside class="form-toc" id="unifiedToc">
         <div class="toc-title">创建进度</div>
         <button class="active" data-target="uf-campaign" onclick="App.jumpUnified('uf-campaign')"><span>01</span><div><b>广告计划</b><small>周期与预算</small></div></button>
@@ -1398,7 +1399,6 @@ const App = {
         <button class="locked" data-target="uf-creative" disabled><span>🔒</span><div><b>广告创意</b><small>确认广告组后解锁</small></div></button>
       </aside>
       <main class="unified-main">
-      <div class="page-head unified-head"><div><h1>新建广告计划</h1><p>设置当前层级，确认后继续创建广告组</p></div></div>
       <div class="unified-paper">
         <section class="paper-level" id="uf-campaign" data-level="01"><div class="level-heading"><span>01</span><div><h2>广告计划</h2><p>设置本次投放的周期、预算和计划名称</p></div><em>当前步骤</em></div>
           <div class="paper-block"><h3>投放周期与预算</h3><div class="pill-group" id="ufDuration"><label class="radio-pill sel" data-value="fixed" onclick="App.pickUfDuration(this)"><b>固定周期</b><small>总预算，可设每日上限</small></label><label class="radio-pill" data-value="ongoing" onclick="App.pickUfDuration(this)"><b>长期投放</b><small>只设置每日预算</small></label></div><div class="input-row" style="margin-top:14px"><div class="field"><label>开始日期<span class="req">*</span></label><input class="input" type="date" id="ufPlanStart" value="2026-08-12" onchange="App.updateUfPlanName()"></div><div class="field" id="ufPlanEndField"><label>结束日期<span class="req">*</span></label><input class="input" type="date" id="ufPlanEnd" value="2026-08-31" onchange="App.updateUfPlanName()"></div></div><div id="ufFixedBudget"><div class="input-row"><div class="field"><label>活动总预算（USD）<span class="req">*</span></label><input class="input" id="ufTotal" value="5000"></div><div class="field"><label>每日上限（选填）</label><input class="input" id="ufDailyCap" placeholder="如：300"></div></div></div><div id="ufOngoingBudget" style="display:none"><div class="field"><label>每日预算（USD）<span class="req">*</span></label><input class="input" id="ufDaily" value="150"></div></div></div>
@@ -1510,7 +1510,7 @@ const App = {
       if(campaignHint)campaignHint.textContent='修改周期、预算和计划名称';
       document.querySelector('#uf-campaign .level-actions')?.remove();
       this.mountUnifiedEditActions('保存后返回原页面；已有广告组仍受新的计划边界约束','保存广告计划','App.saveUnifiedCampaignEdit()');
-      this.setUfActiveStep('uf-campaign');document.getElementById('uf-campaign')?.scrollIntoView({block:'start'});return;
+      this.setUfActiveStep('uf-campaign');this.focusUnifiedLevel('uf-campaign');return;
     }
     const group=(DB.adGroups||[]).find(g=>g.id===(flow.type==='group'?flow.id:this.curGroup));if(!group){this.toast('未找到所属广告组','warn');this.cancelUnified();return;}
     if(cp.mode==='cpd'&&flow.type==='creative'){
@@ -1524,7 +1524,7 @@ const App = {
       this.unlockUf('uf-creative',3);this.fillUfCreative(creative);this.prepareCpdCreativeForm(creative);
       this.mountUnifiedEditActions('修改内容将生成待审核版本，审核通过前当前版本继续投放','提交创意变更审核','App.saveUnifiedCreativeEdit()');
       document.getElementById('uf-review')?.classList.add('stage-hidden');
-      this.setUfActiveStep('uf-creative');requestAnimationFrame(()=>this.setUfActiveStep('uf-creative'));return;
+      this.setUfActiveStep('uf-creative');this.focusUnifiedLevel('uf-creative');return;
     }
     this.ufWorking={campaign:{...cp},group:{...group},existingCampaignId:cp.id};
     this.lockUfContextLevel('uf-campaign',`${cp.name} · ${cp.id}`);
@@ -1540,7 +1540,7 @@ const App = {
       }
       document.querySelector('#uf-group .level-actions')?.remove();
       this.mountUnifiedEditActions('本次只保存广告组；如需修改计划，请退出后在广告计划中单独编辑','保存广告组','App.saveUnifiedGroupEdit()');
-      this.setUfActiveStep('uf-group');requestAnimationFrame(()=>this.setUfActiveStep('uf-group'));return;
+      this.setUfActiveStep('uf-group');this.focusUnifiedLevel('uf-group');return;
     }
     const creative=DB.creatives.find(c=>c.id===flow.id);if(!creative){this.toast('未找到广告创意','warn');this.cancelUnified();return;}
     this.lockUfContextLevel('uf-group',`${group.name} · ${group.id}`);this.unlockUf('uf-creative',3);this.fillUfCreative(creative);
@@ -1548,7 +1548,7 @@ const App = {
     if(creativeHint)creativeHint.textContent='当前仅修改广告创意内容';
     document.querySelector('#uf-creative .level-actions')?.remove();
     this.mountUnifiedEditActions('修改后将生成新版本并重新提交审核','保存并提交审核','App.saveUnifiedCreativeEdit()');
-    this.setUfActiveStep('uf-creative');requestAnimationFrame(()=>this.setUfActiveStep('uf-creative'));
+    this.setUfActiveStep('uf-creative');this.focusUnifiedLevel('uf-creative');
   },
   finishUnifiedEdit(message){const page=this.editFlow?.returnPage||'plans';this.editFlow=null;this.ufWorking=null;this.save();this.go(page);this.toast(message);},
   readUfCampaign(){
@@ -1611,7 +1611,7 @@ const App = {
     if(title)title.textContent='新建广告组';
     if(desc)desc.textContent=`在广告计划「${cp.name}」下新增广告组，并继续设置广告创意`;
     this.setUfActiveStep('uf-group');
-    requestAnimationFrame(()=>this.setUfActiveStep('uf-group'));
+    this.focusUnifiedLevel('uf-group');
   },
   setUfActiveStep(target){
     document.querySelectorAll('#unifiedToc button').forEach(btn=>btn.classList.toggle('active',btn.dataset.target===target));
@@ -1627,10 +1627,14 @@ const App = {
   },
   jumpUnified(id,behavior='smooth'){
     const section=document.getElementById(id);if(!section)return;
-    const topbar=document.querySelector('.topbar')?.getBoundingClientRect().height||0;
-    const title=document.querySelector('.unified-main>.unified-head')?.getBoundingClientRect().height||0;
-    const top=Math.max(0,window.scrollY+section.getBoundingClientRect().top-topbar-title-28);
+    const toc=document.querySelector('.form-toc');
+    /* 28px compensates the shell's content offset so the card edge, not its scroll margin, aligns with the sticky navigation. */
+    const alignedTop=(toc?parseFloat(getComputedStyle(toc).top)||76:76)+28;
+    const top=Math.max(0,window.scrollY+section.getBoundingClientRect().top-alignedTop);
     window.scrollTo({top,behavior});
+  },
+  focusUnifiedLevel(id){
+    requestAnimationFrame(()=>requestAnimationFrame(()=>this.jumpUnified(id,'auto')));
   },
   ufPlanNameMode(){ return document.querySelector('#ufNameMode .sel')?.dataset?.value||'auto'; },
   formatUfPlanDate(value){ const p=(value||'').split('-');return p.length===3?`${p[1]}.${p[2]}`:'待定'; },
@@ -1937,6 +1941,7 @@ const App = {
     if(creativeButtons?.[0]){creativeButtons[0].textContent='取消创建';creativeButtons[0].setAttribute('onclick','App.cancelNewCreative()');}
     if(creativeButtons?.[1]){creativeButtons[1].innerHTML=`${svg(I.check)}提交审核`;creativeButtons[1].setAttribute('onclick','App.submitStandaloneUnifiedCreative()');}
     this.setUfActiveStep('uf-creative');
+    this.focusUnifiedLevel('uf-creative');
   },
   submitStandaloneUnifiedCreative(){
     const cp=DB.campaigns.find(c=>c.id===this.curCamp)||{},group=(DB.adGroups||[]).find(g=>g.id===this.curGroup)||{};
