@@ -1625,7 +1625,13 @@ const App = {
       if(copy&&title)title.textContent=copy[0];if(copy&&desc)desc.textContent=copy[1];
     }
   },
-  jumpUnified(id){ document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}); },
+  jumpUnified(id,behavior='smooth'){
+    const section=document.getElementById(id);if(!section)return;
+    const topbar=document.querySelector('.topbar')?.getBoundingClientRect().height||0;
+    const title=document.querySelector('.unified-main>.unified-head')?.getBoundingClientRect().height||0;
+    const top=Math.max(0,window.scrollY+section.getBoundingClientRect().top-topbar-title-28);
+    window.scrollTo({top,behavior});
+  },
   ufPlanNameMode(){ return document.querySelector('#ufNameMode .sel')?.dataset?.value||'auto'; },
   formatUfPlanDate(value){ const p=(value||'').split('-');return p.length===3?`${p[1]}.${p[2]}`:'待定'; },
   generatedUfPlanName(){
@@ -1674,7 +1680,6 @@ const App = {
     const section=document.getElementById(target); section.classList.remove('stage-hidden'); section.classList.add('stage-reveal');
     const btn=document.querySelector(`#unifiedToc button[data-target="${target}"]`); btn.disabled=false; btn.classList.remove('locked'); btn.onclick=()=>this.jumpUnified(target); btn.querySelector('span').textContent=String(tocIndex).padStart(2,'0');
     document.querySelectorAll('#unifiedToc button').forEach(item=>item.classList.toggle('active',item===btn));
-    setTimeout(()=>section.scrollIntoView({behavior:'smooth',block:'start'}),180);
   },
   completeUfLevel(target, summary){
     const section=document.getElementById(target); section.classList.add('completed');
@@ -1719,13 +1724,13 @@ const App = {
     const cp={name,duration,start,end:duration==='fixed'?end:'',period:duration==='fixed'?`${start} 至 ${end}`:'长期投放',budget:duration==='fixed'?total:daily,totalBudget:total,dailyBudget:daily,dailyCap:Number(this.ufVal('ufDailyCap')||0)};
     this.ufWorking={campaign:cp};
     document.getElementById('ufGroupStart').value=start; document.getElementById('ufGroupEnd').value=duration==='fixed'?end:''; document.getElementById('ufGroupBudget').value=duration==='fixed'?total:daily; const inherit=document.getElementById('ufInheritSummary');if(inherit)inherit.textContent=`${cp.period} · ${duration==='fixed'?fmtMoney(total):fmtMoney(daily)+'/日'} · 均匀投放`;
-    this.completeUfLevel('uf-campaign',`${name} · ${cp.period} · ${duration==='fixed'?fmtMoney(total):fmtMoney(daily)+'/日'}`); this.unlockUf('uf-group',2); this.toast('广告计划设置已确认');
+    this.completeUfLevel('uf-campaign',`${name} · ${cp.period} · ${duration==='fixed'?fmtMoney(total):fmtMoney(daily)+'/日'}`); this.unlockUf('uf-group',2);requestAnimationFrame(()=>this.jumpUnified('uf-group'));this.toast('广告计划设置已确认');
   },
   saveUfGroup(){
     const cp=this.ufWorking?.campaign;if(!cp){this.toast('请先确认广告计划','warn');return;} const name=this.ufVal('ufGroupName'),budget=Number(this.ufVal('ufGroupBudget')||0),bid=Number(this.ufVal('ufBid')||0); if(!name||!budget||!bid){this.toast('请填写广告组名称、预算和出价','warn');return;} if(budget>(cp.duration==='fixed'?cp.totalBudget:cp.dailyBudget)){this.toast('广告组预算不能超过广告计划预算','warn');return;}
     const group={name,start:this.ufVal('ufGroupStart'),end:this.ufVal('ufGroupEnd'),pace:(document.querySelector('#ufPace .sel')||{}).dataset?.value||'even',budget,dailyCap:Number(this.ufVal('ufGroupCap')||0),bidType:this.ufVal('ufBidType'),bid,geo:this.ufVal('ufGeo'),device:this.ufVal('ufDevice'),format:this.ufVal('ufFormat'),inventory:this.ufVal('ufInventory')};
     this.ufWorking.group=group;
-    this.completeUfLevel('uf-group',`${name} · ${group.bidType} ${fmtMoney(bid)} · ${fmtMoney(budget)}`);this.unlockUf('uf-creative',3);this.toast('广告组设置已确认');
+    this.completeUfLevel('uf-group',`${name} · ${group.bidType} ${fmtMoney(bid)} · ${fmtMoney(budget)}`);this.unlockUf('uf-creative',3);requestAnimationFrame(()=>this.jumpUnified('uf-creative'));this.toast('广告组设置已确认');
   },
   saveUfCreative(){
     const group=this.ufWorking?.group;if(!group){this.toast('请先确认广告组','warn');return;}const name=this.ufVal('ufCreativeName'),landing=this.ufVal('ufLanding'),assetEl=document.querySelector('#ufAssets .picked');if(!name||!landing||!assetEl){this.toast('请填写创意名称、选择素材并填写目标链接','warn');return;}const file=DB.assetFiles.find(f=>f.id===assetEl.dataset.id)||{};
