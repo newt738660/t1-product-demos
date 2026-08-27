@@ -806,7 +806,11 @@ body:has(.unified-edit-actions) .unified-create{padding-bottom:100px}
 .choice.sel{border-color:var(--accent);background:var(--accent-soft)}
 .plan-list-tools{gap:10px;flex-wrap:wrap}
 .plan-list-tools .select,.plan-list-tools .input,.group-list-card .card-head>.select,.group-list-card .card-head>.input{height:38px;padding-top:7px;padding-bottom:7px;line-height:22px}
-.plan-list-card .table-wrap{position:relative}
+.plan-list-card{display:flex;flex-direction:column;height:calc(100vh - 154px);min-height:360px}
+.plan-list-card .card-head{flex:0 0 auto}
+.plan-list-card .table-wrap{position:relative;flex:1 1 auto;min-height:0;overflow:auto}
+.plan-list-card .plan-list-table thead th{position:sticky;top:0;z-index:4;background:var(--surface-2)}
+@media(max-width:800px){.plan-list-card{height:auto;min-height:0}.plan-list-card .table-wrap{max-height:calc(100vh - 210px)}}
 .plan-list-table{min-width:1990px;font-size:13px}
 .plan-list-table.type-hidden{min-width:1900px}
 .plan-list-table.cpd-mode{min-width:1420px}
