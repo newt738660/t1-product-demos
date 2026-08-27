@@ -1841,9 +1841,8 @@ const App = {
     const group=(DB.adGroups||[]).find(g=>g.id===this.curGroup)||{};
     const F=FMT[group.format]||FMT.feed;
     const compatible=DB.assetFiles.filter(f=>f.type==='image').slice(0,6);
-    return `<div class="page-head"><div><h1>新建广告创意</h1><p>${cp.name} · 第三层只配置素材、文案与跳转</p></div><div class="spacer"></div><button class="btn btn-ghost" onclick="App.go('newgroup')">← 返回广告组</button></div>
-    <div class="create-steps"><span class="done">✓ 广告计划</span><i>→</i><span class="done">✓ 广告组</span><i>→</i><span class="active">3 广告创意</span></div>
-    <div class="addsite-layout"><div class="addsite-main">
+    return `<div class="page-head"><div><h1>新建广告创意</h1><p>为当前广告组配置素材、文案与跳转；提交后进入审核</p></div></div>
+    <div class="addsite-layout standalone-creative-create"><div class="addsite-main">
       <div class="card" style="margin-bottom:16px"><div class="card-pad"><div class="form-section-title">所属关系与规格</div>
         <div class="input-row"><div class="field"><label>所属广告计划</label><input class="input" value="${cp.name}" readonly></div><div class="field"><label>所属广告组</label><input class="input" value="${group.name}" readonly></div></div>
         <div class="spec-summary"><span class="row-ico" style="color:${F.color}">${svg(F.ico)}</span><div><b>${F.name}</b><small>广告形式与库存由广告组继承；这里只能选择兼容素材。</small></div><span class="badge blue">SSP 规格约束</span></div>
@@ -1857,8 +1856,13 @@ const App = {
         <div class="input-row"><div class="field"><label>跳转类型</label><select class="select" id="creativeJump"><option>外部跳转</option></select></div><div class="field"><label>目标链接<span class="req">*</span></label><input class="input mono" id="creativeLanding" placeholder="https://example.com/landing"></div></div>
         <div class="notice info">提交后进入审核。修改已投放创意时会生成新版本，旧版本在新版本通过前继续生效。</div>
       </div></div>
-      <div class="flex" style="gap:10px"><button class="btn btn-primary" onclick="App.submitCreativeV1()">${svg(I.check)}提交审核</button><button class="btn btn-ghost" onclick="App.go('campdetail')">取消</button></div>
+      <div class="creative-create-actions"><span>提交后创意进入审核，不影响当前广告组的其他创意</span><button class="btn btn-ghost" onclick="App.cancelNewCreative()">取消创建</button><button class="btn btn-primary" onclick="App.submitCreativeV1()">${svg(I.check)}提交审核</button></div>
     </div></div>`;
+  },
+  cancelNewCreative(){
+    const group=(DB.adGroups||[]).find(g=>g.id===this.curGroup);
+    if(group)this.openGroupDetail(group.id,group.name);
+    else this.go('plans');
   },
   pickCompatibleAsset(el){ el.parentNode.querySelectorAll('.asset-cell').forEach(x=>x.classList.remove('picked')); el.classList.add('picked'); },
   submitCreativeV1(){
@@ -1867,7 +1871,7 @@ const App = {
     if(!name||!landing||!asset){ this.toast('请填写创意名称、选择素材并填写目标链接','warn'); return; }
     const file=DB.assetFiles.find(f=>f.id===asset.dataset.id)||{}; const id='CR-'+(9040+DB.creatives.length);
     DB.creatives.unshift({id,name,group:group.name,groupId:group.id,assetId:file.id,fmt:group.format||'feed',kind:file.type||'image',size:file.dim||'—',camp:cp.id,headline:document.getElementById('creativeHeadline').value.trim(),landing,imps:0,clicks:0,ctr:0,status:'review',version:1,created:'2026-08-11'});
-    group.status='active'; cp.status='active'; this.save(); this.openPlan(cp.id); this.toast('广告创意已提交审核，三层投放结构创建完成');
+    this.save(); this.openGroupDetail(group.id,group.name); this.toast('广告创意已提交审核');
   },
   adBillingSection(){
     const edit=DB.creatives.find(c=>c.id===this.editRejectedId && c.status==='rejected');
