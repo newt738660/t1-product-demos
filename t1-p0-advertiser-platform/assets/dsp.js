@@ -1438,8 +1438,9 @@ const App = {
         const creativeHint=creativeNav?.querySelector('small');
         if(creativeHint)creativeHint.textContent='请前往广告创意中修改';
       }
+      document.querySelector('#uf-campaign .level-actions')?.remove();
       document.querySelector('#uf-group .level-actions')?.remove();
-      this.mountUnifiedEditActions('保存后直接完成编辑并返回原页面','保存广告组','App.saveUnifiedGroupEdit()');
+      this.mountUnifiedEditActions('一次保存本页对广告计划和广告组的全部修改','保存修改','App.saveUnifiedGroupEdit()');
       this.setUfActiveStep('uf-group');requestAnimationFrame(()=>this.setUfActiveStep('uf-group'));return;
     }
     const creative=DB.creatives.find(c=>c.id===flow.id);if(!creative){this.toast('未找到广告创意','warn');this.cancelUnified();return;}
@@ -1455,10 +1456,11 @@ const App = {
     if(!name||!start||(duration==='fixed'&&(!end||end<start||!total))||(duration==='ongoing'&&!daily)){this.toast('请完整、正确地填写广告计划必填项','warn');return null;}
     return {name,alias:name,duration,start,end:duration==='fixed'?end:'',period:duration==='fixed'?`${start} 至 ${end}`:'长期投放',budget:duration==='fixed'?total:daily,totalBudget:duration==='fixed'?total:0,dailyBudget:duration==='ongoing'?daily:0,dailyCap:Number(this.ufVal('ufDailyCap')||0)};
   },
-  readUfGroup(group){
-    const cp=DB.campaigns.find(c=>c.id===group?.camp),name=this.ufVal('ufGroupName'),budget=Number(this.ufVal('ufGroupBudget')||0),bid=Number(this.ufVal('ufBid')||0),limit=cp?.duration==='ongoing'?(cp.dailyBudget||cp.budget):(cp?.totalBudget||cp?.budget);
+  readUfGroup(group,campaignData){
+    const cp=campaignData||DB.campaigns.find(c=>c.id===group?.camp),name=this.ufVal('ufGroupName'),start=this.ufVal('ufGroupStart'),end=this.ufVal('ufGroupEnd'),budget=Number(this.ufVal('ufGroupBudget')||0),bid=Number(this.ufVal('ufBid')||0),limit=cp?.duration==='ongoing'?(cp.dailyBudget||cp.budget):(cp?.totalBudget||cp?.budget);
     if(!name||!budget||!bid){this.toast('请填写广告组名称、预算和出价','warn');return null;}if(budget>limit){this.toast('广告组预算不能超过广告计划预算','warn');return null;}
-    return {name,start:this.ufVal('ufGroupStart'),end:this.ufVal('ufGroupEnd'),pace:(document.querySelector('#ufPace .sel')||{}).dataset?.value||'even',budget,dailyCap:Number(this.ufVal('ufGroupCap')||0),bidType:this.ufVal('ufBidType'),bid,geo:this.ufVal('ufGeo'),device:this.ufVal('ufDevice'),format:this.ufVal('ufFormat'),inventory:this.ufVal('ufInventory')};
+    if(start<cp?.start||(cp?.duration!=='ongoing'&&end>cp?.end)){this.toast('广告组投放周期不能超出广告计划周期','warn');return null;}
+    return {name,start,end,pace:(document.querySelector('#ufPace .sel')||{}).dataset?.value||'even',budget,dailyCap:Number(this.ufVal('ufGroupCap')||0),bidType:this.ufVal('ufBidType'),bid,geo:this.ufVal('ufGeo'),device:this.ufVal('ufDevice'),format:this.ufVal('ufFormat'),inventory:this.ufVal('ufInventory')};
   },
   saveUnifiedParentCampaign(returnTarget){
     const cp=DB.campaigns.find(c=>c.id===this.curCamp),data=this.readUfCampaign();if(!cp||!data)return;Object.assign(cp,data);this.ufWorking.campaign={...data};this.save();
@@ -1473,8 +1475,9 @@ const App = {
     DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:'编辑广告计划',target:cp.id,result:'成功'});this.finishUnifiedEdit('广告计划已更新');
   },
   saveUnifiedGroupEdit(){
-    const g=(DB.adGroups||[]).find(x=>x.id===this.editFlow?.id),data=this.readUfGroup(g);if(!g||!data)return;const old=g.name;Object.assign(g,data);DB.creatives.filter(a=>a.groupId===g.id||a.group===old).forEach(a=>a.group=g.name);
-    DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:'编辑广告组',target:g.id,result:'成功'});this.finishUnifiedEdit('广告组已更新');
+    const cp=DB.campaigns.find(c=>c.id===this.curCamp),g=(DB.adGroups||[]).find(x=>x.id===this.editFlow?.id),campaignData=this.readUfCampaign();if(!cp||!g||!campaignData)return;
+    const groupData=this.readUfGroup(g,campaignData);if(!groupData)return;const old=g.name;Object.assign(cp,campaignData);Object.assign(g,groupData);DB.creatives.filter(a=>a.groupId===g.id||a.group===old).forEach(a=>a.group=g.name);
+    DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:'编辑广告组及所属计划',target:g.id,result:'成功'});this.finishUnifiedEdit('广告计划和广告组修改已保存');
   },
   saveUnifiedCreativeEdit(){
     const a=DB.creatives.find(x=>x.id===this.editFlow?.id);if(!a)return;const cp=DB.campaigns.find(c=>c.id===a.camp),isCpd=cp?.mode==='cpd',name=isCpd?a.name:this.ufVal('ufCreativeName'),landing=this.ufVal('ufLanding'),assetEl=document.querySelector('#ufAssets .picked');if(!name||!landing||!assetEl){this.toast(isCpd?'请选择素材并填写目标链接':'请填写创意名称、选择素材并填写目标链接','warn');return;}
