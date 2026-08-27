@@ -1428,7 +1428,9 @@ const App = {
       document.getElementById('uf-review')?.classList.add('stage-hidden');
       this.setUfActiveStep('uf-creative');requestAnimationFrame(()=>this.setUfActiveStep('uf-creative'));return;
     }
-    this.lockUfContextLevel('uf-campaign',`${cp.name} · ${cp.id}`);this.unlockUf('uf-group',2);this.fillUfGroup(group);this.ufWorking.group={...group};
+    const campaignReturn=flow.type==='creative'?'uf-creative':'uf-group';
+    const campaignAction=document.querySelector('#uf-campaign .level-actions');if(campaignAction)campaignAction.innerHTML=`<span>保存计划修改后返回当前${target}；当前层未提交内容会保留</span><button class="btn btn-primary" onclick="App.saveUnifiedParentCampaign('${campaignReturn}')">保存计划修改</button>`;
+    this.completeUfLevel('uf-campaign',`${cp.name} · ${cp.id}`);this.unlockUf('uf-group',2);this.fillUfGroup(group);this.ufWorking.group={...group};
     if(flow.type==='group'){
       const hasCreatives=DB.creatives.some(a=>a.groupId===group.id||a.group===group.name);
       if(hasCreatives){
@@ -1437,13 +1439,14 @@ const App = {
         if(creativeHint)creativeHint.textContent='请前往广告创意中修改';
       }
       document.querySelector('#uf-group .level-actions')?.remove();
-      this.mountUnifiedEditActions('仅修改当前广告组；所属广告计划不会改变','保存广告组','App.saveUnifiedGroupEdit()');
+      this.mountUnifiedEditActions('保存后直接完成编辑并返回原页面','保存广告组','App.saveUnifiedGroupEdit()');
       this.setUfActiveStep('uf-group');requestAnimationFrame(()=>this.setUfActiveStep('uf-group'));return;
     }
     const creative=DB.creatives.find(c=>c.id===flow.id);if(!creative){this.toast('未找到广告创意','warn');this.cancelUnified();return;}
-    this.lockUfContextLevel('uf-group',`${group.name} · ${group.id}`);this.unlockUf('uf-creative',3);this.fillUfCreative(creative);
+    const groupAction=document.querySelector('#uf-group .level-actions');if(groupAction)groupAction.innerHTML='<span>保存广告组修改后返回当前创意；创意层未提交内容会保留</span><button class="btn btn-primary" onclick="App.saveUnifiedParentGroup()">保存广告组修改</button>';
+    this.completeUfLevel('uf-group',`${group.name} · ${group.id}`);this.unlockUf('uf-creative',3);this.fillUfCreative(creative);
     document.querySelector('#uf-creative .level-actions')?.remove();
-    this.mountUnifiedEditActions('修改后将生成新版本并重新提交审核；计划和广告组不会被修改','保存并提交审核','App.saveUnifiedCreativeEdit()');
+    this.mountUnifiedEditActions('修改后将生成新版本并重新提交审核','保存并提交审核','App.saveUnifiedCreativeEdit()');
     this.setUfActiveStep('uf-creative');requestAnimationFrame(()=>this.setUfActiveStep('uf-creative'));
   },
   finishUnifiedEdit(message){const page=this.editFlow?.returnPage||'plans';this.editFlow=null;this.ufWorking=null;this.save();this.go(page);this.toast(message);},
@@ -1573,7 +1576,6 @@ const App = {
       const budget=(cp.totalBudget||cp.budget)?fmtMoney(cp.totalBudget||cp.budget):'—',daily=cp.dailyCap?fmtMoney(cp.dailyCap):'—';
       return `<div class="cpd-readonly-section"><h3>基础设置</h3><dl class="cpd-readonly-grid">${this.cpdReadonlyField('广告计划名称',cp.name,true)}${this.cpdReadonlyField('广告计划 ID',cp.id)}${this.cpdReadonlyField('周期类型',cp.duration==='ongoing'?'长期投放':'固定周期')}${this.cpdReadonlyField('开始日期',cp.start)}${this.cpdReadonlyField('结束日期',cp.duration==='ongoing'?'—':cp.end)}</dl></div><div class="cpd-readonly-section"><h3>预算设置</h3><dl class="cpd-readonly-grid">${this.cpdReadonlyField('活动总预算（USD）',budget)}${this.cpdReadonlyField('每日上限',daily)}</dl></div>`;
     }
-    if(cp.mode==='rtb')return `<div class="cpd-readonly-section"><h3>基础设置</h3><dl class="cpd-readonly-grid">${this.cpdReadonlyField('广告组名称',group.name,true)}${this.cpdReadonlyField('广告组 ID',group.id)}${this.cpdReadonlyField('开始日期',group.start||cp.start)}${this.cpdReadonlyField('结束日期',group.end||cp.end||'长期投放')}</dl></div><div class="cpd-readonly-section"><h3>预算与竞价</h3><dl class="cpd-readonly-grid">${this.cpdReadonlyField('预算',fmtMoney(group.budget||0))}${this.cpdReadonlyField('竞价方式',group.bidType||'CPM')}${this.cpdReadonlyField('出价',fmtMoney(group.bid||0))}</dl></div><div class="cpd-readonly-section"><h3>定向与投放位置</h3><dl class="cpd-readonly-grid">${this.cpdReadonlyField('地区',group.geo||'不限')}${this.cpdReadonlyField('设备',group.device||'不限')}${this.cpdReadonlyField('广告形式',FMT[group.format]?.name||'—')}${this.cpdReadonlyField('投放范围',group.inventoryScope||group.inventory||'全部兼容库存',true)}</dl></div>`;
     return `<div class="cpd-readonly-section"><h3>基础设置</h3><dl class="cpd-readonly-grid">${this.cpdReadonlyField('广告组名称',group.name,true)}${this.cpdReadonlyField('广告组 ID',group.id)}</dl></div><div class="cpd-readonly-section"><h3>预算与出价</h3><dl class="cpd-readonly-grid">${this.cpdReadonlyField('合同金额',group.contractAmount?fmtMoney(group.contractAmount):'—')}${this.cpdReadonlyField('合同时长',group.contractDuration||'—')}${this.cpdReadonlyField('合同编号',group.contractNo||cp.order||'—')}${this.cpdReadonlyField('排期投放时间',group.schedule||`${group.start||cp.start||'—'} 至 ${group.end||cp.end||'—'}`,true)}${this.cpdReadonlyField('计费方式','CPD')}</dl></div><div class="cpd-readonly-section"><h3>用户定向</h3><dl class="cpd-readonly-grid">${this.cpdReadonlyField('地区',group.geo||'不限')}${this.cpdReadonlyField('设备',group.device||'不限')}${this.cpdReadonlyField('频控',group.frequency||'不限')}</dl></div><div class="cpd-readonly-section"><h3>投放位置</h3><dl class="cpd-readonly-grid">${this.cpdReadonlyField('广告位类型',FMT[group.format]?.name||'—')}${this.cpdReadonlyField('投放范围',group.inventoryScope||'指定广告位')}${this.cpdReadonlyField('广告位',group.inventory||'—',true)}</dl></div>`;
   },
   lockUfContextLevel(target,summary){
