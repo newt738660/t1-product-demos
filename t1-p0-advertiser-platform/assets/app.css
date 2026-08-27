@@ -811,16 +811,12 @@ body:has(.unified-edit-actions) .unified-create{padding-bottom:100px}
 .plan-list-tools #unifiedScheduleFilter{width:122px!important}
 .plan-list-tools #unifiedSearch{width:210px!important}
 .plan-list-tools .select,.plan-list-tools .input,.group-list-card .card-head>.select,.group-list-card .card-head>.input{height:38px;padding-top:7px;padding-bottom:7px;line-height:22px}
-.content:has(.plan-list-card){height:calc(100vh - 64px);box-sizing:border-box;overflow:hidden}
-.content:has(.plan-list-card)>.view.active{display:flex;min-height:0;height:100%;flex-direction:column}
-.content:has(.plan-list-card) .page-head{flex:0 0 auto}
-.plan-list-card{display:flex;flex:1 1 auto;min-height:0;flex-direction:column}
+.plan-list-card{display:flex;min-height:0;flex-direction:column}
 .plan-list-card .card-head{flex:0 0 auto}
-.plan-list-card .table-wrap{position:relative;flex:1 1 auto;min-height:0;overflow-x:auto;overflow-y:hidden}
+.plan-list-card .table-wrap{position:relative;flex:none;min-height:0;overflow-x:auto;overflow-y:hidden}
 .plan-list-card .plan-list-table thead th{position:sticky;top:0;z-index:4;background:var(--surface-2)}
-@media(max-width:1100px){.content:has(.plan-list-card){height:auto;overflow:visible}.content:has(.plan-list-card)>.view.active{height:auto}.plan-list-card{flex:none}.plan-list-tools{flex-wrap:wrap}.plan-list-tools #unifiedSearch{width:220px!important}.plan-list-card .table-wrap{flex:none}}
+@media(max-width:1100px){.plan-list-tools{flex-wrap:wrap}.plan-list-tools #unifiedSearch{width:220px!important}}
 @media(max-width:800px){.plan-list-card{height:auto;min-height:0}.plan-list-card .table-wrap{max-height:none}}
-@media(min-width:1051px) and (max-height:740px){.content:has(.plan-list-card){height:calc(100vh - 56px)}}
 .plan-list-table{min-width:1990px;font-size:13px}
 .plan-list-table.type-hidden{min-width:1900px}
 .plan-list-table.cpd-mode{min-width:1420px}
