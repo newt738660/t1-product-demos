@@ -1841,8 +1841,19 @@ const App = {
     const group=(DB.adGroups||[]).find(g=>g.id===this.curGroup)||{};
     const F=FMT[group.format]||FMT.feed;
     const compatible=DB.assetFiles.filter(f=>f.type==='image').slice(0,6);
-    return `<div class="page-head"><div><h1>新建广告创意</h1><p>为当前广告组配置素材、文案与跳转；提交后进入审核</p></div></div>
-    <div class="addsite-layout standalone-creative-create"><div class="addsite-main">
+    return `<div class="page-head unified-head"><div><h1>新建 RTB 投放</h1><p>广告计划和广告组已完成，继续设置广告创意；提交前请确认素材与跳转信息</p></div></div>
+    <div class="unified-create standalone-creative-create">
+      <aside class="form-toc creative-flow-toc" aria-label="创建进度">
+        <div class="toc-title">创建进度</div>
+        <button class="done" type="button"><span>✓</span><div><b>广告计划</b><small>${cp.name||'已完成设置'}</small></div></button>
+        <div class="toc-rule"></div>
+        <button class="done" type="button"><span>✓</span><div><b>广告组</b><small>${group.name||'已完成设置'}</small></div></button>
+        <div class="toc-rule"></div>
+        <button class="active" type="button" aria-current="step"><span>03</span><div><b>广告创意</b><small>选择素材并设置跳转</small></div></button>
+        <div class="toc-rule"></div>
+        <button class="locked" type="button" disabled><span>🔒</span><div><b>检查与发布</b><small>完成创意后进入</small></div></button>
+      </aside>
+      <div class="addsite-main unified-paper">
       <div class="card" style="margin-bottom:16px"><div class="card-pad"><div class="form-section-title">所属关系与规格</div>
         <div class="input-row"><div class="field"><label>所属广告计划</label><input class="input" value="${cp.name}" readonly></div><div class="field"><label>所属广告组</label><input class="input" value="${group.name}" readonly></div></div>
         <div class="spec-summary"><span class="row-ico" style="color:${F.color}">${svg(F.ico)}</span><div><b>${F.name}</b><small>广告形式与库存由广告组继承；这里只能选择兼容素材。</small></div><span class="badge blue">SSP 规格约束</span></div>
