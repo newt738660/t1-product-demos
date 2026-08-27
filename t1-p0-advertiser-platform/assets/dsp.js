@@ -585,7 +585,34 @@ const App = {
     return `<span class="badge ${c}"><span class="dot-status ${c}"></span>${t}</span>`;
   },
   deliveryMoreMenu(type,id){
-    return `<details class="action-more"><summary class="plan-row-action">更多</summary><div class="action-more-menu"><button onclick="App.confirmArchiveDeliveryObject('${type}','${id}')">归档</button><button class="danger" onclick="App.confirmDeleteDeliveryObject('${type}','${id}')">删除</button></div></details>`;
+    return `<button class="plan-row-action action-more-trigger" aria-haspopup="menu" aria-expanded="false" onclick="event.stopPropagation();App.toggleDeliveryMoreMenu(this,'${type}','${id}')">更多<span aria-hidden="true">⌄</span></button>`;
+  },
+  closeDeliveryMoreMenu(){
+    document.querySelectorAll('.action-more-trigger[aria-expanded="true"]').forEach(btn=>btn.setAttribute('aria-expanded','false'));
+    document.getElementById('deliveryMorePopover')?.remove();
+  },
+  toggleDeliveryMoreMenu(trigger,type,id){
+    const wasOpen=trigger.getAttribute('aria-expanded')==='true';
+    this.closeDeliveryMoreMenu();
+    if(wasOpen)return;
+    const rect=trigger.getBoundingClientRect(),menu=document.createElement('div');
+    menu.id='deliveryMorePopover';
+    menu.className='action-more-menu action-more-popover';
+    menu.setAttribute('role','menu');
+    menu.innerHTML=`<button role="menuitem" onclick="App.closeDeliveryMoreMenu();App.confirmArchiveDeliveryObject('${type}','${id}')">归档</button><button role="menuitem" class="danger" onclick="App.closeDeliveryMoreMenu();App.confirmDeleteDeliveryObject('${type}','${id}')">删除</button>`;
+    document.body.appendChild(menu);
+    const menuRect=menu.getBoundingClientRect(),gap=6;
+    let left=Math.min(rect.right-menuRect.width,window.innerWidth-menuRect.width-8);
+    left=Math.max(8,left);
+    let top=rect.bottom+gap;
+    if(top+menuRect.height>window.innerHeight-8)top=Math.max(8,rect.top-menuRect.height-gap);
+    menu.style.left=`${left}px`;
+    menu.style.top=`${top}px`;
+    trigger.setAttribute('aria-expanded','true');
+    setTimeout(()=>{
+      const close=e=>{if(!menu.contains(e.target)&&e.target!==trigger){this.closeDeliveryMoreMenu();document.removeEventListener('click',close,true)}};
+      document.addEventListener('click',close,true);
+    });
   },
   mkChart(id,type,data,opts){
     const ctx=document.getElementById(id); if(!ctx) return;
