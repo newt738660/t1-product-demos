@@ -1853,9 +1853,9 @@ const App = {
         <div class="toc-rule"></div>
         <button class="locked" type="button" disabled><span>🔒</span><div><b>检查与发布</b><small>完成创意后进入</small></div></button>
       </aside>
-      <div class="addsite-main unified-paper">
+      <div class="addsite-main unified-paper creative-create-paper">
       <div class="card" style="margin-bottom:16px"><div class="card-pad"><div class="form-section-title">所属关系与规格</div>
-        <div class="input-row"><div class="field"><label>所属广告计划</label><input class="input" value="${cp.name}" readonly></div><div class="field"><label>所属广告组</label><input class="input" value="${group.name}" readonly></div></div>
+        <div class="input-row"><div class="field"><label>所属广告计划</label><div class="readonly-value"><b>${cp.name||'—'}</b><span>${cp.id||'已确认的广告计划'}</span></div></div><div class="field"><label>所属广告组</label><div class="readonly-value"><b>${group.name||'—'}</b><span>${group.id||'已确认的广告组'}</span></div></div></div>
         <div class="spec-summary"><span class="row-ico" style="color:${F.color}">${svg(F.ico)}</span><div><b>${F.name}</b><small>广告形式与库存由广告组继承；这里只能选择兼容素材。</small></div><span class="badge blue">SSP 规格约束</span></div>
       </div></div>
       <div class="card" style="margin-bottom:16px"><div class="card-pad"><div class="form-section-title">创意内容</div>
