@@ -1859,23 +1859,24 @@ const App = {
         <div class="toc-rule"></div>
         <button class="locked" id="standaloneReviewNav" type="button" disabled><span>🔒</span><div><b>检查与发布</b><small>完成创意后进入</small></div></button>
       </aside>
-      <div class="addsite-main unified-paper creative-create-paper">
-      <div id="standaloneCreativeForm">
-      <div class="card" style="margin-bottom:16px"><div class="card-pad"><div class="form-section-title">所属关系与规格</div>
+      <div class="addsite-main unified-paper standalone-creative-paper">
+      <section class="paper-level" id="standaloneCreativeForm" data-level="03">
+      <div class="level-heading"><span>03</span><div><h2>广告创意</h2><p>选择素材，并设置文案和目标链接</p></div><em>当前步骤</em></div>
+      <div class="paper-block"><h3>所属关系与规格</h3>
         <div class="input-row"><div class="field"><label>所属广告计划</label><div class="readonly-value"><b>${cp.name||'—'}</b><span>${cp.id||'已确认的广告计划'}</span></div></div><div class="field"><label>所属广告组</label><div class="readonly-value"><b>${group.name||'—'}</b><span>${group.id||'已确认的广告组'}</span></div></div></div>
         <div class="spec-summary"><span class="row-ico" style="color:${F.color}">${svg(F.ico)}</span><div><b>${F.name}</b><small>广告形式与库存由广告组继承；这里只能选择兼容素材。</small></div><span class="badge blue">SSP 规格约束</span></div>
-      </div></div>
-      <div class="card" style="margin-bottom:16px"><div class="card-pad"><div class="form-section-title">创意内容</div>
+      </div>
+      <div class="paper-block"><h3>创意内容</h3>
         <div class="field"><label>广告创意名称<span class="req">*</span></label><input class="input" id="creativeName" placeholder="如：欧洲夏促信息流 A"></div>
         <div class="field"><label>主素材<span class="req">*</span></label><div class="cell-sub" style="margin-bottom:8px">仅显示符合当前广告组规格的素材</div><div class="asset-grid" id="compatibleAssets">${compatible.map((f,i)=>`<div class="asset-cell ${i===0?'picked':''}" data-id="${f.id}" onclick="App.pickCompatibleAsset(this)"><div class="asset-thumb" style="height:64px">${svg(I.image)}</div><div class="asset-meta"><div class="asset-name">${f.name}</div><div class="asset-sub">${f.dim} · ${f.size}</div></div></div>`).join('')}</div><button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="App.toast('上传成功后将自动返回当前选择流程（Demo）')">${svg(I.upload)}上传新素材</button></div>
         <div class="field"><label>标题 / 文案</label><input class="input" id="creativeHeadline" maxlength="50" placeholder="最多 50 字；是否必填由广告形式决定"></div>
-      </div></div>
-      <div class="card" style="margin-bottom:16px"><div class="card-pad"><div class="form-section-title">跳转设置</div>
+      </div>
+      <div class="paper-block"><h3>跳转设置</h3>
         <div class="input-row"><div class="field"><label>跳转类型</label><select class="select" id="creativeJump"><option>外部跳转</option></select></div><div class="field"><label>目标链接<span class="req">*</span></label><input class="input mono" id="creativeLanding" placeholder="https://example.com/landing"></div></div>
         <div class="notice info">提交后进入审核。修改已投放创意时会生成新版本，旧版本在新版本通过前继续生效。</div>
-      </div></div>
       </div>
-      <div id="standaloneCreativeReview" style="display:none"><div class="card"><div class="card-pad"><div class="form-section-title">检查广告创意</div><div class="review-chain"><b>广告计划</b><i>→</i><b>广告组</b><i>→</i><b>广告创意</b></div><div class="group-setting-grid" id="standaloneCreativeSummary"></div><div class="notice info" style="margin-top:16px">提交后广告创意进入审核，不影响当前广告组中的其他创意。</div></div></div></div>
+      </section>
+      <section class="paper-level review-level" id="standaloneCreativeReview" data-level="04" style="display:none"><div class="level-heading"><span>04</span><div><h2>检查广告创意</h2><p>确认创意设置后提交审核</p></div><em>当前步骤</em></div><div class="review-chain"><b>广告计划</b><i>→</i><b>广告组</b><i>→</i><b>广告创意</b></div><div class="paper-block"><div class="group-setting-grid" id="standaloneCreativeSummary"></div><div class="notice info" style="margin-top:16px">提交后广告创意进入审核，不影响当前广告组中的其他创意。</div></div></section>
       <div class="creative-create-actions"><span id="standaloneCreativeActionHint">确认创意内容后进入检查与发布</span><button class="btn btn-ghost" onclick="App.cancelNewCreative()">取消创建</button><button class="btn btn-primary" id="standaloneCreativePrimary" onclick="App.reviewNewCreative()">确认广告创意并检查</button></div>
     </div></div>`;
   },
