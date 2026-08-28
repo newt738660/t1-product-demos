@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SSP 商务工作台 · 广告主管理</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">S</span><span>商务工作台</span></div>
+      <nav class="nav-list" aria-label="主导航">
+        <button class="nav-item"><span>▦</span>首页</button>
+        <button class="nav-item active"><span>♙</span>广告主管理</button>
+        <button class="nav-item"><span>▤</span>广告管理</button>
+        <button class="nav-item"><span>✓</span>广告审核工作台</button>
+        <button class="nav-item"><span>◫</span>财务管理</button>
+        <button class="nav-item"><span>⚙</span>系统管理</button>
+      </nav>
+      <div class="sidebar-foot">SSP TEST ENVIRONMENT</div>
+    </aside>
+
+    <div class="main-shell">
+      <header class="topbar">
+        <button class="icon-btn" aria-label="折叠菜单">☰</button>
+        <div class="topbar-spacer"></div>
+        <button class="icon-btn" aria-label="通知">♢<span class="notice-dot"></span></button>
+        <div class="user"><span class="avatar">商</span><span>商务运营</span><span class="chevron">⌄</span></div>
+      </header>
+
+      <main id="app" class="content"></main>
+    </div>
+  </div>
+
+  <div id="modalRoot"></div>
+  <div id="toastRoot" aria-live="polite"></div>
+  <script src="./app.js"></script>
+</body>
+</html>
