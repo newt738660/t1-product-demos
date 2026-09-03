@@ -458,6 +458,7 @@ const App = {
     const binding=type==='bind';
     this.modal(`<div class="modal-head"><div><h3>${binding?'绑定已有广告主':'新创建广告主'}</h3><p>${binding?'请留下您的基本信息，商务核验后将为您关联已有 SSP 广告主':'请留下您的基本信息，商务核验后将协助您完成 SSP 建档'}</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body">
       <input type="hidden" id="gateApplicationType" value="${type}">
+      <div class="field"><label>${binding?'已有广告主名称':'广告主名称'}<span class="req">*</span></label><input class="input" id="gateAdvertiserName" placeholder="${binding?'请输入需要绑定的广告主名称':'请输入要创建的广告主名称'}"></div>
       <div class="input-row"><div class="field"><label>怎么称呼您？<span class="req">*</span></label><input class="input" id="gateApplicant" value="${this.accountEsc(p.name||'')}" placeholder="请输入您的姓名或常用称呼"></div><div class="field"><label>您常用的邮箱地址？<span class="optional">（选填）</span></label><input class="input" id="gateEmail" type="email" value="${this.accountEsc(p.email||'')}" placeholder="例如 name@example.com"></div></div>
       <div class="field"><label>怎么联系您？<span class="req">*</span></label><div class="segment" id="gateContactMethods" style="width:max-content;margin-bottom:10px"><button class="active" data-contact-method="tg" onclick="App.pickAdvertiserContactMethod(this,'tg')">Telegram</button><button data-contact-method="other" onclick="App.pickAdvertiserContactMethod(this,'other')">其他联系方式</button></div><div class="input-row"><div class="field" id="gateContactAppField" style="display:none;margin-bottom:0"><input class="input" id="gateContactApp" placeholder="请输入联系方式，如 WhatsApp"></div><div class="field" style="margin-bottom:0"><input class="input" id="gateContactNumber" placeholder="请输入您的 Telegram 账号"></div></div></div>
       <div class="input-row"><div class="field"><label>您的产品叫什么？<span class="optional">（选填）</span></label><input class="input" id="gateProduct" placeholder="请输入产品或应用名称"></div><div class="field"><label>产品或官网网址<span class="optional">（选填）</span></label><input class="input" id="gateSite" type="url" placeholder="例如 https://example.com"></div></div>
@@ -473,11 +474,11 @@ const App = {
     if(number)number.placeholder=method==='other'?'请输入对应账号或号码':'请输入您的 Telegram 账号';
   },
   submitAdvertiserApplication(){
-    const type=document.getElementById('gateApplicationType').value,applicant=document.getElementById('gateApplicant'),number=document.getElementById('gateContactNumber'),method=this.advertiserContactMethod||'tg',app=document.getElementById('gateContactApp');
-    const required=[[applicant,'您的姓名或常用称呼'],[number,'您的联系方式']]; if(method==='other')required.splice(1,0,[app,'联系方式类型']);
+    const type=document.getElementById('gateApplicationType').value,advertiserName=document.getElementById('gateAdvertiserName'),applicant=document.getElementById('gateApplicant'),number=document.getElementById('gateContactNumber'),method=this.advertiserContactMethod||'tg',app=document.getElementById('gateContactApp');
+    const required=[[advertiserName,'广告主名称'],[applicant,'您的姓名或常用称呼'],[number,'您的联系方式']]; if(method==='other')required.splice(2,0,[app,'联系方式类型']);
     if(!this.validateRequired(required)) return;
     const product=document.getElementById('gateProduct').value.trim(),site=document.getElementById('gateSite').value.trim();
-    localStorage.setItem('t1_advertiser_application',JSON.stringify({type,advertiser:product||'待商务确认',applicant:applicant.value.trim(),contactMethod:method,contactApp:method==='tg'?'Telegram':app.value.trim(),contactNumber:number.value.trim(),email:document.getElementById('gateEmail').value.trim(),product,site,industry:document.getElementById('gateIndustry').value,sales:document.getElementById('gateSales').value.trim()||'待商务确认',status:'pending',submittedAt:new Date().toISOString()}));
+    localStorage.setItem('t1_advertiser_application',JSON.stringify({type,advertiser:advertiserName.value.trim(),applicant:applicant.value.trim(),contactMethod:method,contactApp:method==='tg'?'Telegram':app.value.trim(),contactNumber:number.value.trim(),email:document.getElementById('gateEmail').value.trim(),product,site,industry:document.getElementById('gateIndustry').value,sales:document.getElementById('gateSales').value.trim()||'待商务确认',status:'pending',submittedAt:new Date().toISOString()}));
     this.advertiserContactMethod='tg';
     this.showApplicationSubmitted(type==='bind'?'已有广告主绑定申请已提交':'新广告主创建申请已提交',type==='bind'?'商务将核验您提交的信息，并完成已有 SSP 广告主关联。':'商务将核验您提交的信息，并完成 SSP 广告主建档。');
   },
