@@ -456,6 +456,7 @@ tbody tr:last-child td { border-bottom: none; }
 /* ===================== 表单 ===================== */
 .field { margin-bottom: 16px; }
 .field > label { display: block; font-weight: 650; font-size: 12.5px; margin-bottom: 7px; color: var(--text); }
+.field > label .optional { color: var(--text-3); font-weight: 500; }
 .req { color: var(--negative); margin-left: 3px; }
 .field .hint { font-size: 11.5px; color: var(--text-3); margin-top: 5px; }
 .input, .select, textarea.input {
@@ -473,6 +474,8 @@ tbody tr:last-child td { border-bottom: none; }
 textarea.input { resize: vertical; min-height: 84px; }
 .input-row { display: flex; gap: 12px; }
 .input-row > .field { flex: 1; }
+.advertiser-meta-row > .industry-field { flex: 0 0 38%; }
+.advertiser-meta-row > .sales-field { flex: 1; }
 .inline-prefix { position: relative; }
 .inline-prefix .pfx { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--text-3); font-weight: 600; }
 .inline-prefix .input { padding-left: 28px; }

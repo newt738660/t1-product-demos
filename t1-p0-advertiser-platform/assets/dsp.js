@@ -456,13 +456,13 @@ const App = {
   openAdvertiserApplication(type='new'){
     const p=this.profile()||{};
     const binding=type==='bind';
-    this.modal(`<div class="modal-head"><div><h3>${binding?'绑定已有广告主':'新创建广告主'}</h3><p>${binding?'提交绑定人信息，由商务核验后关联已有 SSP 广告主':'提交创建人信息，由商务核验后完成 SSP 建档'}</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body">
+    this.modal(`<div class="modal-head"><div><h3>${binding?'绑定已有广告主':'新创建广告主'}</h3><p>${binding?'请留下您的基本信息，商务核验后将为您关联已有 SSP 广告主':'请留下您的基本信息，商务核验后将协助您完成 SSP 建档'}</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body">
       <input type="hidden" id="gateApplicationType" value="${type}">
-      <div class="input-row"><div class="field"><label>${binding?'绑定人':'创建人'}<span class="req">*</span></label><input class="input" id="gateApplicant" value="${this.accountEsc(p.name||'')}" placeholder="请输入姓名"></div><div class="field"><label>${binding?'绑定人':'创建人'}邮箱地址</label><input class="input" id="gateEmail" type="email" value="${this.accountEsc(p.email||'')}" placeholder="name@example.com"></div></div>
-      <div class="field"><label>${binding?'绑定人':'创建人'}联系方式<span class="req">*</span></label><div class="segment" id="gateContactMethods" style="width:max-content;margin-bottom:10px"><button class="active" data-contact-method="tg" onclick="App.pickAdvertiserContactMethod(this,'tg')">Telegram</button><button data-contact-method="other" onclick="App.pickAdvertiserContactMethod(this,'other')">其他联系应用</button></div><div class="input-row"><div class="field" id="gateContactAppField" style="display:none;margin-bottom:0"><input class="input" id="gateContactApp" placeholder="请输入联系应用，如 WhatsApp"></div><div class="field" style="margin-bottom:0"><input class="input" id="gateContactNumber" placeholder="请输入 TG 号"></div></div></div>
-      <div class="input-row"><div class="field"><label>产品名称</label><input class="input" id="gateProduct" placeholder="请输入产品或应用名称"></div><div class="field"><label>网址链接</label><input class="input" id="gateSite" type="url" placeholder="https://"></div></div>
-      <div class="field"><label>所属行业</label><select class="select" id="gateIndustry"><option value="">请选择</option><option>游戏</option><option>电商零售</option><option>互联网服务</option><option>金融</option><option>教育</option><option>其他</option></select></div>
-      <div class="field"><label>对接商务（如已有，选填）</label><input class="input" id="gateSales" placeholder="商务姓名或工号"></div>
+      <div class="input-row"><div class="field"><label>怎么称呼您？<span class="req">*</span></label><input class="input" id="gateApplicant" value="${this.accountEsc(p.name||'')}" placeholder="请输入您的姓名或常用称呼"></div><div class="field"><label>您常用的邮箱地址？<span class="optional">（选填）</span></label><input class="input" id="gateEmail" type="email" value="${this.accountEsc(p.email||'')}" placeholder="例如 name@example.com"></div></div>
+      <div class="field"><label>怎么联系您？<span class="req">*</span></label><div class="segment" id="gateContactMethods" style="width:max-content;margin-bottom:10px"><button class="active" data-contact-method="tg" onclick="App.pickAdvertiserContactMethod(this,'tg')">Telegram</button><button data-contact-method="other" onclick="App.pickAdvertiserContactMethod(this,'other')">其他联系方式</button></div><div class="input-row"><div class="field" id="gateContactAppField" style="display:none;margin-bottom:0"><input class="input" id="gateContactApp" placeholder="请输入联系方式，如 WhatsApp"></div><div class="field" style="margin-bottom:0"><input class="input" id="gateContactNumber" placeholder="请输入您的 Telegram 账号"></div></div></div>
+      <div class="input-row"><div class="field"><label>您的产品叫什么？<span class="optional">（选填）</span></label><input class="input" id="gateProduct" placeholder="请输入产品或应用名称"></div><div class="field"><label>产品或官网网址<span class="optional">（选填）</span></label><input class="input" id="gateSite" type="url" placeholder="例如 https://example.com"></div></div>
+      <div class="input-row advertiser-meta-row"><div class="field industry-field"><label>您的产品属于哪个行业？<span class="optional">（选填）</span></label><select class="select" id="gateIndustry"><option value="">请选择行业</option><option>游戏</option><option>电商零售</option><option>互联网服务</option><option>金融</option><option>教育</option><option>其他</option></select></div>
+      <div class="field sales-field"><label>您有对接的商务吗？<span class="optional">（选填）</span></label><input class="input" id="gateSales" placeholder="如有，请填写商务姓名或工号"></div></div>
       </div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.openAdvertiserGate()">上一步</button><div class="spacer"></div><button class="btn btn-primary" onclick="App.submitAdvertiserApplication()">提交申请</button></div>`,true);
   },
   pickAdvertiserContactMethod(btn,method){
@@ -470,16 +470,16 @@ const App = {
     document.querySelectorAll('[data-contact-method]').forEach(x=>x.classList.toggle('active',x===btn));
     const appField=document.getElementById('gateContactAppField'),number=document.getElementById('gateContactNumber');
     if(appField)appField.style.display=method==='other'?'':'none';
-    if(number)number.placeholder=method==='other'?'请输入对应账号或号码':'请输入 TG 号';
+    if(number)number.placeholder=method==='other'?'请输入对应账号或号码':'请输入您的 Telegram 账号';
   },
   submitAdvertiserApplication(){
     const type=document.getElementById('gateApplicationType').value,applicant=document.getElementById('gateApplicant'),number=document.getElementById('gateContactNumber'),method=this.advertiserContactMethod||'tg',app=document.getElementById('gateContactApp');
-    const required=[[applicant,type==='bind'?'绑定人':'创建人'],[number,type==='bind'?'绑定人联系方式':'创建人联系方式']]; if(method==='other')required.splice(1,0,[app,'联系应用']);
+    const required=[[applicant,'您的姓名或常用称呼'],[number,'您的联系方式']]; if(method==='other')required.splice(1,0,[app,'联系方式类型']);
     if(!this.validateRequired(required)) return;
     const product=document.getElementById('gateProduct').value.trim(),site=document.getElementById('gateSite').value.trim();
     localStorage.setItem('t1_advertiser_application',JSON.stringify({type,advertiser:product||'待商务确认',applicant:applicant.value.trim(),contactMethod:method,contactApp:method==='tg'?'Telegram':app.value.trim(),contactNumber:number.value.trim(),email:document.getElementById('gateEmail').value.trim(),product,site,industry:document.getElementById('gateIndustry').value,sales:document.getElementById('gateSales').value.trim()||'待商务确认',status:'pending',submittedAt:new Date().toISOString()}));
     this.advertiserContactMethod='tg';
-    this.showApplicationSubmitted(type==='bind'?'已有广告主绑定申请已提交':'新广告主创建申请已提交',type==='bind'?'商务将核验绑定人信息，并完成已有 SSP 广告主关联。':'商务将核验创建人信息，并完成 SSP 广告主建档。');
+    this.showApplicationSubmitted(type==='bind'?'已有广告主绑定申请已提交':'新广告主创建申请已提交',type==='bind'?'商务将核验您提交的信息，并完成已有 SSP 广告主关联。':'商务将核验您提交的信息，并完成 SSP 广告主建档。');
   },
   openJoinAdvertiser(){
     this.modal(`<div class="modal-head"><div><h3>使用邀请码</h3><p>输入商务提供的邀请码，查询对应的广告主信息</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body"><div class="field"><label>邀请码<span class="req">*</span></label><input class="input" id="gateInviteCode" placeholder="请输入邀请码，例如 T1-SSP-2026"></div><div class="hint">提交后将先展示邀请码对应的广告主信息，由你确认后才会绑定。</div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.openAdvertiserGate()">上一步</button><div class="spacer"></div><button class="btn btn-primary" onclick="App.joinAdvertiser()">查询广告主</button></div>`);
