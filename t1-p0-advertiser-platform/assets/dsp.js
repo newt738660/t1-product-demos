@@ -391,6 +391,9 @@ const App = {
       if(app?.status==='pending'){this.go('dash');this.toast('申请正在审核中，暂时不能再次创建或绑定','warn');return;}
       this.openAdvertiserGate(); return;
     }
+    if(['newplan','newad'].includes(this.cur)&&!['newplan','newad'].includes(id)&&!this.editFlow&&(this.ufWorking||this.ufInitialDirty)){this.requestUfExit(id);return;}
+    if(this.cur!==id)this.stopUfTracking();
+    if(!['newplan','newad'].includes(id)){this.resumeCampId=null;this.editFlow=null;}
     this.cur=id;
     if(DB.uiState && NAV.flatMap(group=>group.items).some(item=>item.id===id)){
       DB.uiState.lastPage=id;
@@ -928,7 +931,7 @@ const App = {
   pickCreateMode(el,mode){ document.querySelectorAll('[data-create-mode]').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');this.createMode=mode; },
   confirmCreateMode(){ if(this.createMode==='cpd'){this.closeModal();this.showCpdSalesTip();return;}this.closeModal();this.startRtbCreate(); },
   startRtbCreate(){ this.beginNewRtb(); },
-  beginNewRtb(){ this.closeModal();this.ufWorking=null;this.curCamp=null;this.go('newplan'); },
+  beginNewRtb(){ this.closeModal();this.ufWorking=null;this.ufInitialDirty=false;this.curCamp=null;this.go('newplan'); },
   showCpdContact(){
     this.modal(`<div class="modal-head"><div><h3>联系运营创建 CPD 投放</h3><p>当前线上仅开放 RTB 自助创建</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body"><div class="notice info"><b>CPD 由运营人员协助创建和管理</b><br>请通过现有业务群或客户经理联系平台运营，并提供投放目标、期望广告位和排期。运营确认库存与价格后，会为你创建 CPD 广告计划。</div></div><div class="modal-foot"><button class="btn btn-primary" onclick="App.closeModal()">我知道了</button></div>`,true);
   },
@@ -1423,19 +1426,25 @@ const App = {
       ['App.saveUfCreative()','创建投放并提交审核'],
     ];
     actionLabels.forEach(([action,label])=>{const button=document.querySelector(`.unified-paper button[onclick="${action}"]`);if(button)button.textContent=label;});
-    this.ufObserver?.disconnect?.();
-    const sections=document.querySelectorAll('.paper-level');
-    this.ufObserver=new IntersectionObserver(entries=>{
-      /* 从已有计划新增广告组时，当前步骤由流程状态决定，不能被首屏中仍可见的计划摘要覆盖。 */
-      if(this.resumeCampId&&!document.getElementById('uf-group')?.classList.contains('completed')){
-        this.setUfActiveStep('uf-group');
-        return;
-      }
-      const visible=entries.filter(e=>e.isIntersecting&&!e.target.classList.contains('completed')&&!e.target.classList.contains('stage-hidden')).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
-      if(visible)this.setUfActiveStep(visible.target.id);
-    },{rootMargin:'-120px 0px -45% 0px',threshold:[0,.2,.5]});
-    sections.forEach(s=>this.ufObserver.observe(s));
+    this.stopUfTracking();
+    this.ufScrollHandler=()=>{
+      cancelAnimationFrame(this.ufScrollFrame);
+      this.ufScrollFrame=requestAnimationFrame(()=>{
+        if(this.ufJumpTarget||this.editFlow)return;
+        const levels=[...document.querySelectorAll('.paper-level:not(.stage-hidden)')];
+        const visible=levels.filter(el=>{const r=el.getBoundingClientRect();return r.bottom>130&&r.top<innerHeight-80;});
+        const target=visible.find(el=>el.getBoundingClientRect().top<=160)||visible[0];
+        if(target)this.setUfActiveStep(target.id);
+      });
+    };
+    this.ufManualScroll=()=>{clearTimeout(this.ufJumpTimer);this.ufJumpTarget=null;this.ufScrollHandler();};
+    window.addEventListener('scroll',this.ufScrollHandler,{passive:true});
+    window.addEventListener('wheel',this.ufManualScroll,{passive:true});
+    window.addEventListener('touchmove',this.ufManualScroll,{passive:true});
+    this.setUfActiveStep('uf-campaign');
     if(this.editFlow){this.initUnifiedEditFlow();return;}
+    this.ufWorking=null;this.ufInitialDirty=false;
+    document.querySelector('.unified-create').addEventListener('input',()=>{this.ufInitialDirty=true;});
     this.ufCustomPlanName='';
     this.updateUfPlanName();
     if(this.resumeCampId) this.initExistingPlanGroupFlow();
@@ -1446,11 +1455,15 @@ const App = {
     this.go('newplan');
   },
   cancelUnified(){
-    if(this.editFlow){const page=this.editFlow.returnPage||'plans';this.editFlow=null;this.ufWorking=null;this.go(page);return;}
-    const returnToCampaign=Boolean(this.resumeCampId);
-    this.ufWorking=null;
-    this.resumeCampId=null;
-    this.go(returnToCampaign?'campdetail':'plans');
+    if(this.editFlow){const page=this.editFlow.returnPage||'plans';this.editFlow=null;this.ufWorking=null;this.ufInitialDirty=false;this.go(page);return;}
+    this.requestUfExit(this.resumeCampId?'campdetail':'plans');
+  },
+  requestUfExit(page){
+    this.ufExitPage=page;
+    this.modal(`<div class="modal-head"><div><h3>退出创建？</h3><p>尚未提交的内容将被放弃，已保存的广告计划修改不受影响。</p></div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">继续填写</button><button class="btn btn-primary" onclick="App.discardUfCreate()">放弃未保存内容并退出</button></div>`,true);
+  },
+  discardUfCreate(){
+    const page=this.ufExitPage||'plans';this.ufExitPage=null;this.ufWorking=null;this.ufInitialDirty=false;this.resumeCampId=null;this.closeModal();this.go(page);
   },
   setUfValue(id,value){const el=document.getElementById(id);if(el)el.value=value??'';},
   setUfChoice(selector,value,key='value'){
@@ -1552,16 +1565,16 @@ const App = {
     this.mountUnifiedEditActions('修改后将生成新版本并重新提交审核','保存并提交审核','App.saveUnifiedCreativeEdit()');
     this.setUfActiveStep('uf-creative');this.focusUnifiedLevel('uf-creative');
   },
-  finishUnifiedEdit(message){const page=this.editFlow?.returnPage||'plans';this.editFlow=null;this.ufWorking=null;this.save();this.go(page);this.toast(message);},
+  finishUnifiedEdit(message){const page=this.editFlow?.returnPage||'plans';this.editFlow=null;this.ufWorking=null;this.ufInitialDirty=false;this.save();this.go(page);this.toast(message);},
   readUfCampaign(){
     const duration=(document.querySelector('#ufDuration .sel')||{}).dataset?.value||'fixed',name=this.ufVal('ufPlanName'),start=this.ufVal('ufPlanStart'),end=this.ufVal('ufPlanEnd'),total=Number(this.ufVal('ufTotal')||0),daily=Number(this.ufVal('ufDaily')||0);
-    if(!name||!start||(duration==='fixed'&&(!end||end<start||!total))||(duration==='ongoing'&&!daily)){this.toast('请完整、正确地填写广告计划必填项','warn');return null;}
+    if(!name||!start||(duration==='fixed'&&(!end||end<start||!Number.isFinite(total)||total<=0))||(duration==='ongoing'&&(!Number.isFinite(daily)||daily<=0))||!Number.isFinite(Number(this.ufVal('ufDailyCap')||0))||Number(this.ufVal('ufDailyCap')||0)<0){this.toast('请完整、正确地填写广告计划必填项','warn');return null;}
     return {name,alias:name,duration,start,end:duration==='fixed'?end:'',period:duration==='fixed'?`${start} 至 ${end}`:'长期投放',budget:duration==='fixed'?total:daily,totalBudget:duration==='fixed'?total:0,dailyBudget:duration==='ongoing'?daily:0,dailyCap:Number(this.ufVal('ufDailyCap')||0)};
   },
   readUfGroup(group,campaignData){
     const cp=campaignData||DB.campaigns.find(c=>c.id===group?.camp),name=this.ufVal('ufGroupName'),start=this.ufVal('ufGroupStart'),end=this.ufVal('ufGroupEnd'),budget=Number(this.ufVal('ufGroupBudget')||0),bid=Number(this.ufVal('ufBid')||0),limit=cp?.duration==='ongoing'?(cp.dailyBudget||cp.budget):(cp?.totalBudget||cp?.budget);
-    if(!name||!budget||!bid){this.toast('请填写广告组名称、预算和出价','warn');return null;}if(budget>limit){this.toast('广告组预算不能超过广告计划预算','warn');return null;}
-    if(start<cp?.start||(cp?.duration!=='ongoing'&&end>cp?.end)){this.toast('广告组投放周期不能超出广告计划周期','warn');return null;}
+    if(!name||!Number.isFinite(budget)||budget<=0||!Number.isFinite(bid)||bid<=0||!Number.isFinite(Number(this.ufVal('ufGroupCap')||0))||Number(this.ufVal('ufGroupCap')||0)<0){this.toast('请填写广告组名称、预算和出价','warn');return null;}if(budget>limit){this.toast('广告组预算不能超过广告计划预算','warn');return null;}
+    if(!start||start<cp?.start||(end&&end<start)||(cp?.duration!=='ongoing'&&(!end||end>cp?.end))){this.toast('广告组投放周期不能超出广告计划周期','warn');return null;}
     return {name,start,end,pace:(document.querySelector('#ufPace .sel')||{}).dataset?.value||'even',budget,dailyCap:Number(this.ufVal('ufGroupCap')||0),bidType:this.ufVal('ufBidType'),bid,geo:this.ufVal('ufGeo'),device:this.ufVal('ufDevice'),format:this.ufVal('ufFormat'),inventory:this.ufVal('ufInventory')};
   },
   saveUnifiedParentCampaign(returnTarget){
@@ -1572,8 +1585,13 @@ const App = {
     const g=(DB.adGroups||[]).find(x=>x.id===this.curGroup),data=this.readUfGroup(g);if(!g||!data)return;const old=g.name;Object.assign(g,data);DB.creatives.filter(a=>a.groupId===g.id||a.group===old).forEach(a=>a.group=g.name);this.ufWorking.group={...g};this.save();
     this.completeUfLevel('uf-group',`${g.name} · ${g.id}`);this.setUfActiveStep('uf-creative');this.jumpUnified('uf-creative');this.toast('广告组已更新，已返回广告创意');
   },
+  validateUfCampaignChildren(id,cp){
+    const invalid=(DB.adGroups||[]).some(g=>g.camp===id&&(g.budget>cp.budget||g.start<cp.start||(cp.duration!=='ongoing'&&(!g.end||g.end>cp.end))));
+    if(invalid){this.toast('修改后的计划周期或预算无法容纳已有广告组，请先调整广告组','warn');return false;}
+    return true;
+  },
   saveUnifiedCampaignEdit(){
-    const cp=DB.campaigns.find(c=>c.id===this.editFlow?.id),data=this.readUfCampaign();if(!cp||!data)return;Object.assign(cp,data);
+    const cp=DB.campaigns.find(c=>c.id===this.editFlow?.id),data=this.readUfCampaign();if(!cp||!data||!this.validateUfCampaignChildren(cp.id,data))return;Object.assign(cp,data);
     DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:'编辑广告计划',target:cp.id,result:'成功'});this.finishUnifiedEdit('广告计划已更新');
   },
   saveUnifiedGroupEdit(){
@@ -1606,8 +1624,12 @@ const App = {
     document.getElementById('ufGroupEnd').value=working.end;
     document.getElementById('ufGroupBudget').value=duration==='ongoing'?working.dailyBudget:working.totalBudget;
     const inherit=document.getElementById('ufInheritSummary');if(inherit)inherit.textContent=`${working.period} · ${duration==='ongoing'?fmtMoney(working.dailyBudget)+'/日':fmtMoney(working.totalBudget)} · 均匀投放`;
+    this.fillUfCampaign(cp);
+    this.ufWorking.campaign=this.readUfCampaign();
+    const saveButton=document.querySelector('#uf-campaign .level-actions .btn-primary');if(saveButton)saveButton.textContent='保存广告计划修改';
+    const hint=document.querySelector('#uf-campaign .level-actions>span');if(hint)hint.textContent='只保存广告计划修改，广告组未保存内容会保留';
     this.completeUfLevel('uf-campaign',`${cp.name} · 已有广告计划`);
-    document.querySelector('#uf-campaign .level-summary button')?.remove();
+
     this.unlockUf('uf-group',2);
     const title=document.querySelector('.unified-head h1'),desc=document.querySelector('.unified-head p');
     if(title)title.textContent='新建广告组';
@@ -1615,8 +1637,23 @@ const App = {
     this.setUfActiveStep('uf-group');
     this.focusUnifiedLevel('uf-group');
   },
+  stopUfTracking(){
+    this.ufObserver?.disconnect?.();
+    window.removeEventListener('scroll',this.ufScrollHandler);
+    window.removeEventListener('wheel',this.ufManualScroll);
+    window.removeEventListener('touchmove',this.ufManualScroll);
+    cancelAnimationFrame(this.ufScrollFrame);clearTimeout(this.ufJumpTimer);this.ufJumpTarget=null;
+  },
   setUfActiveStep(target){
-    document.querySelectorAll('#unifiedToc button').forEach(btn=>btn.classList.toggle('active',btn.dataset.target===target));
+    this.ufActiveLevel=target;
+    document.querySelectorAll('#unifiedToc button').forEach(btn=>{
+      const active=btn.dataset.target===target;btn.classList.toggle('active',active);
+      if(active)btn.setAttribute('aria-current','step');else btn.removeAttribute('aria-current');
+    });
+    document.querySelectorAll('.paper-level').forEach(el=>{
+      const active=el.id===target;el.classList.toggle('uf-current',active);
+      const indicator=el.querySelector('.level-heading em');if(indicator)indicator.textContent=active?'当前区域':'已解锁';
+    });
     if(!this.editFlow){
       const copy={
         'uf-campaign':['新建广告计划','设置投放周期、预算和计划名称，确认后继续创建广告组'],
@@ -1624,11 +1661,17 @@ const App = {
         'uf-creative':['新建广告创意','选择素材并设置文案和目标链接，提交时统一校验三个层级']
       }[target];
       const title=document.querySelector('.unified-head h1'),desc=document.querySelector('.unified-head p');
+      if(target==='uf-campaign'&&this.ufWorking?.existingCampaignId){copy[0]='修改广告计划';copy[1]='保存当前计划修改后继续填写广告组，未保存的子级内容会保留';}
+      if(document.getElementById(target)?.classList.contains('readonly-context-level')){copy[0]=target==='uf-campaign'?'查看所属广告计划':'查看所属广告组';copy[1]='所属信息仅供查看，返回广告创意后继续填写';}
       if(copy&&title)title.textContent=copy[0];if(copy&&desc)desc.textContent=copy[1];
     }
   },
   jumpUnified(id,behavior='smooth'){
-    const section=document.getElementById(id);if(!section)return;
+    const section=document.getElementById(id);if(!section||section.classList.contains('stage-hidden'))return;
+    if(!this.editFlow&&!section.classList.contains('readonly-context-level'))section.classList.remove('completed');
+    this.setUfActiveStep(id);
+    clearTimeout(this.ufJumpTimer);this.ufJumpTarget=id;
+    this.ufJumpTimer=setTimeout(()=>{this.ufJumpTarget=null;},behavior==='smooth'?900:100);
     const toc=document.querySelector('.form-toc');
     /* 28px compensates the shell's content offset so the card edge, not its scroll margin, aligns with the sticky navigation. */
     const alignedTop=(toc?parseFloat(getComputedStyle(toc).top)||76:76)+28;
@@ -1662,8 +1705,8 @@ const App = {
     this.pickRadio(el); const ongoing=el.dataset.value==='ongoing';
     document.getElementById('ufPlanEndField').style.display=ongoing?'none':''; document.getElementById('ufFixedBudget').style.display=ongoing?'none':''; document.getElementById('ufOngoingBudget').style.display=ongoing?'':'none';
     const start=document.getElementById('ufPlanStart').value, end=ongoing?'':document.getElementById('ufPlanEnd').value;
-    document.getElementById('ufGroupStart').value=start; document.getElementById('ufGroupEnd').value=end;
-    document.getElementById('ufGroupBudgetLabel').innerHTML=`${ongoing?'广告组每日预算':'广告组分配预算'}（USD）<span class="req">*</span>`; document.getElementById('ufGroupBudget').value=ongoing?document.getElementById('ufDaily').value:document.getElementById('ufTotal').value;
+    if(!this.ufWorking?.campaign){document.getElementById('ufGroupStart').value=start; document.getElementById('ufGroupEnd').value=end;}
+    document.getElementById('ufGroupBudgetLabel').innerHTML=`${ongoing?'广告组每日预算':'广告组分配预算'}（USD）<span class="req">*</span>`; if(!this.ufWorking?.campaign)document.getElementById('ufGroupBudget').value=ongoing?document.getElementById('ufDaily').value:document.getElementById('ufTotal').value;
     this.updateUfPlanName();
   },
   updateUfFormat(){ const s=document.getElementById('ufFormat'),h=document.getElementById('ufFormatHint'); if(s&&h)h.textContent=`库存与“${s.options[s.selectedIndex].text}”联动；第三层只展示兼容素材。`; },
@@ -1685,7 +1728,8 @@ const App = {
   unlockUf(target, tocIndex, status){
     const section=document.getElementById(target); section.classList.remove('stage-hidden'); section.classList.add('stage-reveal');
     const btn=document.querySelector(`#unifiedToc button[data-target="${target}"]`); btn.disabled=false; btn.classList.remove('locked'); btn.onclick=()=>this.jumpUnified(target); btn.querySelector('span').textContent=String(tocIndex).padStart(2,'0');
-    document.querySelectorAll('#unifiedToc button').forEach(item=>item.classList.toggle('active',item===btn));
+    const hint=btn.querySelector('small');if(hint)hint.textContent=target==='uf-group'?'出价、定向与库存':'素材、文案与目标链接';
+    this.setUfActiveStep(target);
   },
   completeUfLevel(target, summary){
     const section=document.getElementById(target); section.classList.add('completed');
@@ -1724,19 +1768,35 @@ const App = {
     section.querySelector('.level-actions')?.remove();
   },
   editUfLevel(target){ document.getElementById(target)?.classList.remove('completed'); this.jumpUnified(target); },
+  refreshUfCampaignSummary(cp){
+    const inherit=document.getElementById('ufInheritSummary');
+    if(inherit)inherit.textContent=`计划边界：${cp.period} · ${fmtMoney(cp.budget)}${cp.duration==='ongoing'?'/日':''}；已填写的广告组设置保持不变`;
+  },
   saveUfCampaign(){
-    const duration=(document.querySelector('#ufDuration .sel')||{}).dataset?.value||'fixed', name=this.ufVal('ufPlanName'),start=this.ufVal('ufPlanStart'),end=this.ufVal('ufPlanEnd'),total=Number(this.ufVal('ufTotal')||0),daily=Number(this.ufVal('ufDaily')||0);
-    if(!name||!start||(duration==='fixed'&&(!end||!total))||(duration==='ongoing'&&!daily)){this.toast('请完整填写广告计划必填项','warn');return;}
-    const cp={name,duration,start,end:duration==='fixed'?end:'',period:duration==='fixed'?`${start} 至 ${end}`:'长期投放',budget:duration==='fixed'?total:daily,totalBudget:total,dailyBudget:daily,dailyCap:Number(this.ufVal('ufDailyCap')||0)};
-    this.ufWorking={campaign:cp};
-    document.getElementById('ufGroupStart').value=start; document.getElementById('ufGroupEnd').value=duration==='fixed'?end:''; document.getElementById('ufGroupBudget').value=duration==='fixed'?total:daily; const inherit=document.getElementById('ufInheritSummary');if(inherit)inherit.textContent=`${cp.period} · ${duration==='fixed'?fmtMoney(total):fmtMoney(daily)+'/日'} · 均匀投放`;
-    this.completeUfLevel('uf-campaign',`${name} · ${cp.period} · ${duration==='fixed'?fmtMoney(total):fmtMoney(daily)+'/日'}`); this.unlockUf('uf-group',2);requestAnimationFrame(()=>this.jumpUnified('uf-group'));this.toast('广告计划设置已确认');
+    if(this.editFlow)return;
+    const cp=this.readUfCampaign();if(!cp)return;
+    const previous=this.ufWorking||{},existing=DB.campaigns.find(c=>c.id===previous.existingCampaignId);
+    if(existing&&!this.validateUfCampaignChildren(existing.id,cp))return;
+    if(!previous.campaign){
+      this.setUfValue('ufGroupStart',cp.start);this.setUfValue('ufGroupEnd',cp.end);this.setUfValue('ufGroupBudget',cp.budget);
+    }
+    this.ufWorking={...previous,campaign:cp};
+    if(existing){Object.assign(existing,cp);DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:'编辑广告计划',target:existing.id,result:'成功'});this.save();}
+    this.refreshUfCampaignSummary(cp);
+    this.completeUfLevel('uf-campaign',`${cp.name} · ${cp.period}`);
+    const button=document.querySelector('#uf-campaign .level-actions .btn-primary');
+    if(button)button.textContent=existing?'保存广告计划修改':'确认广告计划修改';
+    this.unlockUf('uf-group',2);this.jumpUnified('uf-group');
+    this.toast(existing?'广告计划修改已保存，广告组未保存内容已保留':'广告计划设置已确认，广告组未保存内容已保留');
   },
   saveUfGroup(){
-    const cp=this.ufWorking?.campaign;if(!cp){this.toast('请先确认广告计划','warn');return;} const name=this.ufVal('ufGroupName'),budget=Number(this.ufVal('ufGroupBudget')||0),bid=Number(this.ufVal('ufBid')||0); if(!name||!budget||!bid){this.toast('请填写广告组名称、预算和出价','warn');return;} if(budget>(cp.duration==='fixed'?cp.totalBudget:cp.dailyBudget)){this.toast('广告组预算不能超过广告计划预算','warn');return;}
-    const group={name,start:this.ufVal('ufGroupStart'),end:this.ufVal('ufGroupEnd'),pace:(document.querySelector('#ufPace .sel')||{}).dataset?.value||'even',budget,dailyCap:Number(this.ufVal('ufGroupCap')||0),bidType:this.ufVal('ufBidType'),bid,geo:this.ufVal('ufGeo'),device:this.ufVal('ufDevice'),format:this.ufVal('ufFormat'),inventory:this.ufVal('ufInventory')};
+    if(this.editFlow)return;
+    const cp=this.ufWorking?.campaign;if(!cp){this.toast('请先确认广告计划','warn');return;}
+    const group=this.readUfGroup(null,cp);if(!group)return;
     this.ufWorking.group=group;
-    this.completeUfLevel('uf-group',`${name} · ${group.bidType} ${fmtMoney(bid)} · ${fmtMoney(budget)}`);this.unlockUf('uf-creative',3);requestAnimationFrame(()=>this.jumpUnified('uf-creative'));this.toast('广告组设置已确认');
+    this.completeUfLevel('uf-group',`${group.name} · ${group.bidType} ${fmtMoney(group.bid)} · ${fmtMoney(group.budget)}`);
+    const button=document.querySelector('#uf-group .level-actions .btn-primary');if(button)button.textContent='确认广告组修改';
+    this.unlockUf('uf-creative',3);this.jumpUnified('uf-creative');this.toast('广告组设置已确认，广告创意未保存内容已保留');
   },
   saveUfCreative(){
     const group=this.ufWorking?.group;if(!group){this.toast('请先确认广告组','warn');return;}const name=this.ufVal('ufCreativeName'),landing=this.ufVal('ufLanding'),assetEl=document.querySelector('#ufAssets .picked');if(!name||!landing||!assetEl){this.toast('请填写创意名称、选择素材并填写目标链接','warn');return;}const file=DB.assetFiles.find(f=>f.id===assetEl.dataset.id)||{};
@@ -1744,6 +1804,15 @@ const App = {
     this.submitUnified();
   },
   submitUnified(){
+    if(!this.ufWorking?.group||this.editFlow)return;
+    const campaign=this.readUfCampaign();if(!campaign){this.jumpUnified('uf-campaign');return;}
+    const existing=DB.campaigns.find(c=>c.id===this.ufWorking.existingCampaignId);
+    if(existing&&Object.keys(campaign).some(key=>campaign[key]!==this.ufWorking.campaign[key])){
+      this.toast('请先保存广告计划修改，再提交广告创意','warn');this.jumpUnified('uf-campaign');return;
+    }
+    if(!this.readUfGroup(null,existing||campaign)){this.jumpUnified('uf-group');return;}
+    if(!/^https?:\/\/[^\s/]+/i.test(this.ufVal('ufLanding'))){this.toast('目标链接需为有效的 http:// 或 https:// 地址','warn');this.jumpUnified('uf-creative');return;}
+    if(!document.querySelector('#ufAssets .picked')){this.toast('请选择主素材','warn');this.jumpUnified('uf-creative');return;}
     const val=id=>document.getElementById(id)?.value?.trim()||'', duration=(document.querySelector('#ufDuration .sel')||{}).dataset?.value||'fixed';
     const required=[['ufPlanName','计划名称'],['ufPlanStart','开始日期'],['ufGroupName','广告组名称'],['ufGroupBudget','广告组预算'],['ufBid','手动出价'],['ufCreativeName','广告创意名称'],['ufLanding','目标链接']]; if(duration==='fixed')required.push(['ufPlanEnd','结束日期'],['ufTotal','活动总预算']); else required.push(['ufDaily','每日预算']);
     const missing=required.filter(x=>!val(x[0])); if(missing.length){ this.toast(`请填写：${missing.map(x=>x[1]).join('、')}`,'warn'); this.jumpUnified(missing[0][0].startsWith('ufPlan')||missing[0][0]==='ufTotal'||missing[0][0]==='ufDaily'?'uf-campaign':missing[0][0].startsWith('ufGroup')||missing[0][0]==='ufBid'?'uf-group':'uf-creative'); return; }
@@ -1753,7 +1822,7 @@ const App = {
     const cp={id:cid,name:val('ufPlanName'),alias:val('ufPlanName'),mode:'rtb',objective:'traffic',duration,start:val('ufPlanStart'),end:duration==='fixed'?val('ufPlanEnd'):'',period:duration==='fixed'?`${val('ufPlanStart')} 至 ${val('ufPlanEnd')}`:'长期投放',placement:val('ufInventory'),fmt:format,model:val('ufBidType'),bid:Number(val('ufBid')),status:'active',spend:0,imps:0,clicks:0,conv:0,geo:['🌍 全球'],inv:['app'],budget:duration==='fixed'?total:daily,totalBudget:total,dailyBudget:daily,dailyCap:Number(val('ufDailyCap')||0)};
     const group={id:gid,camp:cid,name:val('ufGroupName'),start:val('ufGroupStart'),end:val('ufGroupEnd'),pace:(document.querySelector('#ufPace .sel')||{}).dataset?.value||'even',budget:groupBudget,dailyCap:Number(val('ufGroupCap')||0),bidType:val('ufBidType'),bid:Number(val('ufBid')),geo:val('ufGeo'),device:val('ufDevice'),format,inventory:val('ufInventory'),status:'active'};
     const cr={id:crid,name:val('ufCreativeName'),group:group.name,groupId:gid,assetId:file.id,fmt:format,kind:file.type||'image',size:file.dim||'—',camp:cid,headline:val('ufHeadline'),landing:val('ufLanding'),imps:0,clicks:0,ctr:0,status:'review',version:1,created:'2026-08-11'};
-    if(!existingCampaignId)DB.campaigns.unshift(cp); DB.adGroups=DB.adGroups||[]; DB.adGroups.unshift(group); DB.creatives.unshift(cr); DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:existingCampaignId?'新增广告组并提交创意审核':'创建 RTB 投放并提交审核',target:cid,result:'成功'}); this.ufWorking=null; this.resumeCampId=null; this.save(); this.curCamp=cid; this.openPlan(cid); this.toast(existingCampaignId?'广告组已创建，广告创意已提交审核':'三层对象已创建，广告创意已提交审核');
+    if(!existingCampaignId)DB.campaigns.unshift(cp); DB.adGroups=DB.adGroups||[]; DB.adGroups.unshift(group); DB.creatives.unshift(cr); DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:existingCampaignId?'新增广告组并提交创意审核':'创建 RTB 投放并提交审核',target:cid,result:'成功'}); this.ufWorking=null;this.ufInitialDirty=false; this.resumeCampId=null; this.save(); this.curCamp=cid; this.openPlan(cid); this.toast(existingCampaignId?'广告组已创建，广告创意已提交审核':'三层对象已创建，广告创意已提交审核');
   },
   submitPlan(){
     const planName = document.getElementById('planName');
@@ -1934,6 +2003,8 @@ const App = {
     ['uf-campaign','uf-group'].forEach(target=>{
       const btn=document.querySelector(`#unifiedToc button[data-target="${target}"]`);
       if(btn){btn.disabled=false;btn.classList.remove('locked');btn.onclick=()=>this.jumpUnified(target);}
+      document.getElementById(target)?.querySelector('.level-actions')?.remove();
+      document.getElementById(target)?.insertAdjacentHTML('beforeend',`<div class="level-actions"><span>所属信息仅供查看，未保存的广告创意内容会保留</span><button class="btn btn-ghost" onclick="App.cancelNewCreative()">取消创建</button><button class="btn btn-primary" onclick="App.jumpUnified('uf-creative')">返回广告创意</button></div>`);
     });
     this.unlockUf('uf-creative',3);
     const creativeHint=document.querySelector('#unifiedToc button[data-target="uf-creative"] small');if(creativeHint)creativeHint.textContent='选择素材并设置跳转';
@@ -1951,7 +2022,7 @@ const App = {
     if(!name||!landing||!asset){this.toast('请填写创意名称、选择素材并填写目标链接','warn');this.jumpUnified('uf-creative');return;}
     const file=DB.assetFiles.find(f=>f.id===asset.dataset.id)||{},id='CR-'+(9040+DB.creatives.length);
     DB.creatives.unshift({id,name,group:group.name,groupId:group.id,assetId:file.id,fmt:group.format||'feed',kind:file.type||'image',size:file.dim||'—',camp:cp.id,headline:this.ufVal('ufHeadline'),landing,imps:0,clicks:0,ctr:0,status:'review',version:1,created:'2026-08-11'});
-    this.ufWorking=null;this.save();this.openGroupDetail(group.id,group.name);this.toast('广告创意已提交审核');
+    this.ufWorking=null;this.ufInitialDirty=false;this.save();this.openGroupDetail(group.id,group.name);this.toast('广告创意已提交审核');
   },
   reviewNewCreative(){
     const name=document.getElementById('creativeName')?.value.trim(),landing=document.getElementById('creativeLanding')?.value.trim(),asset=document.querySelector('#compatibleAssets .picked');

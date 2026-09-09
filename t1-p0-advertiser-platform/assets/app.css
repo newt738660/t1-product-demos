@@ -964,3 +964,9 @@ body:has(.unified-edit-actions) .unified-create{padding-bottom:100px}
 .readonly-value{display:flex;min-height:44px;box-sizing:border-box;flex-direction:column;justify-content:center;gap:3px;padding:10px 12px;border:1px solid var(--border);border-left:3px solid var(--text-3);border-radius:8px;background:var(--surface-2);color:var(--text)}
 .readonly-value b{font-size:13px}.readonly-value span{color:var(--text-3);font-size:11.5px}
 .form-toc button.locked.done{opacity:.72}.form-toc button.locked.done:hover{background:transparent}
+
+/* RTB: one current region owns the fixed action bar, including parent revisits. */
+body:has(.unified-create) .toast-wrap{bottom:90px}
+body:not(:has(.unified-edit-actions)) .unified-create .paper-level>.level-actions{display:none}
+body:not(:has(.unified-edit-actions)) .unified-create .paper-level.uf-current:not(.stage-hidden)>.level-actions{display:flex;position:fixed;z-index:24;left:var(--sidebar-w);right:0;bottom:0}
+@media(max-width:800px){body:not(:has(.unified-edit-actions)) .unified-create .paper-level.uf-current:not(.stage-hidden)>.level-actions{left:0}}
