@@ -16,6 +16,7 @@
   load();
   if(!localStorage.getItem(KEY)){db.items.filter(a=>a.status==='待一审').forEach(a=>notice(a,'新'+a.kind+'｜待一审','请当班商务进入 SSP 核验并提交一审，备援接手前请先沟通'));localStorage.setItem(KEY,JSON.stringify(db))}
   const get=id=>db.items.find(a=>a.id===id);
+  const noticeCards=()=>db.events.slice(0,5).map(e=>`<article class="notice-preview"><strong>${esc(e.title)}</strong><p>${esc(e.id)} · ${new Date(e.time).toLocaleTimeString('zh-CN')}</p><p>客户填写商务：${esc(e.contactSales)}（仅参考，不做映射）</p>${e.who?`<p>@${esc(person(e.who)?.name||e.who)}（示意提醒）</p>`:''}<p>${esc(e.action)}</p><button class="btn link" data-notice-open="${esc(e.id)}">在 SSP 查看申请</button></article>`).join('');
   const stage=a=>({'待一审':1,'待二审':2,'待三审':3}[a.status]||0);
   const handler=a=>stage(a)===1?a.owner:stage(a)===2?a.second:stage(a)===3?a.third:'';
   const can=a=>allowed()&&stage(a)>0&&(stage(a)===1||handler(a)===actorId);
@@ -29,11 +30,12 @@
   function confirm(title,body,submit,cb){modalRoot.innerHTML=`<div class="modal-mask"><div class="modal" style="max-width:560px"><div class="modal-head"><h3>${title}</h3><button class="modal-close">×</button></div><div class="modal-body">${body}<p id="approvalError" role="alert" style="color:#b42318"></p></div><div class="modal-foot"><button class="btn modal-cancel">取消</button><button class="btn primary modal-submit">${submit}</button></div></div></div>`;wireModal(cb)}
   function showError(message){document.querySelector('#approvalError').textContent=message}
   function hydrate(a){state.selected=a;state.selectedSales=salesPeople.find(s=>s.id===a.salesId)||null;state.selectedAdvertiser=advertisers.find(s=>s.id===a.targetId)||null;state.advertiserName=a.finalName||a.company;state.secondId=a.second||''}
+  function bindNoticeLinks(){document.querySelectorAll('[data-notice-open]').forEach(b=>b.onclick=()=>{if(!allowed()){toast('当前账号无权访问审批页');return}hydrate(get(b.dataset.noticeOpen));state.view='detail';render()});}
   const oldBind=bind;
   render=function(){
     load(); if(state.selected)state.selected=get(state.selected.id);
     document.querySelector('[data-nav="advertisers"]').hidden=!allowed();
-    const control=`<details class="demo-tools" ${toolsOpen?'open':''}><summary>交互演示 · 切换人员 / 群消息预览</summary><div class="demo-controls"><label>演示账号 <select id="demoActor" class="select">${actors.map(x=>`<option value="${x.id}" ${x.id===actorId?'selected':''}>${x.name} / ${x.id}（${x.access}）</option>`).join('')}</select></label><button class="btn" id="advanceClock">模拟 10 分钟后</button><button class="btn" id="resetApproval">重置演示</button></div><p class="helper">值班直接一审演示；切换账号可体验不同人员的处理范围。数据仅用于本浏览器演示，不会向 TG 发消息。</p><div id="noticePreview">${db.events.slice(0,5).map(e=>`<article class="notice-preview"><strong>${esc(e.title)}</strong><p>${esc(e.id)} · ${new Date(e.time).toLocaleTimeString('zh-CN')}</p><p>客户填写商务：${esc(e.contactSales)}（仅参考，不做映射）</p>${e.who?`<p>@${esc(person(e.who)?.name||e.who)}（示意提醒）</p>`:''}<p>${esc(e.action)}</p><button class="btn link" data-notice-open="${esc(e.id)}">在 SSP 查看申请</button></article>`).join('')}</div></details>`;
+    const control=`<details class="demo-tools" ${toolsOpen?'open':''}><summary>交互演示 · 切换人员 / 群消息预览</summary><div class="demo-controls"><label>演示账号 <select id="demoActor" class="select">${actors.map(x=>`<option value="${x.id}" ${x.id===actorId?'selected':''}>${x.name} / ${x.id}（${x.access}）</option>`).join('')}</select></label><button class="btn" id="advanceClock">模拟 10 分钟后</button><button class="btn" id="resetApproval">重置演示</button></div><p class="helper">值班直接一审演示；切换账号可体验不同人员的处理范围。数据仅用于本浏览器演示，不会向 TG 发消息。</p><div id="noticePreview">${noticeCards()}</div></details>`;
     app.innerHTML=control+(!allowed()?'<section class="card empty-access"><h2>暂无访问权限</h2><p>广告主申请审批页仅向商务账号及超级管理员开放。</p></section>':state.view==='review'?reviewList():state.view==='detail'?reviewDetail(state.selected):state.view==='invites'?inviteList():advertiserList());
     document.querySelector('.user').innerHTML=`<span class="avatar">商</span><span>${esc(label(actorId))}</span>`;
     if(allowed())bind();
@@ -41,7 +43,7 @@
     document.querySelector('#demoActor').onchange=e=>{actorId=e.target.value;sessionStorage.setItem(KEY+'-actor',actorId);closeModal();if(state.selected)hydrate(state.selected);render()};
     document.querySelector('#advanceClock').onclick=()=>{offset+=10*60*1000+1;sendReminders()};
     document.querySelector('#resetApproval').onclick=()=>confirm('重置演示数据？','<p>仅重置本浏览器中的申请演示记录。</p>','确认重置',async()=>{await navigator.locks.request(LOCK,()=>{db=seed();db.items.filter(a=>a.status==='待一审').forEach(a=>notice(a,'新'+a.kind+'｜待一审','请当班商务进入 SSP 核验并提交一审，备援接手前请先沟通'));localStorage.setItem(KEY,JSON.stringify(db))});state.view='review';state.selected=null;offset=0;closeModal();render()});
-    document.querySelectorAll('[data-notice-open]').forEach(b=>b.onclick=()=>{if(!allowed()){toast('当前账号无权访问审批页');return}hydrate(get(b.dataset.noticeOpen));state.view='detail';render()});
+    bindNoticeLinks();
   };
   managementHeader=function(active){const count=k=>db.items.filter(a=>a.kind===k&&stage(a)).length;return `<div class="page-head"><div class="page-title"><h1>广告主管理</h1><p>开户、绑定与邀请</p></div></div><div class="management-tabs">${['广告主列表','开户申请','绑定申请','邀请码管理'].map(k=>`<button class="management-tab ${active===k?'active':''}" data-mgmt="${k}">${k}${k.endsWith('申请')?` <span class="mini-count">${count(k)}</span>`:''}</button>`).join('')}</div>`};
   reviewList=function(){const rows=db.items.filter(a=>a.kind===state.reviewType&&(state.reviewScope==='全部申请'||stage(a)));return `${managementHeader(state.reviewType)}<div class="warning-box">一审由当班商务直接处理，备援接手前请先沟通。值班与交接以商务群安排为准。</div><section class="card list-card"><div class="review-subtabs">${['待处理','全部申请'].map(k=>`<button class="review-subtab ${state.reviewScope===k?'active':''}" data-scope="${k}">${k}</button>`).join('')}</div><div class="table-wrap"><table><thead><tr><th>申请 ID</th><th>申请人 / 广告主</th><th>客户填写商务</th><th>审核阶段</th><th>当前处理人</th><th>操作</th></tr></thead><tbody>${rows.map(a=>`<tr><td>${a.id}</td><td>${esc(a.applicant)}<br>${esc(a.company)}</td><td>${esc(a.contactSales||'未填写')}</td><td>${statusHtml(a.status)}</td><td>${esc(handlerLabel(a))}</td><td><button class="btn link" data-open-light="${a.id}">${can(a)?'处理':'查看'}</button></td></tr>`).join('')}</tbody></table></div></section>`};
@@ -91,7 +93,7 @@
     });if(changed)localStorage.setItem(KEY,JSON.stringify(db))});
     // A reminder must not discard an in-progress review form or confirmation.
     if(changed&&state.view!=='detail'&&!modalRoot.childElementCount)render();
-    if(changed&&state.view==='detail')toast('已补发待处理提醒，可在群消息预览查看');
+    if(changed&&state.view==='detail'){document.querySelector('#noticePreview').innerHTML=noticeCards();bindNoticeLinks();toast('已补发待处理提醒，可在群消息预览查看')}
   }
   addEventListener('storage',e=>{
     if(e.key!==KEY)return;
