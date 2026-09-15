@@ -324,6 +324,7 @@ const App = {
   init(){
     this.load();this.demoRole=localStorage.getItem('t1-demo-role')||'owner';if(window.Branding) Branding.apply(DB.profile); this.renderNav();
     const previewState=new URLSearchParams(location.search).get('state'); if(previewState)this.homeState=previewState;
+    if(this.isPreviewMode()&&previewState==='rejected'){if(!this.advertiserApplication()){localStorage.setItem('t1_advertiser_application',JSON.stringify(this.rejectedApplicationExample()));const p=this.profile()||{};p.advertiserBound=false;localStorage.setItem('t1_demo_profile',JSON.stringify(p));}this.homeState=this.advertiserApplication()?.status==='pending'?'pending':this.advertiserApplication()?.status==='rejected'?'rejected':'';}
     this.syncAccountContext();this.syncRoleSimulator();
     const query=new URLSearchParams(location.search),requestedNew=query.get('new')==='rtb',welcome=query.get('welcome')==='1';
     if(this.isDemoMode()) DB.uiState.planListView='all';
@@ -458,6 +459,7 @@ const App = {
   continueAdvertiserGate(){if(this.advertiserGateType==='new')this.openAdvertiserApplication('new');else if(this.advertiserGateType==='invite')this.openJoinAdvertiser();else if(this.advertiserGateType==='bind')this.openAdvertiserApplication('bind');},
   openAdvertiserApplication(type='new'){
     const p=this.profile()||{};
+    this.advertiserContactMethod='tg';
     const binding=type==='bind';
     this.modal(`<div class="modal-head"><div><h3>${binding?'绑定已有广告主':'新创建广告主'}</h3><p>${binding?'请留下您的基本信息，商务核验后将为您关联已有 SSP 广告主':'请留下您的基本信息，商务核验后将协助您完成 SSP 建档'}</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body">
       <input type="hidden" id="gateApplicationType" value="${type}">
@@ -469,6 +471,24 @@ const App = {
       <div class="field sales-field"><label>您有对接的商务吗？<span class="optional">（选填）</span></label><input class="input" id="gateSales" placeholder="如有，请填写商务姓名或工号"></div></div>
       </div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.openAdvertiserGate()">上一步</button><div class="spacer"></div><button class="btn btn-primary" onclick="App.submitAdvertiserApplication()">提交申请</button></div>`,true);
   },
+  viewAdvertiserRejection(){
+    const a=this.advertiserApplication();
+    if(!a||a.status!=='rejected'){this.toast('申请状态已更新，请查看最新状态','info');this.homeState='';this.go('dash');return;}
+    this.modal(`<div class="modal-head"><div><h3>驳回原因</h3><p>${a.type==='bind'?'绑定已有广告主':'新创建广告主'} · ${this.accountEsc(a.advertiser||'—')}</p></div><div class="spacer"></div><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body"><span class="badge red">审核未通过</span><p class="muted" style="margin:12px 0">${a.rejectedAt?'审核时间：'+this.accountEsc(new Date(a.rejectedAt).toLocaleString('zh-CN')):'审核时间：暂未提供'}</p><div class="notice warning" style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto">${this.accountEsc(a.rejectReason||'暂未获取到驳回原因，请稍后重试或联系对接商务。')}</div><p class="muted" style="margin-top:12px">本次申请已结束。修改后将重新发起申请，从一审开始。</p></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">关闭</button><div class="spacer"></div><button class="btn btn-primary" onclick="App.reapplyAdvertiser()">修改并重新申请</button></div>`);
+  },
+  reapplyAdvertiser(){
+    const a=this.advertiserApplication();
+    if(!a||a.status!=='rejected'){this.toast('申请状态已更新，请查看最新状态','info');this.closeModal();this.homeState='';this.go('dash');return;}
+    this.openAdvertiserApplication(a.type==='bind'?'bind':'new');
+    const fields={gateAdvertiserName:a.advertiser,gateApplicant:a.applicant,gateEmail:a.email,gateContactApp:a.contactApp,gateContactNumber:a.contactNumber,gateProduct:a.product,gateSite:a.site,gateIndustry:a.industry,gateSales:a.sales==='待商务确认'?'':a.sales};
+    for(const [id,value] of Object.entries(fields))if(value!=null)document.getElementById(id).value=value;
+    const method=a.contactMethod==='other'?'other':'tg';
+    this.pickAdvertiserContactMethod(document.querySelector(`[data-contact-method="${method}"]`),method);
+    const note=document.createElement('div');note.className='notice warning';note.style.cssText='margin-bottom:16px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:180px;overflow:auto';note.textContent='上次驳回原因：'+(a.rejectReason||'暂未获取，请联系对接商务。');document.querySelector('#modalMask .modal-body').prepend(note);
+    document.querySelector('#modalMask .modal-foot .btn-ghost').textContent='取消修改';
+    document.querySelector('#modalMask .modal-foot .btn-ghost').onclick=()=>this.closeModal();
+  },
+  rejectedApplicationExample(){return {id:'T1-DEMO-REJECTED',type:'bind',advertiser:'星海互动',applicant:'陈晓',email:'demo@example.com',contactMethod:'tg',contactApp:'Telegram',contactNumber:'@demo_contact',product:'StarWave',site:'https://example.com',industry:'游戏',sales:'',status:'rejected',rejectReason:'您填写的 Telegram 账号无法联系。请核对账号拼写，并确认可通过该账号联系到您，再重新提交申请。',rejectedAt:new Date().toISOString()};},
   pickAdvertiserContactMethod(btn,method){
     this.advertiserContactMethod=method;
     document.querySelectorAll('[data-contact-method]').forEach(x=>x.classList.toggle('active',x===btn));
@@ -477,12 +497,15 @@ const App = {
     if(number)number.placeholder=method==='other'?'请输入对应账号或号码':'请输入您的 Telegram 账号';
   },
   submitAdvertiserApplication(){
+    const previous=this.advertiserApplication();
+    if(previous?.status==='pending'){this.toast('已有审核中的申请，请勿重复提交','warn');return;}
     const type=document.getElementById('gateApplicationType').value,advertiserName=document.getElementById('gateAdvertiserName'),applicant=document.getElementById('gateApplicant'),number=document.getElementById('gateContactNumber'),method=this.advertiserContactMethod||'tg',app=document.getElementById('gateContactApp');
     const required=[[advertiserName,'广告主名称'],[applicant,'您的姓名或常用称呼'],[number,'您的联系方式']]; if(method==='other')required.splice(2,0,[app,'联系方式类型']);
     if(!this.validateRequired(required)) return;
     const product=document.getElementById('gateProduct').value.trim(),site=document.getElementById('gateSite').value.trim();
-    localStorage.setItem('t1_advertiser_application',JSON.stringify({type,advertiser:advertiserName.value.trim(),applicant:applicant.value.trim(),contactMethod:method,contactApp:method==='tg'?'Telegram':app.value.trim(),contactNumber:number.value.trim(),email:document.getElementById('gateEmail').value.trim(),product,site,industry:document.getElementById('gateIndustry').value,sales:document.getElementById('gateSales').value.trim()||'待商务确认',status:'pending',submittedAt:new Date().toISOString()}));
-    this.advertiserContactMethod='tg';
+    localStorage.setItem('t1_advertiser_application',JSON.stringify({id:'T1-'+crypto.randomUUID(),previousApplicationId:previous?.status==='rejected'?previous.id||null:null,type,advertiser:advertiserName.value.trim(),applicant:applicant.value.trim(),contactMethod:method,contactApp:method==='tg'?'Telegram':app.value.trim(),contactNumber:number.value.trim(),email:document.getElementById('gateEmail').value.trim(),product,site,industry:document.getElementById('gateIndustry').value,sales:document.getElementById('gateSales').value.trim()||'待商务确认',status:'pending',submittedAt:new Date().toISOString()}));
+    if(previous?.status==='rejected'){let history;try{history=JSON.parse(localStorage.getItem('t1_advertiser_application_history')||'[]')}catch{history=[]}history.push(previous);localStorage.setItem('t1_advertiser_application_history',JSON.stringify(history));}
+    this.homeState='';this.advertiserContactMethod='tg';
     this.showApplicationSubmitted(type==='bind'?'已有广告主绑定申请已提交':'新广告主创建申请已提交',type==='bind'?'商务将核验您提交的信息，并完成已有 SSP 广告主关联。':'商务将核验您提交的信息，并完成 SSP 广告主建档。');
   },
   openJoinAdvertiser(){
@@ -500,7 +523,7 @@ const App = {
   showApplicationSubmitted(title,desc){this.modal(`<div class="modal-body" style="text-align:center;padding:42px"><div style="width:58px;height:58px;border-radius:50%;background:#eef0ff;color:var(--accent);display:grid;place-items:center;margin:0 auto 18px;font-size:26px">✓</div><h3>${title}</h3><p class="muted" style="margin-top:8px">${desc}</p><div class="notice info" style="margin-top:20px;text-align:left">当前状态：<b>审核中</b><br>审核完成前不能再次创建或绑定广告主。</div></div><div class="modal-foot"><div class="spacer"></div><button class="btn btn-primary" onclick="App.closeModal();App.go('dash')">返回首页</button></div>`);},
   cancelAdvertiserApplication(){const app=this.advertiserApplication();if(!app||app.status!=='pending'||app.type!=='new')return;this.modal(`<div class="modal-head"><div><h3>撤销开户申请？</h3><p>撤销后商务将不再处理本次申请，你可以重新提交。</p></div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">暂不撤销</button><div class="spacer"></div><button class="btn btn-danger" onclick="App.confirmCancelAdvertiserApplication()">确认撤销</button></div>`);},
   confirmCancelAdvertiserApplication(){localStorage.removeItem('t1_advertiser_application');this.closeModal();this.toast('开户申请已撤销');this.go('dash');},
-  demoReviewApplication(result){const app=this.advertiserApplication();if(!app)return;if(result==='approved'){const p=this.profile()||{};p.advertiserBound=true;p.advertiserName=app.advertiser||'演示广告主';localStorage.setItem('t1_demo_profile',JSON.stringify(p));localStorage.removeItem('t1_advertiser_application');this.syncAccountContext();this.toast('商务核验通过，已进入投放');this.go('dash');return;}app.status='rejected';app.rejectReason='现有信息不足以确认客户与目标广告主的关系';localStorage.setItem('t1_advertiser_application',JSON.stringify(app));this.go('dash');},
+  demoReviewApplication(result){const app=this.advertiserApplication();if(!app)return;if(result==='approved'){const p=this.profile()||{};p.advertiserBound=true;p.advertiserName=app.advertiser||'演示广告主';localStorage.setItem('t1_demo_profile',JSON.stringify(p));localStorage.removeItem('t1_advertiser_application');this.syncAccountContext();this.toast('商务核验通过，已进入投放');this.go('dash');return;}app.status='rejected';app.rejectReason=this.rejectedApplicationExample().rejectReason;app.rejectedAt=new Date().toISOString();this.homeState='';localStorage.setItem('t1_advertiser_application',JSON.stringify(app));this.go('dash');},
   copy(t,b){ navigator.clipboard?.writeText(t).catch(()=>{}); this.toast('已复制'); if(b){const o=b.innerHTML;b.innerHTML=svg(I.check);setTimeout(()=>b.innerHTML=o,1200);} },
 
   /* ---------- 消息通知 ---------- */
@@ -676,7 +699,7 @@ const App = {
     if(this.isPreviewMode()){
       const p=this.profile()||{name:'评审用户',email:'review@t1.demo'};p.advertiserBound=state==='empty'||state==='active';localStorage.setItem('t1_demo_profile',JSON.stringify(p));
       if(state==='pending')localStorage.setItem('t1_advertiser_application',JSON.stringify({type:'new',advertiser:'星海互动',status:'pending'}));
-      else if(state==='rejected')localStorage.setItem('t1_advertiser_application',JSON.stringify({type:'bind',advertiser:'星海互动',status:'rejected',rejectReason:'现有信息不足以确认客户与目标广告主的关系'}));
+      else if(state==='rejected')localStorage.setItem('t1_advertiser_application',JSON.stringify(this.rejectedApplicationExample()));
       else localStorage.removeItem('t1_advertiser_application');
       this.syncAccountContext();
     }
@@ -736,7 +759,7 @@ const App = {
     const ready=forcedState==='empty';
     const demoActions=pending?`<div class="flex" style="gap:8px;margin-left:auto"><button class="btn btn-subtle btn-sm" onclick="App.demoReviewApplication('rejected')">模拟驳回</button><button class="btn btn-primary btn-sm" onclick="App.demoReviewApplication('approved')">模拟通过</button></div>`:'';
     const applicationLabel=app?.type==='bind'?'已有广告主绑定申请':app?.type==='new'?'新广告主创建申请':app?.type==='invite'?'邀请码绑定申请':'广告主申请';
-    const stateStrip=pending?`<div class="application-strip"><span class="badge amber">审核中</span><div><b>${applicationLabel}审核中</b><p>商务正在核验「${app?.advertiser||'客户信息'}」；完成前不能再次提交广告主申请。</p></div>${app?.type==='new'?'<button class="btn btn-ghost btn-sm" onclick="App.cancelAdvertiserApplication()">撤销开户申请</button>':''}${demoActions}</div>`:rejected?`<div class="application-strip"><span class="badge red">需补充</span><div><b>现有信息暂不足</b><p>${app?.rejectReason||'商务暂时无法完成客户与广告主关系核验。'} 你可以补充信息后重新申请。</p></div><button class="btn btn-primary btn-sm" onclick="App.openAdvertiserGate()">补充并重新申请</button></div>`:ready?`<div class="application-strip ready"><div><b>广告主已绑定，可以开始第一条投放</b><p>绑定事件已结束，你可以直接使用投放功能。</p></div><button class="btn btn-primary btn-sm" onclick="App.startRtbCreate()">创建第一条 RTB 投放</button></div>`:'';
+    const stateStrip=pending?`<div class="application-strip"><span class="badge amber">审核中</span><div><b>${applicationLabel}审核中</b><p>商务正在核验「${app?.advertiser||'客户信息'}」；完成前不能再次提交广告主申请。</p></div>${app?.type==='new'?'<button class="btn btn-ghost btn-sm" onclick="App.cancelAdvertiserApplication()">撤销开户申请</button>':''}${demoActions}</div>`:rejected?`<div class="application-strip"><span class="badge red">审核未通过</span><div><b>${applicationLabel}未通过审核</b><p>请查看驳回原因，修改信息后重新申请。</p></div><button class="btn btn-ghost btn-sm" onclick="App.viewAdvertiserRejection()">查看驳回原因</button><button class="btn btn-primary btn-sm" onclick="App.reapplyAdvertiser()">修改并重新申请</button></div>`:ready?`<div class="application-strip ready"><div><b>广告主已绑定，可以开始第一条投放</b><p>绑定事件已结束，你可以直接使用投放功能。</p></div><button class="btn btn-primary btn-sm" onclick="App.startRtbCreate()">创建第一条 RTB 投放</button></div>`:'';
     const primary=pending?`<button class="btn btn-primary" disabled>审核完成后开始投放</button>`:`<button class="btn btn-primary" onclick="App.startRtbCreate()">${svg(I.plus)}${ready?'创建第一条 RTB 投放':'开始 RTB 自助投放'}</button>`;
     const foot=pending?'审核期间仍可浏览平台能力、案例和帮助内容。':ready?'广告主已绑定，可直接创建投放。':rejected?'本次申请已结束，可重新创建或绑定广告主。':'浏览平台无需绑定广告主；开始真实投放时再提交创建或绑定申请。';
     return `${stateStrip}<div class="first-screen-growth">
