@@ -1414,7 +1414,7 @@ const App = {
       </div></div>`;
   },
   view_unifiednew(){
-    const assets=DB.assetFiles.filter(f=>f.type==='image').slice(0,6);
+    const assets=DB.assetFiles.filter(f=>f.type==='image');
     const advertiserName=this.profile()?.advertiserName||'T1演示广告主';
     return `<div class="unified-create">
       <div class="page-head unified-head"><div><h1>新建广告计划</h1><p>设置当前层级，确认后继续创建广告组</p></div></div>
