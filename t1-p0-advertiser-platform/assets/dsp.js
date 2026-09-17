@@ -112,9 +112,10 @@ const fmtNum = n => n.toLocaleString('en-US');
 const fmtK = n => n>=1e6 ? (n/1e6).toFixed(2)+'M' : n>=1e3 ? (n/1e3).toFixed(1)+'K' : n;
 function cssVar(v){ return getComputedStyle(document.body).getPropertyValue(v).trim(); }
 function creativeThumb(a){
+  const preview=DB.assetFiles.find(f=>f.id===a.assetId)?.preview;if(preview)return `<img class="creative-thumb" src="${preview}" alt="创意素材预览">`;
   const byCampaign={'C-1002':'automotive.jpg','C-1003':'gaming.jpg','C-1004':'shopping.jpg','C-1005':'gaming.jpg'};
   const byFormat={splashimg:'automotive.jpg',reward:'gaming.jpg',native:'shopping.jpg',feed:'shopping.jpg',video:'brand.jpg'};
-  const file=byCampaign[a.camp]||byFormat[a.fmt]||'brand.jpg';
+  const f=DB.assetFiles.find(x=>x.id===a.assetId);const file=(f?(f.dim==='1080×1920'?'automotive.jpg':'shopping.jpg'):null)||byCampaign[a.camp]||byFormat[a.fmt]||'brand.jpg';
   return `<img class="creative-thumb" src="assets/creative-images/${file}" alt="${a.name}创意图片">`;
 }
 
@@ -1083,9 +1084,9 @@ const App = {
       </dl>
     </div>
     ${cp.mode==='cpd'?`<div class="notice info" style="margin-bottom:14px">该计划由运营创建并管理。价格、库存、投放周期、时段和启停状态不可修改；你可以查看数据并提交创意图片、文案或落地页变更。</div>`:''}
-    <div class="card group-list-card"><div class="card-head"><div><b>广告组</b><div class="cell-sub">共 <span id="visibleGroupCount">${groups.length}</span> 个广告组；点击名称进入广告组详情</div></div><div class="spacer"></div>${groups.length?`<input class="input group-search" id="campaignGroupSearch" placeholder="搜索广告组名称 / ID" oninput="App.filterCampaignGroups()"><select class="select group-status-filter" id="campaignGroupStatus" style="box-sizing:border-box;flex:0 0 200px;width:200px;min-width:200px;max-width:200px;padding-left:16px;padding-right:44px" onchange="App.filterCampaignGroups()"><option value="">全部状态</option><option value="active">投放中</option><option value="draft">草稿</option><option value="review">审核中</option><option value="needs-creative">待创建创意</option></select>`:''}</div>
+    <div class="card group-list-card"><div class="card-head"><div><b>广告组</b><div class="cell-sub">共 <span id="visibleGroupCount">${groups.length}</span> 个广告组；点击名称进入广告组详情</div></div><div class="spacer"></div>${groups.length?`<input class="input group-search" id="campaignGroupSearch" placeholder="搜索广告组名称 / ID" oninput="App.filterCampaignGroups()"><select class="select group-status-filter" id="campaignGroupStatus" style="box-sizing:border-box;flex:0 0 200px;width:200px;min-width:200px;max-width:200px;padding-left:16px;padding-right:44px" onchange="App.filterCampaignGroups()"><option value="">全部状态</option><option value="active">投放中</option><option value="draft">草稿</option><option value="review">审核中</option><option value="paused">已暂停</option><option value="needs-creative">待创建创意</option></select>`:''}</div>
       <div class="table-wrap"><table class="campaign-group-table ${cp.mode==='cpd'?'cpd-readonly-table':''}"><thead><tr><th>广告组</th><th>状态</th><th>投放情况</th><th>排期</th>${cp.mode==='cpd'?'<th>广告形式</th><th>投放位置</th>':'<th>预算</th><th>竞价方式</th><th>出价</th>'}<th class="num">创意</th><th class="num">曝光</th><th class="num">点击</th><th class="num">CTR</th>${cp.mode==='rtb'?'<th class="act">操作</th>':''}</tr></thead><tbody id="campaignGroupRows">
-      ${groups.map(g=>{const ga=ads.filter(a=>a.groupId===g.id||a.group===g.name),gi=ga.reduce((s,a)=>s+(a.imps||0),0),gc=ga.reduce((s,a)=>s+(a.clicks||0),0),gctr=gi?(gc/gi*100).toFixed(2)+'%':'—',needsCreative=ga.length===0,groupIssue=this.groupDeliveryIssue(g,cp,ga),canToggle=['active','paused'].includes(g.status),toggleLabel=g.status==='paused'?'恢复':'暂停',actions=`<div class="plan-row-actions"><button class="plan-row-action" onclick="App.openGroupEdit('${g.id}','campdetail')">编辑</button>${canToggle?`<button class="plan-row-action" onclick="App.confirmGroupStatus('${g.id}','campdetail')">${toggleLabel}</button>`:''}</div>`;return `<tr data-group-row data-search="${(g.name+' '+g.id).toLowerCase()}" data-status="${needsCreative?'needs-creative':g.status}"><td><button class="link-btn" onclick="App.openGroupDetail('${g.id}','${g.name.replaceAll("'","&#39;")}')"><b>${g.name}</b></button><div class="cell-sub">${g.id}</div></td><td>${this.statusBadge(g.status)}</td><td><span class="badge ${groupIssue.cls}">${groupIssue.label}</span></td><td>${g.start||cp.start||'—'}<div class="cell-sub">${g.end?'至 '+g.end:'长期投放'}</div></td>${cp.mode==='cpd'?`<td>${FMT[g.format]?.name||'—'}</td><td>${g.inventory||cp.placement||'—'}</td>`:`<td>${fmtMoney(g.budget||0)}</td><td>${g.bidType||'CPM'}</td><td>${fmtMoney(g.bid||0)}</td>`}<td class="num">${needsCreative?(cp.mode==='rtb'?`<button class="text-link" onclick="App.openNewCreativeForGroup('${g.id}')">创建创意</button>`:'<span class="badge amber">0 · 待补充</span>'):ga.length}</td><td class="num">${fmtK(gi)}</td><td class="num">${fmtK(gc)}</td><td class="num">${gctr}</td>${cp.mode==='rtb'?`<td class="act">${actions}</td>`:''}</tr>`}).join('')||`<tr><td colspan="${cp.mode==='rtb'?12:10}"><div class="empty">${svg(I.group||I.camp)}<div>当前广告计划还没有广告组</div>${cp.mode==='rtb'?`<button class="btn btn-primary btn-sm" onclick="App.startNewGroup('${cp.id}')">创建第一个广告组</button>`:''}</div></td></tr>`}
+      ${groups.map(g=>{const ga=ads.filter(a=>a.groupId===g.id||(!a.groupId&&a.camp===g.camp&&a.group===g.name)),gi=ga.reduce((s,a)=>s+(a.imps||0),0),gc=ga.reduce((s,a)=>s+(a.clicks||0),0),gctr=gi?(gc/gi*100).toFixed(2)+'%':'—',needsCreative=ga.length===0,groupIssue=this.groupDeliveryIssue(g,cp,ga),canToggle=['active','paused'].includes(g.status),toggleLabel=g.status==='paused'?'恢复':'暂停',actions=`<div class="plan-row-actions"><button class="plan-row-action" onclick="App.openGroupEdit('${g.id}','campdetail')">编辑</button>${canToggle?`<button class="plan-row-action" onclick="App.confirmGroupStatus('${g.id}','campdetail')">${toggleLabel}</button>`:''}</div>`;return `<tr data-group-row data-search="${(g.name+' '+g.id).toLowerCase()}" data-status="${needsCreative?'needs-creative':g.status}"><td><button class="link-btn" onclick="App.openGroupDetail('${g.id}','${g.name.replaceAll("'","&#39;")}')"><b>${g.name}</b></button><div class="cell-sub">${g.id}</div></td><td>${this.statusBadge(g.status)}</td><td><span class="badge ${groupIssue.cls}">${groupIssue.label}</span></td><td>${g.start||cp.start||'—'}<div class="cell-sub">${g.end?'至 '+g.end:'长期投放'}</div></td>${cp.mode==='cpd'?`<td>${FMT[g.format]?.name||'—'}</td><td>${g.inventory||cp.placement||'—'}</td>`:`<td>${fmtMoney(g.budget||0)}</td><td>${g.bidType||'CPM'}</td><td>${fmtMoney(g.bid||0)}</td>`}<td class="num">${needsCreative?(cp.mode==='rtb'?`<button class="text-link" onclick="App.openNewCreativeForGroup('${g.id}')">创建创意</button>`:'<span class="badge amber">0 · 待补充</span>'):ga.length}</td><td class="num">${fmtK(gi)}</td><td class="num">${fmtK(gc)}</td><td class="num">${gctr}</td>${cp.mode==='rtb'?`<td class="act">${actions}</td>`:''}</tr>`}).join('')||`<tr><td colspan="${cp.mode==='rtb'?12:10}"><div class="empty">${svg(I.group||I.camp)}<div>当前广告计划还没有广告组</div>${cp.mode==='rtb'?`<button class="btn btn-primary btn-sm" onclick="App.startNewGroup('${cp.id}')">创建第一个广告组</button>`:''}</div></td></tr>`}
       </tbody></table></div></div>`;
   },
   filterCampaignGroups(){
@@ -1163,7 +1164,7 @@ const App = {
   },
   view_groupdetail(){
     const group=(DB.adGroups||[]).find(g=>g.id===this.curGroup)||{name:this.curGroupName||'默认广告组',camp:this.curCamp,status:'active'};
-    const cp=DB.campaigns.find(c=>c.id===group.camp)||{},ads=DB.creatives.filter(a=>a.camp===cp.id&&(a.groupId===group.id||a.group===group.name));
+    const cp=DB.campaigns.find(c=>c.id===group.camp)||{},ads=DB.creatives.filter(a=>a.camp===cp.id&&(a.groupId===group.id||(!a.groupId&&a.group===group.name)));
     const groupIssue=this.groupDeliveryIssue(group,cp,ads);
     const isRtb=cp.mode==='rtb',groupCanToggle=['active','paused'].includes(group.status),groupToggleLabel=group.status==='paused'?'恢复广告组':'暂停广告组';
     const groupImps=ads.reduce((sum,a)=>sum+(a.imps||0),0),groupSpend=group.spend??((cp.imps||0)>0?(cp.spend||0)*groupImps/cp.imps:0);
@@ -1196,11 +1197,11 @@ const App = {
         <section><h3>投放位置</h3><dl class="group-setting-grid"><div><dt>广告位类型</dt><dd>${FMT[group.format]?.name||'—'}</dd></div><div><dt>投放范围</dt><dd>${group.inventoryScope||'指定广告位'}</dd></div><div class="group-setting-period"><dt>广告位</dt><dd>${group.inventory||'—'}</dd></div></dl></section>
       </div>
     </div>`:''}
-    <div class="card creative-priority-card"><div class="card-head"><div><b>广告创意</b><div class="cell-sub">审核状态说明内容是否可用；投放状态同时受计划、广告组和创意自身状态影响</div></div>${isRtb?`<div class="spacer"></div><button class="btn btn-primary btn-sm" onclick="App.openNewCreativeForGroup('${group.id}')">${svg(I.plus)}新建创意</button>`:''}</div><div class="table-wrap"><table><thead><tr><th>广告创意</th><th>素材规格</th><th>审核状态</th><th>投放状态</th><th class="num">曝光</th><th class="num">点击</th><th class="num">CTR</th><th>更新时间</th><th>操作</th></tr></thead><tbody>${ads.map(a=>{const ctr=a.imps?((a.clicks||0)/a.imps*100).toFixed(2)+'%':'—',creativeIssue=this.creativeDeliveryIssue(a,group,cp),reviewState=a.pendingVersion?'<span class="badge green">当前版本已通过</span><div class="cell-sub" style="margin-top:4px">新版本审核中</div>':this.statusBadge(a.status),canToggle=isRtb&&['active','paused'].includes(a.status),toggleLabel=a.status==='paused'?'恢复':'暂停',updated=a.pendingVersion?.submittedAt?new Date(a.pendingVersion.submittedAt).toLocaleDateString('zh-CN'):a.updated||a.created||'—';return `<tr><td><div class="cell-flex">${creativeThumb(a)}<div><button class="link-btn" onclick="App.openCreativePreview('${a.id}')"><b>${a.name}</b></button><div class="cell-sub">${a.id} · ${a.headline||'未填写标题'}</div></div></div></td><td>${a.size||'—'}</td><td>${reviewState}</td><td><span class="badge ${creativeIssue.cls}">${creativeIssue.label}</span></td><td class="num">${fmtK(a.imps||0)}</td><td class="num">${fmtK(a.clicks||0)}</td><td class="num">${ctr}</td><td>${updated}</td><td><div class="cell-flex"><button class="plan-row-action" onclick="App.openCreative('${a.id}')">编辑</button>${canToggle?`<button class="plan-row-action" onclick="App.confirmCreativeStatus('${a.id}')">${toggleLabel}</button>`:''}<button class="plan-row-action" onclick="App.confirmDeleteDeliveryObject('creative','${a.id}')">删除</button></div></td></tr>`}).join('')||`<tr><td colspan="9"><div class="empty">${svg(I.creative)}<div>当前广告组还没有广告创意</div>${isRtb?`<button class="btn btn-primary btn-sm" onclick="App.openNewCreativeForGroup('${group.id}')">创建第一条创意</button>`:''}</div></td></tr>`}</tbody></table></div></div>`;
+    <div class="card creative-priority-card"><div class="card-head"><div><b>广告创意</b><div class="cell-sub">审核状态说明内容是否可用；投放状态同时受计划、广告组和创意自身状态影响</div></div>${isRtb?`<div class="spacer"></div><button class="btn btn-primary btn-sm" onclick="App.openNewCreativeForGroup('${group.id}')">${svg(I.plus)}新建创意</button>`:''}</div><div class="table-wrap"><table><thead><tr><th>广告创意</th><th>素材规格</th><th>审核状态</th><th>投放状态</th><th class="num">曝光</th><th class="num">点击</th><th class="num">CTR</th><th>更新时间</th><th>操作</th></tr></thead><tbody>${ads.map(a=>{const ctr=a.imps?((a.clicks||0)/a.imps*100).toFixed(2)+'%':'—',creativeIssue=this.creativeDeliveryIssue(a,group,cp),reviewState=a.pendingVersion?'<span class="badge green">当前版本已通过</span><div class="cell-sub" style="margin-top:4px">'+(a.pendingVersion.status==='rejected'?'新版本被驳回':'新版本审核中')+'</div>':this.statusBadge(a.status),canToggle=isRtb&&['active','paused'].includes(a.status),toggleLabel=a.status==='paused'?'恢复':'暂停',updated=a.pendingVersion?.submittedAt?new Date(a.pendingVersion.submittedAt).toLocaleDateString('zh-CN'):a.updated||a.created||'—';return `<tr><td><div class="cell-flex">${creativeThumb(a)}<div><button class="link-btn" onclick="App.openCreativePreview('${a.id}')"><b>${a.name}</b></button><div class="cell-sub">${a.id} · V${a.version||1} · ${a.headline||'未填写标题'}</div></div></div></td><td>${a.size||'—'}</td><td>${reviewState}</td><td><span class="badge ${creativeIssue.cls}">${creativeIssue.label}</span></td><td class="num">${fmtK(a.imps||0)}</td><td class="num">${fmtK(a.clicks||0)}</td><td class="num">${ctr}</td><td>${updated}</td><td><div class="cell-flex"><button class="plan-row-action" onclick="App.openCreative('${a.id}')">编辑</button>${canToggle?`<button class="plan-row-action" onclick="App.confirmCreativeStatus('${a.id}')">${toggleLabel}</button>`:''}<button class="plan-row-action" onclick="App.confirmDeleteDeliveryObject('creative','${a.id}')">删除</button></div></td></tr>`}).join('')||`<tr><td colspan="9"><div class="empty">${svg(I.creative)}<div>当前广告组还没有广告创意</div>${isRtb?`<button class="btn btn-primary btn-sm" onclick="App.openNewCreativeForGroup('${group.id}')">创建第一条创意</button>`:''}</div></td></tr>`}</tbody></table></div></div>`;
   },
   openCreativePreview(id){
     const a=DB.creatives.find(x=>x.id===id);if(!a)return;const cp=DB.campaigns.find(c=>c.id===a.camp)||{},group=(DB.adGroups||[]).find(g=>g.id===a.groupId)||{},asset=DB.assetFiles.find(f=>f.id===a.assetId)||{},issue=this.creativeDeliveryIssue(a,group,cp),ctr=a.imps?((a.clicks||0)/a.imps*100).toFixed(2)+'%':'—';
-    this.modal(`<div class="modal-head"><div><h3>${a.name}</h3><p>${a.id} · 当前生效版本 V${a.version||1}</p></div><div class="spacer"></div><span class="badge ${issue.cls}">${issue.label}</span><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body">${a.pendingVersion?`<div class="notice info" style="margin-bottom:16px"><b>新版本审核中</b><div style="margin-top:5px">当前展示的是仍在投放的 V${a.version||1}，审核通过后才会替换。</div></div>`:''}<div class="creative-preview-modal"><div class="creative-preview-large">${creativeThumb(a)}<span>${asset.name||a.size||'当前素材'}</span></div><div><dl class="cpd-readonly-grid"><div class="wide"><dt>所属广告计划</dt><dd>${cp.name||'—'}</dd></div><div class="wide"><dt>所属广告组</dt><dd>${group.name||a.group||'—'}</dd></div><div><dt>素材规格</dt><dd>${a.size||asset.dim||'—'}</dd></div><div><dt>曝光</dt><dd>${fmtK(a.imps||0)}</dd></div><div><dt>点击</dt><dd>${fmtK(a.clicks||0)}</dd></div><div><dt>CTR</dt><dd>${ctr}</dd></div><div><dt>广告形式</dt><dd>${FMT[a.fmt]?.name||'—'}</dd></div><div class="wide"><dt>标题</dt><dd>${a.headline||'—'}</dd></div><div class="wide"><dt>补充文案</dt><dd>${a.description||'—'}</dd></div><div><dt>跳转类型</dt><dd>外部跳转</dd></div><div class="wide"><dt>目标链接</dt><dd class="mono">${a.landing||'—'}</dd></div></dl></div></div></div><div class="modal-foot"><div class="spacer"></div><button class="btn btn-primary" onclick="App.closeModal()">关闭</button></div>`,true);
+    this.modal(`<div class="modal-head"><div><h3>${a.name}</h3><p>${a.id} · 当前版本 V${a.version||1}</p></div><div class="spacer"></div><span class="badge ${issue.cls}">${issue.label}</span><button class="icon-btn" onclick="App.closeModal()">${svg(I.x)}</button></div><div class="modal-body">${a.pendingVersion?`<div class="notice info" style="margin-bottom:16px"><b>${a.pendingVersion.status==='rejected'?'新版本被驳回':'新版本审核中'}</b><div style="margin-top:5px">当前展示的是已通过的 V${a.version||1}；实际投放受启停、排期和预算约束。新内容审核通过后才会替换。</div></div>`:''}<div class="creative-preview-modal"><div class="creative-preview-large">${creativeThumb(a)}<span>${asset.name||a.size||'当前素材'}</span></div><div><dl class="cpd-readonly-grid"><div class="wide"><dt>所属广告计划</dt><dd>${cp.name||'—'}</dd></div><div class="wide"><dt>所属广告组</dt><dd>${group.name||a.group||'—'}</dd></div><div><dt>素材规格</dt><dd>${a.size||asset.dim||'—'}</dd></div><div><dt>曝光</dt><dd>${fmtK(a.imps||0)}</dd></div><div><dt>点击</dt><dd>${fmtK(a.clicks||0)}</dd></div><div><dt>CTR</dt><dd>${ctr}</dd></div><div><dt>广告形式</dt><dd>${({splashimg:'开屏',feed:'信息流',bbanner:'横幅',rect:'矩形',micon:'图标',text:'文字'})[a.fmt]||FMT[a.fmt]?.name||'—'}</dd></div><div class="wide"><dt>标题</dt><dd>${a.headline||'—'}</dd></div><div class="wide"><dt>描述</dt><dd>${a.description||'—'}</dd></div><div class="wide"><dt>CTA文案</dt><dd>${a.cta||'—'}</dd></div><div><dt>跳转类型</dt><dd>外部跳转</dd></div><div class="wide"><dt>目标链接</dt><dd class="mono">${a.landing||'—'}</dd></div></dl></div></div></div><div class="modal-foot"><div class="spacer"></div><button class="btn btn-primary" onclick="App.closeModal()">关闭</button></div>`,true);
   },
   confirmGroupStatus(id,returnPage='groupdetail'){
     const group=(DB.adGroups||[]).find(g=>g.id===id);if(!group||!['active','paused'].includes(group.status))return;
@@ -1260,7 +1261,7 @@ const App = {
   },
   openNewCreativeForGroup(id){const group=(DB.adGroups||[]).find(g=>g.id===id);if(!group)return;const cp=DB.campaigns.find(c=>c.id===group.camp);if(cp?.mode==='cpd'){this.toast('CPD 创意由运营创建，广告主只能修改允许的创意内容','info');return;}this.curGroup=id;this.curCamp=group.camp;this.editRejectedId=null;this.go('newad');},
   openGroupEdit(id,returnPage='groupdetail'){const g=(DB.adGroups||[]).find(x=>x.id===id);if(!g)return;const cp=DB.campaigns.find(c=>c.id===g.camp);if(cp?.mode==='cpd'){this.toast('CPD 广告组由运营管理，广告主不可修改','info');return;}this.editFlow={type:'group',id,returnPage};this.curGroup=id;this.curCamp=g.camp;this.go('newplan');},
-  saveGroupEdit(){const g=(DB.adGroups||[]).find(x=>x.id===this.editGroupId);if(!g)return;const old=g.name,name=document.getElementById('editGroupName').value.trim(),bid=Number(document.getElementById('editGroupBid').value||0);if(!name||!bid){this.toast('请填写广告组名称和出价','warn');return;}g.name=name;g.bidType=document.getElementById('editGroupBidType').value;g.bid=bid;g.inventory=document.getElementById('editGroupInventory').value;DB.creatives.filter(a=>a.groupId===g.id||a.group===old).forEach(a=>a.group=name);this.save();this.closeModal();this.go(this.editGroupReturnPage||'groupdetail');this.editGroupReturnPage=null;this.toast('广告组已更新');},
+  saveGroupEdit(){const g=(DB.adGroups||[]).find(x=>x.id===this.editGroupId);if(!g)return;const old=g.name,name=document.getElementById('editGroupName').value.trim(),bid=Number(document.getElementById('editGroupBid').value||0);if(!name||!bid){this.toast('请填写广告组名称和出价','warn');return;}g.name=name;g.bidType=document.getElementById('editGroupBidType').value;g.bid=bid;g.inventory=document.getElementById('editGroupInventory').value;DB.creatives.filter(a=>a.groupId===g.id||(!a.groupId&&a.camp===g.camp&&a.group===old)).forEach(a=>a.group=name);this.save();this.closeModal();this.go(this.editGroupReturnPage||'groupdetail');this.editGroupReturnPage=null;this.toast('广告组已更新');},
   openGroupCreatives(group){
     const btn=document.querySelectorAll('#campaignTabs button')[3];
     this.switchCampaignTab(btn,'creatives');
@@ -1434,7 +1435,7 @@ const App = {
           <div class="paper-block"><h3>竞价、定向与库存</h3><div class="input-row"><div class="field"><label>竞价方式</label><select class="select" id="ufBidType"><option value="CPM">按曝光竞价（CPM）</option><option value="CPC">按点击竞价（CPC）</option></select></div><div class="field"><label>手动出价（USD）<span class="req">*</span></label><input class="input" id="ufBid" value="2.40"></div></div><div class="input-row"><div class="field"><label>地域</label><select class="select" id="ufGeo"><option>不限</option><option>指定地区</option></select></div><div class="field"><label>设备</label><select class="select" id="ufDevice"><option>不限</option><option>Android</option><option>iOS</option><option>PC</option></select></div></div><div class="input-row"><div class="field"><label>广告形式<span class="req">*</span></label><select class="select" id="ufFormat" onchange="App.updateUfFormat()"><option value="splashimg">开屏</option><option value="feed" selected>信息流</option><option value="bbanner">横幅</option><option value="rect">矩形</option><option value="micon">图标</option><option value="text">文字</option></select></div><div class="field"><label>投放范围<span class="req">*</span></label><select class="select" id="ufInventory"><option>全部兼容库存</option><option>指定 App</option><option>指定广告位</option></select></div></div><div class="hint" id="ufFormatHint">库存与“信息流”联动；第三层只展示兼容素材。</div><div class="notice info" style="margin-top:14px">平台会在后台统一控制重复曝光，客户前台不开放频控阈值。</div></div><div class="level-actions"><span>确认后继续设置广告创意，数据将在最终提交时创建</span><button class="btn btn-ghost" onclick="App.cancelUnified()">取消创建</button><button class="btn btn-primary" onclick="App.saveUfGroup()">确认广告组并继续 →</button></div>
         </section>
         <section class="paper-level stage-hidden" id="uf-creative" data-level="03"><div class="level-heading"><span>03</span><div><h2>广告创意</h2><p>选择素材，并设置文案和目标链接</p></div><em>当前步骤</em></div>
-          <div class="paper-block"><h3>创意内容</h3><div class="field"><label>广告创意名称<span class="req">*</span></label><input class="input" id="ufCreativeName" placeholder="如：欧洲夏促信息流 A"></div><div class="field"><label>主素材<span class="req">*</span></label><div class="flex between" style="margin-bottom:8px"><span class="cell-sub">仅显示符合当前广告组规格的素材</span><button class="btn btn-ghost btn-sm" onclick="App.openUfUpload()">${svg(I.upload)}上传新素材</button></div><div class="asset-grid" id="ufAssets">${assets.map((f,i)=>`<div class="asset-cell ${i===0?'picked':''}" data-id="${f.id}" onclick="App.pickCompatibleAsset(this)"><div class="asset-thumb" style="height:64px">${svg(I.image)}</div><div class="asset-meta"><div class="asset-name">${f.name}</div><div class="asset-sub">${f.dim} · ${f.size}</div></div></div>`).join('')}</div></div><div class="field"><label>标题 / 文案</label><input class="input" id="ufHeadline" maxlength="50" placeholder="是否必填由广告形式决定"></div><div class="input-row"><div class="field"><label>跳转类型</label><select class="select" id="ufJump"><option>外部跳转</option></select></div><div class="field"><label>目标链接<span class="req">*</span></label><input class="input mono" id="ufLanding" placeholder="https://example.com/landing"></div></div></div><div class="level-actions"><span>提交时统一校验三个层级，并创建当前投放</span><button class="btn btn-ghost" onclick="App.cancelUnified()">取消创建</button><button class="btn btn-primary" onclick="App.saveUfCreative()">创建投放并提交审核</button></div>
+          <div class="paper-block"><h3>创意内容</h3><div class="field"><label>广告创意名称<span class="req">*</span></label><input class="input" id="ufCreativeName" placeholder="如：欧洲夏促信息流 A"></div><div class="field"><label>主素材<span class="req">*</span></label><div class="flex between" style="margin-bottom:8px"><span class="cell-sub">仅显示符合当前广告组规格的素材</span><button class="btn btn-ghost btn-sm" onclick="App.openUfUpload()">${svg(I.upload)}上传新素材</button></div><div class="asset-grid" id="ufAssets">${assets.map((f,i)=>`<div class="asset-cell ${i===0?'picked':''}" data-id="${f.id}" onclick="App.pickCompatibleAsset(this)"><div class="asset-thumb" style="height:64px">${svg(I.image)}</div><div class="asset-meta"><div class="asset-name">${f.name}</div><div class="asset-sub">${f.dim} · ${f.size}</div></div></div>`).join('')}</div></div><div class="field"><label>标题 / 文案</label><input class="input" id="ufHeadline" maxlength="100" placeholder="选填，最多100字"></div><div class="field"><label>描述</label><textarea class="input" id="ufDescription" maxlength="200" placeholder="选填，最多200字"></textarea></div><div class="field"><label>CTA文案</label><input class="input" id="ufCta" maxlength="20" placeholder="选填，最多20字"></div><div class="input-row"><div class="field"><label>跳转类型</label><select class="select" id="ufJump"><option>外部跳转</option></select></div><div class="field"><label>目标链接<span class="req">*</span></label><input class="input mono" id="ufLanding" maxlength="500" placeholder="https://example.com/landing"></div></div></div><div class="level-actions"><span>提交时统一校验三个层级，并创建当前投放</span><button class="btn btn-ghost" onclick="App.cancelUnified()">取消创建</button><button class="btn btn-primary" onclick="App.saveUfCreative()">创建投放并提交审核</button></div>
         </section>
       </div></main>
     </div>`;
@@ -1512,7 +1513,7 @@ const App = {
   },
   fillUfCreative(creative){
     const data=creative.pendingVersion||creative;
-    this.setUfValue('ufCreativeName',data.name||creative.name);this.setUfValue('ufHeadline',data.headline||creative.headline||'');this.setUfValue('ufDescription',data.description||creative.description||'');this.setUfValue('ufLanding',data.landing||creative.landing||'');
+    this.setUfValue('ufCreativeName',data.name||creative.name);this.setUfValue('ufHeadline',data.headline||creative.headline||'');this.setUfValue('ufDescription',data.description||creative.description||'');this.setUfValue('ufLanding',data.landing||creative.landing||'');this.setUfValue('ufCta',data.cta??creative.cta??'');
     const assets=document.querySelectorAll('#ufAssets .asset-cell');assets.forEach(el=>el.classList.toggle('picked',el.dataset.id===creative.assetId));
     if(assets.length&&!document.querySelector('#ufAssets .picked'))assets[0].classList.add('picked');
   },
@@ -1567,7 +1568,7 @@ const App = {
     if(flow.type==='group'){
       const groupHint=document.querySelector('#unifiedToc [data-target="uf-group"] small');
       if(groupHint)groupHint.textContent='当前仅修改广告组设置';
-      const hasCreatives=DB.creatives.some(a=>a.groupId===group.id||a.group===group.name);
+      const hasCreatives=DB.creatives.some(a=>a.groupId===group.id||(!a.groupId&&a.group===group.name));
       if(hasCreatives){
         const creativeNav=document.querySelector('#unifiedToc [data-target="uf-creative"]');
         const creativeHint=creativeNav?.querySelector('small');
@@ -1602,7 +1603,7 @@ const App = {
     this.completeUfLevel('uf-campaign',`${cp.name} · ${cp.period}`);this.setUfActiveStep(returnTarget);this.jumpUnified(returnTarget);this.toast('广告计划已更新，已返回当前编辑层');
   },
   saveUnifiedParentGroup(){
-    const g=(DB.adGroups||[]).find(x=>x.id===this.curGroup),data=this.readUfGroup(g);if(!g||!data)return;const old=g.name;Object.assign(g,data);DB.creatives.filter(a=>a.groupId===g.id||a.group===old).forEach(a=>a.group=g.name);this.ufWorking.group={...g};this.save();
+    const g=(DB.adGroups||[]).find(x=>x.id===this.curGroup),data=this.readUfGroup(g);if(!g||!data)return;const old=g.name;Object.assign(g,data);DB.creatives.filter(a=>a.groupId===g.id||(!a.groupId&&a.camp===g.camp&&a.group===old)).forEach(a=>a.group=g.name);this.ufWorking.group={...g};this.save();
     this.completeUfLevel('uf-group',`${g.name} · ${g.id}`);this.setUfActiveStep('uf-creative');this.jumpUnified('uf-creative');this.toast('广告组已更新，已返回广告创意');
   },
   validateUfCampaignChildren(id,cp){
@@ -1616,13 +1617,16 @@ const App = {
   },
   saveUnifiedGroupEdit(){
     const cp=DB.campaigns.find(c=>c.id===this.curCamp),g=(DB.adGroups||[]).find(x=>x.id===this.editFlow?.id);if(!cp||!g)return;
-    const groupData=this.readUfGroup(g,cp);if(!groupData)return;const old=g.name;Object.assign(g,groupData);DB.creatives.filter(a=>a.groupId===g.id||a.group===old).forEach(a=>a.group=g.name);
+    const groupData=this.readUfGroup(g,cp);if(!groupData)return;const old=g.name;Object.assign(g,groupData);DB.creatives.filter(a=>a.groupId===g.id||(!a.groupId&&a.camp===g.camp&&a.group===old)).forEach(a=>a.group=g.name);
     DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:'编辑广告组',target:g.id,result:'成功'});this.finishUnifiedEdit('广告组已更新');
   },
   saveUnifiedCreativeEdit(){
     const a=DB.creatives.find(x=>x.id===this.editFlow?.id);if(!a)return;const cp=DB.campaigns.find(c=>c.id===a.camp),isCpd=cp?.mode==='cpd',name=isCpd?a.name:this.ufVal('ufCreativeName'),landing=this.ufVal('ufLanding'),assetEl=document.querySelector('#ufAssets .picked');if(!name||!landing||!assetEl){this.toast(isCpd?'请选择素材并填写目标链接':'请填写创意名称、选择素材并填写目标链接','warn');return;}
-    a.pendingVersion={version:(a.version||1)+1,name,headline:this.ufVal('ufHeadline'),description:this.ufVal('ufDescription'),landing,assetId:assetEl.dataset.id,status:'review',submittedAt:new Date().toISOString()};a.changeStatus='review';
-    DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:isCpd?'提交 CPD 创意变更审核':'编辑广告创意并提交审核',target:a.id,result:'成功'});this.finishUnifiedEdit(isCpd?'创意变更已提交审核，当前生效版本保持不变':'新版本已提交审核，当前线上版本保持投放');
+    const data={name,headline:this.ufVal('ufHeadline'),description:this.ufVal('ufDescription'),cta:this.ufVal('ufCta'),landing,assetId:assetEl.dataset.id,status:'review',submittedAt:new Date().toISOString()};
+    const initialRejected=a.status==='rejected'&&!a.pendingVersion;
+    if(initialRejected){Object.assign(a,data);a.size=DB.assetFiles.find(f=>f.id===data.assetId)?.dim||a.size;a.version=(a.version||1)+1;delete a.rejectReason;delete a.reason;delete a.rejectionReason;}
+    else {a.pendingVersion={version:(a.pendingVersion?.version||a.version||1)+1,...data};a.changeStatus='review';}
+    DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:isCpd?'提交 CPD 创意变更审核':'编辑广告创意并提交审核',target:a.id,result:'成功'});this.finishUnifiedEdit(initialRejected?'创意已重新提交审核，审核通过前不可投放':'新版本已提交审核，当前已通过内容保持不变');
   },
   initExistingPlanGroupFlow(){
     const cp=DB.campaigns.find(c=>c.id===this.resumeCampId);
@@ -1688,7 +1692,7 @@ const App = {
   },
   jumpUnified(id,behavior='smooth'){
     const section=document.getElementById(id);if(!section||section.classList.contains('stage-hidden'))return;
-    if(!this.editFlow&&!section.classList.contains('readonly-context-level'))section.classList.remove('completed');
+
     this.setUfActiveStep(id);
     clearTimeout(this.ufJumpTimer);this.ufJumpTarget=id;
     this.ufJumpTimer=setTimeout(()=>{this.ufJumpTarget=null;},behavior==='smooth'?900:100);
@@ -1733,7 +1737,7 @@ const App = {
   toggleUfGroupAdvanced(){
     const box=document.getElementById('ufGroupAdvanced'); if(!box)return;
     const open=box.style.display==='none'; box.style.display=open?'block':'none';
-    this.toast(open?'已展开广告组独立设置':'已恢复使用广告计划设置');
+    this.toast(open?'已展开广告组独立设置':'已收起设置，独立配置保持不变');
   },
   openUfUpload(){
     const fmt=document.getElementById('ufFormat'),formatName=fmt?fmt.options[fmt.selectedIndex].text:'当前广告形式';
@@ -1820,7 +1824,7 @@ const App = {
   },
   saveUfCreative(){
     const group=this.ufWorking?.group;if(!group){this.toast('请先确认广告组','warn');return;}const name=this.ufVal('ufCreativeName'),landing=this.ufVal('ufLanding'),assetEl=document.querySelector('#ufAssets .picked');if(!name||!landing||!assetEl){this.toast('请填写创意名称、选择素材并填写目标链接','warn');return;}const file=DB.assetFiles.find(f=>f.id===assetEl.dataset.id)||{};
-    this.ufWorking.creative={name,assetId:file.id,headline:this.ufVal('ufHeadline'),landing};
+    this.ufWorking.creative={name,assetId:file.id,headline:this.ufVal('ufHeadline'),description:this.ufVal('ufDescription'),cta:this.ufVal('ufCta'),landing};
     this.submitUnified();
   },
   submitUnified(){
@@ -1841,7 +1845,7 @@ const App = {
     const cid=existingCampaignId||'C-'+(50330+DB.campaigns.length),gid='G-'+(8020+(DB.adGroups||[]).length),crid='CR-'+(9040+DB.creatives.length),format=val('ufFormat'),assetEl=document.querySelector('#ufAssets .picked'),file=DB.assetFiles.find(f=>f.id===assetEl?.dataset.id)||{};
     const cp={id:cid,name:val('ufPlanName'),alias:val('ufPlanName'),mode:'rtb',objective:'traffic',duration,start:val('ufPlanStart'),end:duration==='fixed'?val('ufPlanEnd'):'',period:duration==='fixed'?`${val('ufPlanStart')} 至 ${val('ufPlanEnd')}`:'长期投放',placement:val('ufInventory'),fmt:format,model:val('ufBidType'),bid:Number(val('ufBid')),status:'active',spend:0,imps:0,clicks:0,conv:0,geo:['🌍 全球'],inv:['app'],budget:duration==='fixed'?total:daily,totalBudget:total,dailyBudget:daily,dailyCap:Number(val('ufDailyCap')||0)};
     const group={id:gid,camp:cid,name:val('ufGroupName'),start:val('ufGroupStart'),end:val('ufGroupEnd'),pace:(document.querySelector('#ufPace .sel')||{}).dataset?.value||'even',budget:groupBudget,dailyCap:Number(val('ufGroupCap')||0),bidType:val('ufBidType'),bid:Number(val('ufBid')),geo:val('ufGeo'),device:val('ufDevice'),format,inventory:val('ufInventory'),status:'active'};
-    const cr={id:crid,name:val('ufCreativeName'),group:group.name,groupId:gid,assetId:file.id,fmt:format,kind:file.type||'image',size:file.dim||'—',camp:cid,headline:val('ufHeadline'),landing:val('ufLanding'),imps:0,clicks:0,ctr:0,status:'review',version:1,created:'2026-08-11'};
+    const cr={id:crid,name:val('ufCreativeName'),group:group.name,groupId:gid,assetId:file.id,fmt:format,kind:file.type||'image',size:file.dim||'—',camp:cid,headline:val('ufHeadline'),description:val('ufDescription'),cta:val('ufCta'),landing:val('ufLanding'),imps:0,clicks:0,ctr:0,status:'review',version:1,created:new Date().toISOString().slice(0,10)};
     if(!existingCampaignId)DB.campaigns.unshift(cp); DB.adGroups=DB.adGroups||[]; DB.adGroups.unshift(group); DB.creatives.unshift(cr); DB.auditLogs.unshift({id:'LOG-'+Date.now(),time:new Date().toLocaleString('zh-CN',{hour12:false}),actor:'演示用户',action:existingCampaignId?'新增广告组并提交创意审核':'创建 RTB 投放并提交审核',target:cid,result:'成功'}); this.ufWorking=null;this.ufInitialDirty=false; this.resumeCampId=null; this.save(); this.curCamp=cid; this.openPlan(cid); this.toast(existingCampaignId?'广告组已创建，广告创意已提交审核':'三层对象已创建，广告创意已提交审核');
   },
   submitPlan(){
@@ -2041,7 +2045,7 @@ const App = {
     const name=this.ufVal('ufCreativeName'),landing=this.ufVal('ufLanding'),asset=document.querySelector('#ufAssets .picked');
     if(!name||!landing||!asset){this.toast('请填写创意名称、选择素材并填写目标链接','warn');this.jumpUnified('uf-creative');return;}
     const file=DB.assetFiles.find(f=>f.id===asset.dataset.id)||{},id='CR-'+(9040+DB.creatives.length);
-    DB.creatives.unshift({id,name,group:group.name,groupId:group.id,assetId:file.id,fmt:group.format||'feed',kind:file.type||'image',size:file.dim||'—',camp:cp.id,headline:this.ufVal('ufHeadline'),landing,imps:0,clicks:0,ctr:0,status:'review',version:1,created:'2026-08-11'});
+    DB.creatives.unshift({id,name,group:group.name,groupId:group.id,assetId:file.id,fmt:group.format||'feed',kind:file.type||'image',size:file.dim||'—',camp:cp.id,headline:this.ufVal('ufHeadline'),description:this.ufVal('ufDescription'),cta:this.ufVal('ufCta'),landing,imps:0,clicks:0,ctr:0,status:'review',version:1,created:new Date().toISOString().slice(0,10)});
     this.ufWorking=null;this.ufInitialDirty=false;this.save();this.openGroupDetail(group.id,group.name);this.toast('广告创意已提交审核');
   },
   reviewNewCreative(){
@@ -2078,7 +2082,7 @@ const App = {
     const name=document.getElementById('creativeName').value.trim(), landing=document.getElementById('creativeLanding').value.trim(), asset=document.querySelector('#compatibleAssets .picked');
     if(!name||!landing||!asset){ this.toast('请填写创意名称、选择素材并填写目标链接','warn'); return; }
     const file=DB.assetFiles.find(f=>f.id===asset.dataset.id)||{}; const id='CR-'+(9040+DB.creatives.length);
-    DB.creatives.unshift({id,name,group:group.name,groupId:group.id,assetId:file.id,fmt:group.format||'feed',kind:file.type||'image',size:file.dim||'—',camp:cp.id,headline:document.getElementById('creativeHeadline').value.trim(),landing,imps:0,clicks:0,ctr:0,status:'review',version:1,created:'2026-08-11'});
+    DB.creatives.unshift({id,name,group:group.name,groupId:group.id,assetId:file.id,fmt:group.format||'feed',kind:file.type||'image',size:file.dim||'—',camp:cp.id,headline:document.getElementById('creativeHeadline').value.trim(),landing,imps:0,clicks:0,ctr:0,status:'review',version:1,created:new Date().toISOString().slice(0,10)});
     this.save(); this.openGroupDetail(group.id,group.name); this.toast('广告创意已提交审核');
   },
   adBillingSection(){
@@ -2888,7 +2892,7 @@ const App = {
       <select class="select" style="width:auto" id="repDimSel" onchange="App.repDim(this.value)">
         <option value="fmt" selected>按格式</option><option value="inv">按流量类型</option><option value="camp">按计划</option><option value="geo">按地区</option>
       </select>
-      <button class="btn btn-ghost btn-sm" style="margin-left:8px" onclick="App.toast('CSV 已开始下载')">${svg(I.download)}导出</button></div>
+      <button class="btn btn-ghost btn-sm" style="margin-left:8px" onclick="App.exportRtbReport()">${svg(I.download)}导出</button></div>
       <div class="table-wrap" id="repBody"></div>
     </div>`;
   },
@@ -2907,7 +2911,7 @@ const App = {
     this.toast(`已切换至 ${mode==='all'?'全部投放':mode.toUpperCase()}`);
   },
   repCampaigns(){ return DB.campaigns.filter(c=>(this.repMode||'all')==='all' || c.mode===this.repMode); },
-  repFactor(){ return ({7:1,14:1.96,30:4.25})[this.repDays||7]||1; },
+  repFactor(){ return (this.repDays||7)/7; },
   repRangeMeta(){
     const days=this.repDays||7;
     const factor=this.repFactor(), list=this.repCampaigns();
@@ -2982,7 +2986,7 @@ const App = {
         });
       });
       const rows=Object.entries(geoAgg).map(([geo,row])=>[geo,Math.round(row.imps),Math.round(row.clicks),row.spend]);
-      html=rows.map(r=>{ const cpc=r[2]?fmtMoney(r[3]/r[2]):'$0.00'; const cpm=r[1]?fmtMoney(r[3]/r[1]*1000):'$0.00'; return `<tr><td class="cell-main">${r[0]}</td><td class="num">${fmtNum(r[1])}</td><td class="num">${fmtNum(r[2])}</td><td class="num">${(r[2]/r[1]*100).toFixed(2)}%</td><td class="num">${cpc}</td><td class="num">${cpm}</td><td class="num cell-main">${fmtMoney(r[3])}</td></tr>`; }).join('');
+      html=rows.map(r=>{ const cpc=r[2]?fmtMoney(r[3]/r[2]):'$0.00'; const cpm=r[1]?fmtMoney(r[3]/r[1]*1000):'$0.00'; return `<tr><td class="cell-main">${r[0]}</td><td class="num">${fmtNum(r[1])}</td><td class="num">${fmtNum(r[2])}</td><td class="num">${r[1]?(r[2]/r[1]*100).toFixed(2)+'%':'—'}</td><td class="num">${cpc}</td><td class="num">${cpm}</td><td class="num cell-main">${fmtMoney(r[3])}</td></tr>`; }).join('');
     }
     document.getElementById('repTitle').textContent=title;
     document.getElementById('repBody').innerHTML=`<table><thead><tr>${head}</tr></thead><tbody>${html}</tbody></table>`;
