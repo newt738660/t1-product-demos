@@ -29,7 +29,7 @@
         bs.setProperty('--accent-soft', hexA(p.accent, document.body.classList.contains('dark') ? .18 : .12));
       }
       const name = document.querySelector('.brand .name');
-      if(name && name.childNodes[0] && p.company) name.childNodes[0].nodeValue = p.company;
+      if(name && name.childNodes[0] && p.company) name.childNodes[0].nodeValue = p.company.replace(/\s*Ads$/i, "");
       const logo = document.querySelector('.brand .logo');
       if(logo){
         if(p.logo) logo.innerHTML = `<img src="${p.logo}" alt="logo" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`;

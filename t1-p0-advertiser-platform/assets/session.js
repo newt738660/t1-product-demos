@@ -13,7 +13,7 @@
   var demoBypass = new URLSearchParams(location.search).get('demo') === '1';
 
   if(demoBypass && !acct){
-    acct = 'T1 演示账号';
+    acct = 'Victor Wang';
     localStorage.setItem(SKEY, acct);
   }
 
@@ -22,7 +22,8 @@
     location.replace('login.html?app=' + role);
     return;
   }
-  acct = acct || 'T1 Demo 广告主';
+  if (/演示|评审|Demo/.test(acct || '')) { acct = 'Victor Wang'; localStorage.setItem(SKEY, acct); }
+  acct = acct || '广告主账户';
 
   window.SESSION = { role: role, account: acct };
   window.logout = function(){
