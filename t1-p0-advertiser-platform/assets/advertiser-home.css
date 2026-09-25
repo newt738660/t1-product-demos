@@ -33,3 +33,13 @@
 .home-merged .home-section-title{justify-content:flex-start}
 
 #homeBalanceRisk{margin-top:4px;max-width:none}.home-balance-risk summary{white-space:nowrap;font-size:11px;line-height:16px}@media(max-width:700px){.home-balance-risk>.card{position:fixed;top:70px;left:16px;right:16px;width:auto;max-width:none;text-align:left}}
+
+/* Emphasize confirmed delivery blocks without enlarging the overview into a list. */
+.home-summary{align-items:center;gap:12px;flex-wrap:nowrap;padding:12px 20px}
+.home-summary-copy{min-width:0;max-width:640px}.home-summary-copy strong{display:block;font-size:14px;line-height:1.5;color:var(--text)}.home-summary-copy>div{font-size:12px;line-height:1.5;margin-top:3px;color:var(--text-2)}
+.home-summary-icon{width:22px;height:22px;flex-shrink:0}.home-summary>.btn{flex-shrink:0;margin-left:8px}
+.home-summary-danger{background:color-mix(in srgb,var(--danger,#d92d20) 8%,var(--surface,#fff));border-left:3px solid var(--danger,#d92d20)}.home-summary-danger .home-summary-icon,.home-summary-danger strong{color:var(--danger,#d92d20)}
+.home-summary-warning{background:color-mix(in srgb,#d69a24 9%,var(--surface,#fff));border-left:3px solid #d69a24}.home-summary-warning .home-summary-icon{color:#b77708}.home-summary-neutral strong{font-size:12px;font-weight:400;color:var(--text-2)}
+.home-sync-note{font-size:12px;color:var(--text-3);padding:0 20px 10px}.home-secondary-states .link-btn{color:var(--text-2);font-size:12px;font-weight:400}
+@media(max-width:700px){.home-summary{flex-wrap:wrap;padding:12px 16px}.home-summary-copy{flex:1}.home-summary>.btn{margin-left:34px}.home-summary-neutral>.btn{margin-left:0}.home-sync-note{padding-left:16px;padding-right:16px}}
+body.dark .home-summary-danger strong,body.dark .home-summary-danger .home-summary-icon{color:#ff9a91}
