@@ -14,7 +14,7 @@
  });
  wrap('init',function(old){old();if(new URLSearchParams(location.search).get('case')==='cpd-version-review')this.openGroupDetail(ids.g);});
  wrap('view_groupdetail',function(old){let html=old();const g=DB.adGroups.find(g=>g.id===this.curGroup),cp=DB.campaigns.find(c=>c.id===g?.camp);if(cp?.mode!=='cpd')return html;
-  for(const a of DB.creatives.filter(a=>a.groupId===g.id&&a.pendingVersion?.status==='review'))html=html.replace(`<button class="plan-row-action" onclick="App.openCreative('${a.id}')">编辑</button>`,`<button class="plan-row-action" onclick="App.openCreativePreview('${a.id}')">查看版本</button><button class="plan-row-action" disabled title="已有新版本审核中，暂不可再次编辑">审核中，暂不可编辑</button>`);
+  for(const a of DB.creatives.filter(a=>a.groupId===g.id&&a.pendingVersion?.status==='review'))html=html.replace(`<button class="plan-row-action" onclick="App.openCreative('${a.id}')">编辑</button>`,`<button class="plan-row-action" onclick="App.openCreativePreview('${a.id}')">查看版本</button><button class="plan-row-action" disabled title="已有新版本审核中，暂不可再次编辑">编辑</button>`);
   return html;
  });
  A.replayCpdVersionCase=function(){this.modal('<div class="modal-head"><h3>重演编辑送审流程？</h3></div><div class="modal-body">仅清除本演示案例的待审内容，保留当前投放的V1，然后进入创意编辑。其他广告不受影响。</div><div class="modal-foot"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button><button class="btn btn-primary" onclick="App.startCpdVersionReplay()">开始演示</button></div>');};
