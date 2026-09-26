@@ -970,3 +970,12 @@ body:has(.unified-create) .toast-wrap{bottom:90px}
 body:not(:has(.unified-edit-actions)) .unified-create .paper-level>.level-actions{display:none}
 body:not(:has(.unified-edit-actions)) .unified-create .paper-level.uf-current:not(.stage-hidden)>.level-actions{display:flex;position:fixed;z-index:24;left:var(--sidebar-w);right:0;bottom:0}
 @media(max-width:800px){body:not(:has(.unified-edit-actions)) .unified-create .paper-level.uf-current:not(.stage-hidden)>.level-actions{left:0}}
+
+/* Detail regression repair: shared settings expansion and separate performance. */
+.detail-performance{border-top:1px solid var(--border)}
+.cpd-group-sections .detail-field-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 24px;align-items:start}
+.cpd-group-sections .detail-field-grid>div{display:block;padding:0;border:0;white-space:normal;min-width:0;margin:0}
+.detail-field-grid dd{margin-top:4px;overflow-wrap:anywhere;font-weight:500}
+.detail-field-wide{grid-column:1/-1}
+.group-summary-head>.settings-toggle-label{margin-left:auto;flex-shrink:0}
+@media(max-width:650px){.cpd-group-sections .detail-field-grid{grid-template-columns:1fr}.group-summary-head{flex-wrap:wrap}}
