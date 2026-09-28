@@ -4,6 +4,8 @@
   var APPLICATION_KEY='t1_advertiser_application';
   var USED_INVITES_KEY='t1_demo_used_invites';
 
+  function destination(path){ if(!window.T1_REVIEW)return path;var u=new URL(path,location.href);u.searchParams.set('review','1');u.searchParams.set('demo','1');return u.href;}
+
   function value(id){ return (document.getElementById(id).value||'').trim(); }
   function error(id,message,ok){ var el=document.getElementById(id); el.textContent=message||''; el.classList.toggle('ok',!!ok); }
   function validEmail(email){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
@@ -19,7 +21,7 @@
       if(!account||!password){ error('loginError','请输入账号和密码'); return; }
       localStorage.setItem(SESSION_KEY,account);
       localStorage.setItem(PROFILE_KEY,JSON.stringify({name:account.indexOf('@')>0?account.split('@')[0]:account,email:account}));
-      location.replace('dsp.html');
+      location.replace(destination('dsp.html'));
     },
     register:function(){
       var name=value('registerName'), email=value('registerEmail'), pwd=value('registerPassword'), pwd2=value('registerPassword2'), invite=value('registerInvite');
@@ -38,7 +40,7 @@
         Auth.show('invite-confirm');
         return;
       }
-      location.replace('dsp.html?welcome=1');
+      location.replace(destination('dsp.html?welcome=1'));
     },
     confirmRegistrationInvite:function(){
       var code=Auth.pendingInviteCode||value('registerInvite');
@@ -49,7 +51,7 @@
       var profile={};try{profile=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');}catch(e){}
       profile.advertiserBound=true;profile.advertiserName='星海互动';profile.sspAdvertiserId='ADV-70285';
       localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));localStorage.removeItem(APPLICATION_KEY);
-      location.replace('dsp.html?welcome=1&invited=1');
+      location.replace(destination('dsp.html?welcome=1&invited=1'));
     },
     previewState:function(state){
       var profile={name:'评审用户',email:'review@t1.demo',advertiserBound:state==='empty'||state==='active'};
@@ -77,7 +79,7 @@
       var application=JSON.parse(localStorage.getItem(APPLICATION_KEY)||'{}');
       application.status='approved'; localStorage.setItem(APPLICATION_KEY,JSON.stringify(application));
       localStorage.setItem(SESSION_KEY,profile.name||profile.email||'T1 Demo 广告主');
-      location.replace('dsp.html');
+      location.replace(destination('dsp.html'));
     },
     forgot:function(){
       var email=value('forgotEmail');

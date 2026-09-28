@@ -36,6 +36,7 @@
   .auth-demo button:hover{background:rgba(255,255,255,.16)}.auth-terms{font-size:11.5px;color:var(--text-3);line-height:1.6;margin-top:12px}
   @media(max-width:780px){.auth-shell{grid-template-columns:1fr;max-width:450px}.auth-brand{display:none}.auth-form{padding:36px 28px}}
 </style>
+<script src="assets/review-sandbox.js?v=20260928"></script>
 </head>
 <body class="dsp auth-page">
   <main class="auth-shell">
@@ -117,7 +118,19 @@
       </div>
     </section>
   </main>
-<script src="assets/auth.js?v=2026082202"></script>
+<script src="assets/auth.js?v=20260928scope"></script>
 <script src="assets/theme.js?v=2026082202"></script>
+<script>
+// Keep the review flow in its isolated namespace after logging in.
+if(window.T1_REVIEW){
+ const replace=Auth.login;Auth.login=function(){
+  const a=document.getElementById('loginAccount').value.trim(),p=document.getElementById('loginPassword').value;
+  if(!a||!p){document.getElementById('loginError').textContent='请输入账号和密码';return;}
+  const old=JSON.parse(localStorage.getItem('t1_demo_profile')||'{}');
+  localStorage.setItem('54ads_session_dsp',a);localStorage.setItem('t1_demo_profile',JSON.stringify(old.email===a?old:{name:a.split('@')[0],email:a,advertiserBound:false}));
+  location.replace('dsp.html?demo=1&review=1');
+ };
+}
+</script>
 </body>
 </html>
