@@ -2,7 +2,17 @@
   "baselineCommit": "c8a8de97663a8a51d9da1af8348a0ad1accb1149",
   "rootAlias": "review-20260929",
   "versions": [
-    {"id":"review-20260929","label":"现有评审基线 · 冻结","path":"versions/review-20260929/","note":"2026-09-29评审快照，保留当时功能；不是纯V2.0或V2.1范围。"},
-    {"id":"v2.2","label":"V2.2 开发稿","path":"versions/v2.2/","note":"已复制评审基线。V2.2新增需求尚未实现，后续只在此版迭代。"}
+    {
+      "id": "review-20260929",
+      "label": "现有评审基线 · 冻结",
+      "path": "versions/review-20260929/",
+      "note": "2026-09-29评审快照，保留当时功能；不是纯V2.0或V2.1范围。"
+    },
+    {
+      "id": "v2.2",
+      "label": "V2.2 开发稿",
+      "path": "versions/v2.2/",
+      "note": "V2.2五模块交互稿：财务、首页通知、组织权限、帮助、账号重置。仅演示，不接入真实后台；规则待评审。"
+    }
   ]
 }

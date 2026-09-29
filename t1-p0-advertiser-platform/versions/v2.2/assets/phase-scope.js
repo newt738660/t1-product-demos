@@ -2,7 +2,7 @@
 (()=>{
  const A=App,E=A.workspace.E,B=A.workspace.button,close=()=>B('关闭','App.closeModal()');
  const wrap=(name,fn)=>{const old=A[name];A[name]=function(...args){return fn.call(this,old?.bind(this),...args);};};
- const allowed=new Set(['dash','plans','report','billing','help']);
+ const allowed=new Set(['dash','plans','report','billing','help','org','access']);
  const guides={
   start:{title:'平台快速入门',desc:'从关联广告主到查看投放结果',steps:['注册并登录T1账号，创建广告主、申请绑定已有广告主，或通过邀请码确认绑定。','未完成关联时，只能浏览介绍与帮助；申请审核中可查看进度，驳回后按原因修改重提。','RTB由广告主配置预算、广告组与创意；CPD先联系运营确认资源和排期。','投放结果在数据报表查看；充值与资金消耗在财务管理查看。'],action:'创建或绑定广告主',call:'App.scopeStart()'},
   rtb:{title:'RTB自助投放',desc:'按计划、广告组、广告创意三层创建',steps:['广告计划：填写名称，设置排期、总预算或每日预算。','广告组：设置出价、定向和投放范围，检查与计划预算、排期的关系。','广告创意：上传符合规格的素材，填写标题、描述和跳转链接，确认后提交审核。','创建后进入对应计划查看广告组与创意。开启不等于一定可投放，还需满足审核、排期、余额及预算条件。'],action:'创建RTB投放',call:'App.scopeStart()'},
