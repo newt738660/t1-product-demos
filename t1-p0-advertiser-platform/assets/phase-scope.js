@@ -12,9 +12,11 @@
   review:{title:'审核与创意版本',desc:'首次审核和修改版本分开查看',steps:['首次提交后，尚无审核通过的版本时不能投放。','已有生效版本的创意提交修改，新版审核期间保留旧版；不要把待审稿当作正在展示的素材。','驳回后在创意详情查看原因，按意见修改重提。','通知记录审核事件；当前是否能投放，以计划、广告组和创意当前条件为准。'],action:'查看广告投放',call:"App.go('plans')"}
  };
  // Remove only future surfaces; nested creative management stays in campaign/group pages.
- NAV.splice(0,NAV.length,{group:'工作台',items:[
-  {id:'dash',label:'首页',ico:I.dash,sub:'概览与需要处理的事项'},
-  {id:'plans',label:'广告投放',ico:I.camp,sub:'CPD运营代投与RTB自助投放'},
+ NAV.splice(0,NAV.length,{group:'总览',items:[
+  {id:'dash',label:'首页',ico:I.dash,sub:'概览与需要处理的事项'}
+ ]},{group:'投放管理',items:[
+  {id:'plans',label:'广告投放',ico:I.camp,sub:'CPD运营代投与RTB自助投放'}
+ ]},{group:'资产与分析',items:[
   {id:'report',label:'数据报表',ico:I.report,sub:'投放效果与明细'},
   {id:'billing',label:'财务管理',ico:I.wallet,sub:'充值、充值记录与消耗记录'}
  ]});

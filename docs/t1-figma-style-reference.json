@@ -1,0 +1,590 @@
+{
+  "file": "N6pXwQULab5u3nBe6w2JYL",
+  "method": "Public Copy as code > CSS (all layers)",
+  "date": "2026-09-29",
+  "checks": [
+    {
+      "route": "plans",
+      "selector": ".nav-group-label",
+      "source": "rtb",
+      "layer": "总览",
+      "offset": 4583,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "10.5px",
+        "line-height": "16px",
+        "letter-spacing": "1px",
+        "color": "#94A3B5"
+      }
+    },
+    {
+      "route": "plans",
+      "selector": ".nav-item[data-id=\"plans\"]",
+      "source": "rtb",
+      "layer": "广告投放",
+      "offset": 7507,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "13px",
+        "line-height": "18px",
+        "color": "#4B4BC5"
+      }
+    },
+    {
+      "route": "plans",
+      "selector": ".nav-item[data-id=\"report\"]",
+      "source": "rtb",
+      "layer": "数据报表",
+      "offset": 9365,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "13px",
+        "line-height": "18px",
+        "color": "#5B6B80"
+      }
+    },
+    {
+      "route": "plans",
+      "selector": ".page-head h1",
+      "source": "rtb",
+      "layer": "广告投放",
+      "offset": 17112,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "22px",
+        "line-height": "34px",
+        "letter-spacing": "-1px",
+        "color": "#0F1B2D"
+      }
+    },
+    {
+      "route": "plans",
+      "selector": ".page-head p",
+      "source": "rtb",
+      "layer": "统一查看和管理 CPD 代投与 RTB 自助投放",
+      "offset": 17612,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "13px",
+        "line-height": "20px",
+        "color": "#94A3B5"
+      }
+    },
+    {
+      "route": "plans",
+      "selector": ".cpd-contact-link",
+      "source": "rtb",
+      "layer": "需要 CPD 代投？联系运营",
+      "offset": 18315,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "600",
+        "font-size": "13px",
+        "line-height": "18px",
+        "color": "#5B5BF0"
+      }
+    },
+    {
+      "route": "plans",
+      "selector": ".page-head>.btn-primary",
+      "source": "rtb",
+      "layer": "新建 RTB 投放",
+      "offset": 19848,
+      "expected": {
+        "font-family": "'Inter'",
+        "font-weight": "600",
+        "font-size": "14px",
+        "line-height": "17px",
+        "color": "#FFFFFF"
+      }
+    },
+    {
+      "route": "plans",
+      "selector": ".plan-list-table th.status-col",
+      "source": "rtb",
+      "layer": "状态",
+      "offset": 31414,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "600",
+        "font-size": "11px",
+        "line-height": "17px",
+        "color": "#94A3B5"
+      }
+    },
+    {
+      "route": "plans",
+      "selector": ".plan-name-col .link-btn",
+      "source": "rtb",
+      "layer": "广告标题广告标题广告标题广告标题广告标题",
+      "offset": 50694,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "600",
+        "font-size": "12px",
+        "line-height": "17px",
+        "color": "#121212"
+      }
+    },
+    {
+      "route": "plans",
+      "selector": ".plan-list-table .plan-row-action",
+      "source": "rtb",
+      "layer": "编辑",
+      "offset": 147041,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "12px",
+        "line-height": "20px",
+        "color": "#3A82FA"
+      }
+    },
+    {
+      "route": "create",
+      "selector": ".unified-head h1",
+      "source": "create",
+      "layer": "新建广告计划",
+      "offset": 13968,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "22px",
+        "line-height": "31px",
+        "color": "#000000"
+      }
+    },
+    {
+      "route": "create",
+      "selector": ".toc-title",
+      "source": "create",
+      "layer": "创建进度",
+      "offset": 15091,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "600",
+        "font-size": "11px",
+        "line-height": "17px",
+        "letter-spacing": "0.88px",
+        "color": "#94A3B5"
+      }
+    },
+    {
+      "route": "create",
+      "selector": ".form-toc button b",
+      "source": "create",
+      "layer": "广告计划",
+      "offset": 16479,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "13px",
+        "line-height": "18px",
+        "color": "#3A82FA"
+      }
+    },
+    {
+      "route": "create",
+      "selector": ".form-toc button small",
+      "source": "create",
+      "layer": "周期与预算",
+      "offset": 16926,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "10.5px",
+        "line-height": "15px",
+        "color": "#94A3B5"
+      }
+    },
+    {
+      "route": "create",
+      "selector": ".level-heading h2",
+      "source": "create",
+      "layer": "广告计划",
+      "offset": 22645,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "18px",
+        "line-height": "28px",
+        "color": "#0F1B2D"
+      }
+    },
+    {
+      "route": "create",
+      "selector": ".level-heading p",
+      "source": "create",
+      "layer": "设置本次投放的周期、预算和计划名称",
+      "offset": 23126,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "12px",
+        "line-height": "19px",
+        "color": "#94A3B5"
+      }
+    },
+    {
+      "route": "create",
+      "selector": ".paper-block h3",
+      "source": "create",
+      "layer": "投放周期与预算",
+      "offset": 24455,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "14px",
+        "line-height": "22px",
+        "color": "#0F1B2D"
+      }
+    },
+    {
+      "route": "create",
+      "selector": ".radio-pill.sel b",
+      "source": "create",
+      "layer": "固定周期",
+      "offset": 25309,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "13.5px",
+        "line-height": "21px",
+        "color": "#3A82FA"
+      }
+    },
+    {
+      "route": "create",
+      "selector": ".radio-pill.sel small",
+      "source": "create",
+      "layer": "总预算，可设每日上限",
+      "offset": 25792,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "11px",
+        "line-height": "17px",
+        "color": "#94A3B5"
+      }
+    },
+    {
+      "route": "create",
+      "selector": ".field>label",
+      "source": "create",
+      "layer": "开始日期",
+      "offset": 28190,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "600",
+        "font-size": "12.5px",
+        "line-height": "19px",
+        "color": "#0F1B2D"
+      }
+    },
+    {
+      "route": "create",
+      "selector": "#ufTotal",
+      "source": "create",
+      "layer": "5000",
+      "offset": 32450,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "14px",
+        "line-height": "20px",
+        "color": "#0F1B2D"
+      }
+    },
+    {
+      "route": "create2",
+      "selector": "#uf-group .level-heading h2",
+      "source": "create",
+      "layer": "广告组",
+      "offset": 64969,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "20px",
+        "line-height": "31px",
+        "color": "#0F1B2D"
+      }
+    },
+    {
+      "route": "create3",
+      "selector": "#uf-creative .level-heading h2",
+      "source": "create",
+      "layer": "广告创意",
+      "offset": 113352,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "20px",
+        "line-height": "31px",
+        "color": "#0F1B2D"
+      }
+    },
+    {
+      "route": "cpd",
+      "selector": ".group-summary-head>div>b",
+      "source": "cpd",
+      "layer": "投放设置",
+      "offset": 62571,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "14px",
+        "line-height": "22px",
+        "color": "#0F1B2D"
+      }
+    },
+    {
+      "route": "cpd",
+      "selector": ".creative-priority-card .card-head b",
+      "source": "cpd",
+      "layer": "广告创意",
+      "offset": 69843,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "14px",
+        "line-height": "22px",
+        "color": "#0F1B2D"
+      }
+    },
+    {
+      "route": "cpd",
+      "selector": ".creative-priority-card thead th",
+      "source": "cpd",
+      "layer": "广告创意",
+      "offset": 71302,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "600",
+        "font-size": "11.5px",
+        "line-height": "18px",
+        "letter-spacing": "0.5px",
+        "color": "#94A3B5"
+      }
+    },
+    {
+      "route": "cpd",
+      "selector": ".creative-priority-card .plan-row-action",
+      "source": "cpd",
+      "layer": "编辑",
+      "offset": 84452,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "600",
+        "font-size": "12.5px",
+        "line-height": "20px",
+        "color": "#5B5BF0"
+      }
+    },
+    {
+      "route": "report",
+      "selector": ".page-head h1",
+      "source": "reports",
+      "layer": "数据报表",
+      "offset": 18547,
+      "expected": {
+        "font-family": "'Segoe UI'",
+        "font-weight": "700",
+        "font-size": "22px",
+        "line-height": "34px",
+        "letter-spacing": "-0.5px",
+        "color": "#0F1B2D"
+      }
+    },
+    {
+      "route": "report",
+      "selector": ".kpi-label",
+      "source": "reports",
+      "layer": "曝光量",
+      "offset": 32064,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "600",
+        "font-size": "12px",
+        "line-height": "19px",
+        "color": "#5B6B80"
+      }
+    },
+    {
+      "route": "report",
+      "selector": ".kpi-val",
+      "source": "reports",
+      "layer": "5,550,000",
+      "offset": 32542,
+      "expected": {
+        "font-family": "'Euclid Circular A'",
+        "font-weight": "600",
+        "font-size": "40px",
+        "line-height": "27px",
+        "letter-spacing": "-1px",
+        "color": "#0F1B2D"
+      }
+    },
+    {
+      "route": "report",
+      "selector": ".card-head h3",
+      "source": "reports",
+      "layer": "曝光趋势分析（近7天）",
+      "offset": 46245,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "600",
+        "font-size": "16px",
+        "line-height": "22px",
+        "color": "#121212"
+      }
+    },
+    {
+      "route": "report",
+      "selector": "thead th",
+      "source": "reports",
+      "layer": "CTR",
+      "offset": 64293,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "600",
+        "font-size": "11.5px",
+        "line-height": "18px",
+        "letter-spacing": "0.5px",
+        "color": "#94A3B5"
+      }
+    },
+    {
+      "route": "notification",
+      "selector": ".notif-head>b",
+      "source": "notifications",
+      "layer": "站内通知",
+      "offset": 34117,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "14.5px",
+        "line-height": "22px",
+        "color": "#0F1B2D"
+      }
+    },
+    {
+      "route": "notification",
+      "selector": ".ws-message b",
+      "source": "notifications",
+      "layer": "充值服务维护安排",
+      "offset": 36065,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "13.3333px",
+        "line-height": "21px",
+        "color": "#0F1B2D"
+      }
+    },
+    {
+      "route": "notification",
+      "selector": ".ws-message p",
+      "source": "notifications",
+      "layer": "明日02:00—02:30 UTC充值审核可能延迟，既有广告投放不受影响。",
+      "offset": 36325,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "13px",
+        "line-height": "21px",
+        "color": "#5B6B80"
+      }
+    },
+    {
+      "route": "notification",
+      "selector": ".ws-message small",
+      "source": "notifications",
+      "layer": "2026-09-24 01:40:00 UTC · 未读",
+      "offset": 36609,
+      "expected": {
+        "font-family": "'PingFang SC'",
+        "font-weight": "400",
+        "font-size": "11.1111px",
+        "line-height": "18px",
+        "color": "#94A3B5"
+      }
+    },
+    {
+      "route": "login",
+      "selector": "#auth-login .auth-head h1",
+      "source": "login",
+      "layer": "欢迎来到 T1 ADS",
+      "offset": 13114,
+      "expected": {
+        "font-family": "'Roboto'",
+        "font-weight": "500",
+        "font-size": "24px",
+        "line-height": "32px",
+        "letter-spacing": "0.072px",
+        "color": "#0C0D0E"
+      }
+    },
+    {
+      "route": "login",
+      "selector": ".auth-brand h2",
+      "source": "login",
+      "layer": "让每一次投放更清晰、更可控",
+      "offset": 8992,
+      "expected": {
+        "font-family": "'Inter'",
+        "font-weight": "700",
+        "font-size": "30px",
+        "line-height": "37px",
+        "letter-spacing": "-0.7px",
+        "color": "#2857FA"
+      }
+    },
+    {
+      "route": "login",
+      "selector": ".auth-brand p",
+      "source": "login",
+      "layer": "为你提供 CPD 项目查看与 RTB 自助投放的一体化工作空间。",
+      "offset": 9286,
+      "expected": {
+        "font-family": "'Segoe UI'",
+        "font-weight": "400",
+        "font-size": "14px",
+        "line-height": "24px",
+        "color": "#0C0D0E"
+      }
+    },
+    {
+      "route": "login",
+      "selector": "#auth-login .field>label",
+      "source": "login",
+      "layer": "邮箱或账号",
+      "offset": 15043,
+      "expected": {
+        "font-family": "'Segoe UI'",
+        "font-weight": "600",
+        "font-size": "12.5px",
+        "line-height": "19px",
+        "color": "#0F1B2D"
+      }
+    },
+    {
+      "route": "login",
+      "selector": "#auth-login .auth-submit",
+      "source": "login",
+      "layer": "登录",
+      "offset": 20138,
+      "expected": {
+        "font-family": "'Segoe UI'",
+        "font-weight": "600",
+        "font-size": "15px",
+        "line-height": "20px",
+        "color": "#FFFFFF"
+      }
+    }
+  ]
+}

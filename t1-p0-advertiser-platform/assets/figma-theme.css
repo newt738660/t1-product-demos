@@ -1,28 +1,32 @@
 /* Figma N6pXwQULab5u3nBe6w2JYL · presentation only.
+   2026-09-29: corrected using anonymous Copy as code > CSS (all layers), not screenshot estimates.
    Scope, routing, dates, status semantics and fixtures remain in existing modules. */
 body.dsp {
-  --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Droid Sans Fallback",Roboto,Helvetica,Arial,sans-serif;
-  --accent:#387fff!important; --accent-strong:#2864df!important;
-  --accent-soft:#edf3ff!important; --radius:14px; --radius-sm:8px;
+  --font:"PingFang SC",-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans GB","Microsoft YaHei","Droid Sans Fallback",Roboto,Helvetica,Arial,sans-serif;
+  --accent:#3a82fa!important; --accent-strong:#3a82fa!important;
+  --accent-soft:rgba(91,138,240,.12)!important; --radius:14px; --radius-sm:8px;
   --primary-gradient:linear-gradient(180deg,#5054df 0%,#6558ff 100%);
   --sidebar-w:248px;
 }
 body.dsp:not(.dark){
-  --bg:#f5f7fa; --surface:#fff; --surface-2:#fafbfd;
-  --border:#e9edf3; --border-strong:#dce3ec;
-  --text:#101e34; --text-2:#61728d; --text-3:#879bb7;
+  --bg:#f6f8fa; --surface:#fff; --surface-2:#fafbfd;
+  --border:#e9edf2; --border-strong:#dde3ea;
+  --text:#0f1b2d; --text-2:#5b6b80; --text-3:#94a3b5;
   --topbar-bg:#fff; --shadow-sm:0 1px 2px rgba(20,39,75,.06);
   --shadow:0 4px 16px rgba(20,39,75,.05);
 }
 body.dsp.dark{--accent:#79a8ff!important;--accent-strong:#a6c5ff!important;--accent-soft:#223550!important}
 body.dsp{font-size:14px;-webkit-font-smoothing:antialiased}
-.brand{height:118px;padding:24px 26px;align-items:flex-start}
-.brand .t1-brand-logo{display:block;width:60px;height:46px;object-fit:contain}
+.brand{height:100px;min-height:100px;padding:22px 22px 18px;align-items:center}
+.brand .t1-brand-logo{display:block;width:60px;height:60px;object-fit:contain}
 body.dark .t1-brand-logo{filter:drop-shadow(0 0 1px #fff);background:#fff;border-radius:4px}
-.nav{padding:4px 12px}
-.nav-group-label{font-size:11px;font-weight:500;padding:18px 12px 9px;letter-spacing:0}
-.nav-item{min-height:44px;border-radius:6px;font-size:14px;font-weight:400;gap:12px}
-.nav-item.active{color:var(--accent);background:var(--accent-soft);font-weight:500}
+.nav{padding:0 12px}
+.nav-group-label{font-size:10.5px;line-height:16px;font-weight:400;padding:18px 12px 7px;letter-spacing:1px;color:var(--text-3)}
+.nav-group-label:first-child{padding-top:16px}
+.nav-item{height:48px;min-height:48px;border-radius:10px;font-size:13px;line-height:18px;font-weight:400;gap:11px;margin-bottom:0}
+.nav-item svg,.nav-item .figma-nav-icon{width:30px;height:30px;flex-shrink:0}
+.nav-item.active{color:#4b4bc5;background:var(--accent-soft);font-weight:400}
+.nav-item[data-id="dash"]{font-weight:600}
 .sidebar-foot:has(> :only-child:empty),.sidebar-foot:empty{border:0}
 .topbar{height:64px;background:var(--surface);gap:16px;padding:0 28px;backdrop-filter:none}
 .workspace-chip{font-size:12px!important;font-weight:400!important;border:1px solid var(--border)!important;background:var(--surface)!important;border-radius:20px!important;padding:6px 12px!important;color:var(--text-3)!important}
@@ -39,16 +43,16 @@ body.dark .t1-brand-logo{filter:drop-shadow(0 0 1px #fff);background:#fff;border
 .scope-menu{padding:8px;border-radius:12px;box-shadow:0 8px 30px #142c4d18}
 .scope-menu .btn{border:0;background:transparent;font-size:13px;font-weight:400;min-height:38px}
 .scope-menu .btn:hover{background:var(--accent-soft);color:var(--accent)}
-.content{padding:28px}
+.content{padding:26px 28px 60px}
 .view{animation:figmaFade .15s ease}
 @keyframes figmaFade{from{opacity:0}to{opacity:1}}
 .page-head{margin-bottom:20px;align-items:center}
-.page-head h1{font-size:22px;letter-spacing:0;font-weight:650}
-.page-head p{font-size:13px;margin-top:6px}
+.page-head h1{font-size:22px;line-height:34px;letter-spacing:-1px;font-weight:400}
+.page-head p{font-size:13px;line-height:20px;font-weight:400;margin-top:3px;color:var(--text-3)}
 .card{border-radius:14px;box-shadow:var(--shadow-sm)}
 .card-head{padding:16px 20px}
 .card-head h3{font-size:15px;font-weight:600}
-.btn{border-radius:8px;font-size:13px;font-weight:500;padding:9px 16px;min-height:36px;transition:background .15s,border-color .15s,color .15s}
+.btn{border-radius:8px;font-size:13px;font-weight:600;padding:9px 16px;min-height:36px;transition:background .15s,border-color .15s,color .15s}
 .btn-primary{background:var(--accent);color:#fff;box-shadow:none}
 .btn-primary:hover{background:#2d71ec;transform:none}
 .page-head>.btn-primary,.page-head .flex>.btn-primary{background:var(--primary-gradient);border:1px solid #7773ff;min-height:46px;min-width:180px;border-radius:10px}
@@ -56,29 +60,29 @@ body.dark .t1-brand-logo{filter:drop-shadow(0 0 1px #fff);background:#fff;border
 .btn-ghost{background:var(--surface);border-color:var(--border-strong)}
 .btn-subtle{background:var(--surface-2)}
 .text-link,.link-btn{color:var(--accent);font-weight:400}
-.badge{font-size:11px;font-weight:500;padding:3px 9px}
+.badge{font-size:11px;line-height:17px;font-weight:600;padding:3px 9px}
 .badge.green{background:#e9f8ee;color:#218647;border-color:#cbecd6}
 .badge.blue{background:#eaf0ff;color:#3773ef;border-color:#d2e0ff}
 .badge.gray{background:#eef2f7;color:#6d809b;border-color:#e5ebf3}
 .badge.red{background:#fff0ee;color:#d95648;border-color:#ffd9d3}
 .plan-type-col .badge.amber{background:#f0edff;color:#7851dc;border-color:#e2dbff}
 .segment{border-radius:10px;background:var(--surface-2);padding:3px}
-.segment button{font-size:12px;font-weight:400;min-height:30px;padding:5px 14px}
+.segment button{font-size:12px;line-height:17px;font-weight:600;min-height:30px;padding:5px 14px}
 .segment button.active,.segment button.btn-primary{background:var(--accent);color:#fff;box-shadow:none;border-color:transparent}
 .input,.select,textarea.input{border-radius:8px;border-color:var(--border-strong);min-height:36px;font-size:13px;background-color:var(--surface);box-shadow:none}
 .input:focus,.select:focus{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 12%,transparent)}
-.field>label{font-size:13px;font-weight:500;color:var(--text)}
+.field>label{font-size:12.5px;line-height:19px;font-weight:600;color:var(--text)}
 input::placeholder{color:#aab3c1}
 input[type=checkbox],input[type=radio]{accent-color:var(--accent)}
 table{font-size:13px}
-thead th{font-size:11px;font-weight:400;letter-spacing:0;text-transform:none;padding:10px 16px}
+thead th{font-size:11px;line-height:17px;font-weight:600;color:var(--text-3);letter-spacing:0;text-transform:none;padding:10px 16px}
 tbody td{padding:11px 16px}
-.cell-main{font-weight:500}.cell-sub{font-size:12px}
+.cell-main{font-weight:600}.cell-sub{font-size:12px}
 .plan-list-card .card-head{padding:16px 20px;gap:8px;flex-wrap:wrap}
 .plan-list-tools{flex-wrap:wrap!important;row-gap:10px}
 .plan-list-table th{padding-top:10px;padding-bottom:10px}
 .plan-list-table td{padding-top:9px;padding-bottom:9px}
-.plan-list-table .plan-name-col .link-btn{color:var(--text);font-weight:500}
+.plan-list-table .plan-name-col .link-btn{color:#121212;font-size:12px;line-height:17px;font-weight:600}
 .t-actions{gap:12px}
 .t-actions .btn{background:none;border:0;color:var(--accent);padding:2px 0;min-height:26px;font-size:12px}
 .t-actions .btn:disabled{color:var(--text-3)}
@@ -87,20 +91,21 @@ tbody td{padding:11px 16px}
 .table-wrap::-webkit-scrollbar-thumb{background:#d2dbe7;border-radius:8px}
 .unified-create{grid-template-columns:220px minmax(0,860px);column-gap:16px;row-gap:16px}
 .unified-head{padding:4px 0 8px;border:0;background:var(--bg);top:64px;min-height:40px;backdrop-filter:none}
-.unified-head h1{font-size:20px;line-height:30px}
-.form-toc{border-radius:12px;padding:10px;top:132px}
-.toc-title{font-size:11px;font-weight:400;letter-spacing:0;padding:4px 8px 12px}
-.form-toc button{padding:10px 8px;gap:9px;border-radius:8px}
+.unified-head h1{font-size:22px;line-height:31px;font-weight:400;color:#000;letter-spacing:0}
+.form-toc{border-radius:12px;padding:8px;top:132px}
+.toc-title{font-size:11px;line-height:17px;font-weight:600;letter-spacing:.88px;padding:6px 9px 8px}
+.form-toc button{padding:8px 9px;gap:9px;border-radius:10px}
 .form-toc button>span{width:26px;height:26px;border-radius:6px}
-.form-toc button b{font-size:13px;font-weight:500}
+.form-toc button b{font-size:13px;line-height:18px;font-weight:400}
+.form-toc button small{font-size:10.5px;line-height:15px;color:var(--text-3)}
 .paper-level{border-radius:14px;scroll-margin-top:125px}
 .paper-level.stage-reveal{animation:none}
 .level-heading,#uf-campaign .level-heading{padding:18px 20px;gap:12px}
 .level-heading>span,#uf-campaign .level-heading>span{width:34px;height:34px;border-radius:8px;font-size:13px}
-.level-heading h2,#uf-campaign .level-heading h2{font-size:18px;font-weight:600}
-.level-heading p,#uf-campaign .level-heading p{font-size:12px;display:block;line-height:1.5;margin-top:3px}
+.level-heading h2,#uf-campaign .level-heading h2{font-size:18px;line-height:28px;font-weight:400}
+.level-heading p,#uf-campaign .level-heading p{font-size:12px;display:block;line-height:19px;margin-top:3px}
 .paper-block,#uf-campaign .paper-block{padding:18px 20px}
-.paper-block h3{font-size:14px;font-weight:500;margin-bottom:14px}
+.paper-block h3{font-size:14px;line-height:22px;font-weight:400;margin-bottom:10px}
 .choice{border-radius:8px}.choice.sel{box-shadow:none;border-color:var(--accent);background:var(--accent-soft)}
 .choice.sel b{color:var(--accent)}
 #uf-campaign .input{height:36px}
@@ -108,25 +113,25 @@ tbody td{padding:11px 16px}
 body:not(:has(.unified-edit-actions)) .unified-create .paper-level.uf-current:not(.stage-hidden)>.level-actions,.creative-create-actions,.unified-edit-actions{background:var(--surface);box-shadow:none;padding:14px max(28px,calc((100vw - var(--sidebar-w) - 1096px)/2));gap:12px;backdrop-filter:none}
 .modal{border-radius:16px;border:1px solid var(--border);box-shadow:0 18px 60px #15253c26}
 .modal-mask{background:rgba(16,30,52,.35);backdrop-filter:none}
-.modal-head{padding:20px 24px}.modal-head h3{font-size:18px;font-weight:600}
+.modal-head{padding:20px 24px}.modal-head h3{font-size:17px;line-height:26px;font-weight:400}
 .modal-head>.btn:last-child{margin-left:auto}
 .modal-foot{background:var(--surface);padding:16px 24px}
 .modal-foot .btn{min-width:88px}
 .advertiser-home{max-width:none;padding:0 0 24px}
-.home-heading{margin:0 0 20px}.home-heading h1{font-size:22px}
+.home-heading{margin:0 0 20px}.home-heading h1{font-size:22px;line-height:34px;font-weight:400}
 .home-section-title h2,.home-issue-heading h2{font-size:15px;font-weight:600}
 .home-welcome{border:1px solid var(--border);border-radius:14px;background:linear-gradient(115deg,#eaf1ff,var(--surface) 70%);padding:32px;margin-bottom:20px}
-.home-welcome h1{font-size:26px}.home-welcome p{color:var(--text-2);font-size:14px}
+.home-welcome h1{font-size:28px;line-height:43px;letter-spacing:-.84px;font-weight:400}.home-welcome p{color:var(--text-2);font-size:14px}
 .scope-guide-card{padding:24px;min-height:184px;border-radius:14px;background:linear-gradient(135deg,var(--surface),var(--surface-2))}
-.scope-guide-card h2{font-size:17px;font-weight:600}.scope-guide-card p{font-size:13px}
-.scope-guide-card:hover{outline:0;border-color:var(--accent);box-shadow:0 4px 18px #387fff12}
+.scope-guide-card h2{font-size:17px;line-height:26px;font-weight:600}.scope-guide-card p{font-family:"Segoe UI",var(--font);font-size:14px;line-height:23px;color:var(--text-2)}
+.scope-guide-card:hover{outline:0;border-color:var(--accent);box-shadow:0 4px 18px #3a82fa12}
 .scope-guide-card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .scope-guide-article{border-radius:14px}
 .ws-report{max-width:none;position:relative;isolation:isolate}
 .ws-report:before{content:"";position:absolute;z-index:-1;pointer-events:none;top:-28px;left:-28px;right:-28px;height:150px;background:linear-gradient(125deg,transparent 30%,#e3ecff66 55%,#dddfff66 75%,transparent 95%)}
 .ws-kpis .kpi{min-height:132px;padding:22px 24px}
-.kpi .kpi-val{font-size:32px;font-weight:700;margin-top:14px;letter-spacing:-.6px;font-variant-numeric:tabular-nums}
-.ws-kpis .kpi-label{display:flex;align-items:center;gap:9px;font-weight:400}
+.kpi .kpi-val{font-family:"Euclid Circular A",var(--font);font-size:40px;line-height:27px;font-weight:600;margin-top:12px;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.ws-kpis .kpi-label{display:flex;align-items:center;gap:9px;font-size:12px;line-height:19px;font-weight:600}
 .figma-metric-icon{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;background:linear-gradient(145deg,#837bff,#bcafff);color:#fff;flex-shrink:0}
 .figma-metric-icon svg{width:15px;height:15px;stroke-width:1.6}
 .ws-kpis .kpi:nth-child(2) .figma-metric-icon{background:linear-gradient(145deg,#3984ff,#86b7ff)}
@@ -145,7 +150,7 @@ body.auth-page{background:radial-gradient(ellipse at 18% 8%,#d9d9ff99,transparen
 .auth-points{margin-top:78px;gap:16px}.auth-points li{min-height:50px;padding:12px 20px;justify-content:center;border:1px solid #fff;border-radius:11px;background:#ffffff42;color:#222;font-size:14px}
 .auth-points li:before{background:transparent;color:#4f6588;border:1px solid #97a5b8;border-radius:5px;width:16px;height:16px;font-size:10px;margin-right:8px}
 .auth-points li:before{display:none}.auth-points li>svg{width:19px;height:19px;flex-shrink:0}
-.auth-form{padding:44px;min-height:632px;background:#fff;border-radius:20px;box-shadow:0 4px 18px #172f4d08;justify-content:flex-start;color:#101e34}
+.auth-form{padding:44px;min-height:632px;background:#fff;border-radius:20px;box-shadow:0 4px 18px #172f4d08;justify-content:flex-start;color:#0f1b2d}
 .auth-head{margin-bottom:25px}.auth-head h1{font-size:25px;font-weight:600}.auth-head p{font-size:14px;line-height:1.5}
 .auth-form .input{height:42px}.auth-form .field{margin-bottom:18px}
 .auth-form .auth-submit{height:48px;font-size:15px;border-radius:10px;margin-top:8px}.auth-switch{margin-top:22px}
@@ -160,3 +165,80 @@ body.dark .auth-points li{background:#ffffff08;border-color:var(--border-strong)
 @media(min-width:801px) and (max-width:1200px){.unified-create{grid-template-columns:180px minmax(0,1fr)}.content{padding:24px}.topbar{gap:10px;padding:0 24px}}
 @media(max-width:800px){.unified-create{display:block}.unified-head{top:64px}.form-toc{top:114px}.content{padding:18px}.auth-shell{grid-template-columns:1fr;max-width:476px;gap:0;min-height:0}.auth-brand{display:none}.auth-form{min-height:540px;padding:32px}.auth-corner-brand{top:20px;left:24px}body.auth-page{padding:80px 20px 30px}body:not(:has(.unified-edit-actions)) .unified-create .paper-level.uf-current>.level-actions,.creative-create-actions,.unified-edit-actions{padding:12px 16px;left:0}.level-actions .btn-primary,.unified-edit-actions .btn-primary,.creative-create-actions .btn-primary{min-width:130px}}
 @media(max-width:700px){.topbar{gap:6px;height:auto;min-height:64px}.topbar #financeBox{order:5}.page-head>.btn-primary{min-width:0}.home-welcome{padding:24px}.scope-guide-grid{grid-template-columns:1fr}.ws-report:before{left:-18px;right:-18px}.auth-form{padding:28px 24px}.paper-block,#uf-campaign .paper-block{padding:18px 14px}.level-heading,#uf-campaign .level-heading{padding:16px 14px}}
+
+/* Measured layer properties from public Figma CSS export (2026-09-29).
+   Labels/coordinates are recorded in docs/t1-figma-exact-20260929.md.
+   Existing business content, accessible actions and responsive reflow are retained. */
+body.dsp{--primary-gradient:radial-gradient(34.01% 43.94% at 49.79% 100%,rgba(149,100,235,.3) 0%,rgba(143,93,240,0) 100%),radial-gradient(61.19% 55.13% at 49.79% 97.14%,rgba(93,179,240,.3) 0%,rgba(93,127,240,0) 100%),radial-gradient(63.08% 151.52% at 50% -33.33%,rgba(18,95,209,.8) 0%,rgba(29,85,131,0) 100%),#5b5bf0}
+.nav-item{--nav-icon-primary:#adb0b7;--nav-icon-secondary:#e2e2e2}
+.nav-item.active{--nav-icon-primary:#3b62f9;--nav-icon-secondary:#8fa8fb}
+.nav-item .figma-nav-icon{stroke:none}
+.nav-item[data-id="dash"]{font-weight:600}
+.page-head>.btn-primary,.page-head .flex>.btn-primary{font-family:Inter,var(--font);font-size:14px;line-height:17px;font-weight:600;min-width:184px;min-height:48px;border:0;border-radius:12px;background-blend-mode:plus-lighter,plus-lighter,normal,normal;box-shadow:0 2px 2px #00000005,inset 0 0 0 1px #cdd8ffe6}
+.page-head:has(+.plan-list-card) .btn-ghost{min-width:200px;min-height:48px;border-radius:10px;color:#5b5bf0;font-size:13px;line-height:18px;font-weight:600}
+.scope-user-name{font-size:16px;line-height:20.64px;letter-spacing:-.32px;color:#333}
+.input,.select,textarea.input{font-size:14px;line-height:20px;font-weight:400;color:var(--text)}
+.select{font-size:13px}
+input::placeholder{color:#757575}
+.plan-list-card input::placeholder{color:#c8c8c8}
+tbody td{font-size:13px;line-height:20px;font-weight:400}
+.cell-sub{font-size:12px;line-height:18px;color:var(--text-3)}
+.badge.green{background:#e7f7ed;color:#157a3e}
+.badge.blue{background:#eaf0ff;color:#2256c8}
+.badge.gray{color:#64748b}
+.paper-block .choice b,.choice .c-body b{font-size:13.5px;line-height:21px;font-weight:400}
+.paper-block .choice small,.choice .c-body small{font-size:11px;line-height:17px;font-weight:400;color:var(--text-3)}
+.field .hint,#uf-campaign .hint{font-size:11px;line-height:17px;color:var(--text-3)}
+.paper-level .level-heading>span{font-weight:600;line-height:20px}
+.level-actions .btn{font-size:13.5px;line-height:19px;font-weight:400}
+.level-actions .btn-primary{font-weight:600}
+body.dsp .ws-report .page-head h1{font-family:"Segoe UI",var(--font);font-size:22px;line-height:34px;font-weight:700;letter-spacing:-1px}
+.ws-report .page-head p,.ws-filters>label{font-family:"Segoe UI",var(--font)}
+.ws-report .card-head h3{font-size:16px;line-height:22px;font-weight:600;color:#121212}
+.ws-report thead th{font-size:11.5px;line-height:18px}
+.ws-report .segment button{font-size:12.5px;line-height:17px}
+.ws-kpis .kpi-val{font-variant-numeric:normal}
+.ws-message b{font-size:13.3333px;line-height:21px;font-weight:400}
+.ws-message p{font-size:13px;line-height:21px;font-weight:400}
+.ws-message small{font-size:11.1111px;line-height:18px;font-weight:400}
+.ws-message .badge,.notif-head .badge{font-size:11.5px;line-height:18px;font-weight:600}
+.notif-head>b{font-size:14.5px;line-height:22px;font-weight:400}
+/* Login uses different source font families; system fallbacks are explicit. */
+body.auth-page{--font:"Segoe UI","PingFang SC",Arial,sans-serif;--accent:#3a82fa!important;--accent-strong:#3a82fa!important;--text:#0f1b2d;--text-2:#5b6b80;--text-3:#94a3b5;--border:#e9edf2;--border-strong:#dde3ea;background:#f5f5f5 url('figma-login-bg.png') center / cover no-repeat;padding:94px 32px 32px}
+.auth-shell{max-width:970px;grid-template-columns:404px 476px;gap:90px;min-height:662px;align-items:start}
+.auth-brand h2{font-family:Inter,"PingFang SC",sans-serif;font-size:30px;font-weight:700;line-height:37px;letter-spacing:0;color:#2857fa;margin-bottom:14px}
+.auth-brand p{font-family:"Segoe UI","PingFang SC",sans-serif;font-size:14px;font-weight:400;line-height:24px;color:#0c0d0e}
+.auth-logo{width:56.22px;height:31.91px;margin-bottom:14px}
+.auth-logo .t1-brand-logo{width:56.22px;height:31.91px;object-fit:contain}
+.auth-points{gap:16px;margin-top:78px}
+.auth-points li{font-size:14px;line-height:50px;font-weight:400;color:rgba(12,13,14,.92);padding:0 20px;min-height:50px;border-radius:10px;background:rgba(255,255,255,.4)}
+.auth-form{min-height:520px;padding:48px 43px 32px;box-shadow:0 5px 15px #0000000d}
+.auth-head{margin-bottom:24px}
+.auth-head h1{font-family:Roboto,"PingFang SC",sans-serif;font-size:24px;line-height:32px;font-weight:500;letter-spacing:.072px;color:#0c0d0e}
+.auth-head p{font-family:"Segoe UI","PingFang SC",sans-serif;font-size:14px;line-height:22px;font-weight:400;color:#5b6b80;margin-top:6px}
+.auth-form .field>label{font-size:12.5px;line-height:19px;font-weight:600}
+.auth-form .input{font-size:14px;line-height:19px;height:42px}
+.auth-form .auth-submit{font-size:15px;line-height:20px;font-weight:600}
+.auth-switch{font-size:13px;line-height:20px;color:#5b6b80}
+.auth-switch a,.auth-tools a{font-size:12.5px;line-height:17px;font-weight:600;color:#3a82fa}
+.auth-corner-brand{top:23px;left:32px;width:60px;height:60px}
+body.dark .nav-item.active{color:var(--accent)}
+body.dark .scope-user-name,body.dark .unified-head h1,body.dark .ws-report .card-head h3,body.dark .plan-list-table .plan-name-col .link-btn,body.dark .auth-head h1{color:var(--text)}
+body.dark .auth-head p{color:var(--text-2)}
+@media(max-width:1100px){.auth-shell{grid-template-columns:minmax(0,404px) minmax(0,476px);gap:40px}}
+@media(max-width:800px){.auth-shell{display:block;max-width:476px;min-height:0}.auth-form{min-height:520px;padding:36px 28px}body.auth-page{padding:94px 20px 30px}.scope-user-name{font-size:13px;letter-spacing:0}.ws-kpis .kpi-val{font-size:32px;line-height:34px}}
+/* The actual form option class is radio-pill, separate from inventory choices. */
+.radio-pill b{font-size:13.5px;line-height:21px;font-weight:400}
+.radio-pill small{font-size:11px;line-height:17px;font-weight:400}
+.cpd-contact-link{display:inline-flex;align-items:center;justify-content:center;min-width:200px;min-height:48px;padding:0 4px 0 0;border:1px solid var(--border-strong);border-radius:10px;font-size:13px;font-weight:600;line-height:18px;color:#5b5bf0;background:transparent}
+.page-head:has(+.plan-list-card){align-items:flex-end;min-height:60px}
+@media(max-width:700px){.cpd-contact-link{min-width:0;padding:8px 12px}}
+body.dsp .ws-report .page-head h1{letter-spacing:-.5px}
+.ws-report thead th{letter-spacing:.5px}
+.auth-brand h2{letter-spacing:-.7px}
+#uf-group .level-heading h2,#uf-creative .level-heading h2{font-size:20px;line-height:31px;font-weight:400}
+.plan-list-table .plan-row-action,.plan-list-table .t-actions .btn{font-size:12px;font-weight:400;line-height:20px}
+.group-summary-head>div>b,.creative-priority-card .card-head b{font-size:14px;line-height:22px;font-weight:400}
+.creative-priority-card thead th{font-size:11.5px;line-height:18px}
+.creative-priority-card .plan-row-action{font-size:12.5px;line-height:20px;font-weight:600;color:#5b5bf0}
+.creative-priority-card thead th{letter-spacing:.5px}
