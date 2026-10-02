@@ -24,7 +24,7 @@
   DB.performanceFixture=1;this.save();
  };
  wrap('load',function(old){old();this.phSeed()});
- wrap('scopeSwitchState',function(old,key){old(key);DB.performanceFixture=0;this.phSeed();this.phState=null;this.go('dash')});
+ wrap('scopeSwitchState',function(old,key){old(key);DB.performanceFixture=0;this.phSeed();this.phState=null;this.homeIssueView='active';this.homeIssuesExpanded=false;this.go('dash')});
  A.phConfig=function(){
   if(!this.phState)this.phState={dim:'creative',mode:DB.campaigns.some(c=>c.mode==='rtb')?'rtb':'cpd',camp:'',group:'',format:''};
   const s=this.phState,plans=DB.campaigns.filter(c=>c.mode===s.mode);
@@ -105,7 +105,7 @@
  };
  A.homeIssueRow=function(a,ignored=false){const obj=a.creative?'创意：'+a.creative.name:a.group?'广告组：'+a.group.name:a.c?'计划：'+a.c.name:'账户：'+(this.profile()?.advertiserName||'当前广告主');return `<div class="home-four-row"><div><span class="badge gray">${a.type==='rejected'?'创意审核':a.type==='missing'?'投放准备':'资金与预算'}</span></div><div class="home-four-problem"><b>${E(a.title)}</b><div class="cell-sub">${E(a.desc)}</div></div><div class="home-four-object"><b>${E(obj)}</b><div class="cell-sub">${E(a.creative?[a.c.name,a.group?.name].filter(Boolean).join(' / '):a.group?a.c.name:a.budgets?a.budgets.filter(b=>b.effective>0).map(b=>b.c.name).join('、'):'')}</div>${a.budgets?B('查看预算依据','App.phBudgetDetail()','link-btn'):''}</div><div class="home-four-actions">${B(a.label,a.call)}${a.ignorable?B(ignored?'恢复提醒':'忽略',`App.ignoreHomeIssue(${J(a.id)},${ignored})`,'link-btn'):''}</div></div>`};
  A.renderHomeIssues=function(){
-  const {issues,saved}=this.homeIssueState(),active=issues.filter(a=>!saved[a.id]),ignored=issues.filter(a=>saved[a.id]),showIgnored=this.homeIssueView==='ignored',rows=showIgnored?ignored:active,expanded=this.homeIssuesExpanded||active.length===1||showIgnored;
+  const {issues,saved}=this.homeIssueState(),active=issues.filter(a=>!saved[a.id]),ignored=issues.filter(a=>saved[a.id]),showIgnored=this.homeIssueView==='ignored'&&ignored.length>0,rows=showIgnored?ignored:active,expanded=this.homeIssuesExpanded||active.length===1||showIgnored;
   if(!issues.length)return '<div id="homeIssues" hidden></div>';
   if(!active.length&&!showIgnored)return `<div id="homeIssues" class="ph-ignored">${B('已忽略提醒（'+ignored.length+'）',"App.setHomeIssueView('ignored')",'link-btn')}</div>`;
   const blocked=active.some(a=>a.type==='budget'||a.type==='missing'||a.type==='balance'&&DB.balance<=0||a.type==='rejected'&&a.group&&!DB.creatives.some(cr=>cr.groupId===a.group.id&&cr.status==='active'));
