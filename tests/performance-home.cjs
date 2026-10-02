@@ -6,11 +6,18 @@ const out=process.env.PH_OUTPUT||'/root/.openclaw/workspace/outputs/t1-performan
  const browser=await chromium.launch({args:['--no-sandbox']}),p=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[],checks=[];
  p.on('pageerror',e=>errors.push(e.message));const done=s=>{checks.push(s);console.log('OK',s)};
  await p.goto(base+'dsp.html?demo=1&review=1');await p.locator('#performancePanel').waitFor();
- assert.equal(await p.locator('.ph-card[data-kind]').count(),4);assert.doesNotMatch(await p.locator('#content').innerText(),/近期排期|计划状态/);
+ assert.equal(await p.locator('[data-dimension="creative"] .ph-card[data-kind]').count(),4);assert.doesNotMatch(await p.locator('#content').innerText(),/近期排期|计划状态/);
  const initial=await p.evaluate(()=>{const d=App.phData();return {scope:d.s,high:d.high.key,low:d.low.key,up:d.up.key,down:d.down.key,from:d.from,to:d.to}});
  assert.equal(initial.high,'W-A1');assert.equal(initial.low,'W-A1B');assert.equal(initial.up,'W-A1');assert.equal(initial.down,'W-A1B');done('homepage prioritizes actions and four descriptive CTR results');
+ assert.equal(await p.locator('.ph-dimension').count(),4);assert.equal(await p.getByRole('tab',{name:'创意',exact:true}).count(),0);assert.equal(await p.locator('#performancePanel select').count(),1);
+ for(const dim of ['creative','group','slot','camp'])for(const kind of ['high','down']){
+  const expected=await p.evaluate(({dim,kind})=>{const d=App.phDashboardData().find(d=>d.s.dim===dim);return {scope:d.s,key:d[kind]?.key}},{dim,kind});
+  if(!expected.key)continue;
+  await p.locator(`[data-dimension="${dim}"] [data-kind="${kind}"] button`).click();assert.equal(await p.evaluate(()=>App.cur),'performance');assert.deepEqual(await p.evaluate(()=>App.phData().s),expected.scope);assert.equal(await p.evaluate(()=>App.phSelected),expected.key);await p.getByRole('button',{name:'返回首页',exact:true}).click();assert.equal(await p.locator('.ph-dimension').count(),4);
+ }
+ await p.evaluate(s=>{App.phState=s;App.go('dash')},initial.scope);done('four dimensions stay flat and each card preserves its own object, period and scope');
  await p.waitForTimeout(350);await p.screenshot({path:out+'/homepage.png',fullPage:true});
- await p.locator('[data-kind="high"] button').click();assert.equal(await p.evaluate(()=>App.cur),'performance');assert.deepEqual(await p.evaluate(()=>App.phData().s),initial.scope);assert.equal(await p.locator('.ph-comparison tbody tr').count(),2);await p.waitForTimeout(350);await p.screenshot({path:out+'/comparison.png',fullPage:true});
+ await p.locator('[data-dimension="creative"] [data-kind="high"] button').click();assert.equal(await p.evaluate(()=>App.cur),'performance');assert.deepEqual(await p.evaluate(()=>App.phData().s),initial.scope);assert.equal(await p.locator('.ph-comparison tbody tr').count(),2);await p.waitForTimeout(350);await p.screenshot({path:out+'/comparison.png',fullPage:true});
  await p.locator('.ph-comparison tbody tr').first().getByRole('button').click();assert.equal(await p.locator('.ph-chart').count(),1);assert.equal(await p.locator('.ph-detail tbody tr').count(),14);await p.waitForTimeout(350);await p.screenshot({path:out+'/trend.png',fullPage:true});done('real clicks preserve scope and open comparison, chart and 14 daily rows');
  await p.getByRole('button',{name:'返回首页',exact:true}).click();
  for(const dim of ['creative','group','slot','camp']){
@@ -22,8 +29,8 @@ const out=process.env.PH_OUTPUT||'/root/.openclaw/workspace/outputs/t1-performan
  await p.evaluate(()=>{App.phSet('mode','cpd');App.phSet('dim','camp')});
  assert.ok(await p.evaluate(()=>App.phData().rows.some(r=>r.delayed)));assert.ok(await p.evaluate(()=>App.phData().eligible.every(r=>!r.delayed)));
  await p.evaluate(()=>App.phOpen(App.phData().rows.find(r=>r.delayed).key,true));assert.equal(await p.locator('.ph-chart').count(),0);assert.match(await p.locator('#content').innerText(),/暂不生成/);assert.doesNotMatch(await p.locator('#content').innerText(),/花费 \$/);done('delayed CPD excluded, no fabricated trend or contract cost allocation');
- await p.evaluate(()=>App.phSample('small'));assert.equal(await p.locator('.ph-card[data-kind]').count(),0);
- await p.evaluate(()=>App.phSample('single'));assert.equal(await p.locator('[data-kind="high"], [data-kind="low"]').count(),0);done('small samples and single objects do not manufacture ranking');
+ await p.evaluate(()=>App.phSample('small'));assert.equal(await p.locator('[data-dimension="creative"] .ph-card[data-kind]').count(),0);
+ await p.evaluate(()=>App.phSample('single'));assert.equal(await p.locator('[data-dimension="creative"] [data-kind="high"], [data-dimension="creative"] [data-kind="low"]').count(),0);done('small samples and single objects do not manufacture ranking');
  await p.evaluate(()=>App.phSample('normal'));
  const edge=await p.evaluate(()=>{
   const original=DB.deliveryFacts.map(r=>({...r}));
