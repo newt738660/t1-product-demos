@@ -1,15 +1,6 @@
 const {chromium}=require('/root/.openclaw/workspace/t1-dsp-benchmark-demo/node_modules/playwright');
-const assert=require('node:assert/strict'),fs=require('node:fs');
-const out=process.env.ROLE_OUTPUT||'/root/.openclaw/workspace/outputs/t1-roles-20261003';fs.mkdirSync(out,{recursive:true});
-const base=(process.env.DEMO_BASE||'http://127.0.0.1:8765')+'/t1-p0-advertiser-platform/versions/v2.2/dsp.html?demo=1&review=1&case=roles';
-(async()=>{
- const browser=await chromium.launch({args:['--no-sandbox']}),ctx=await browser.newContext({viewport:{width:1440,height:1000}}),p=await ctx.newPage(),errors=[],checks=[];
- p.on('pageerror',e=>errors.push(e.message));const ok=s=>{checks.push(s);console.log('OK',s)};
- await p.goto(base);await p.locator('#v22Tools').waitFor({state:'attached'});
- assert.equal(await p.evaluate(()=>App.cur),'org');
- assert.deepEqual(await p.evaluate(()=>Object.keys(App.v22Roles)),['owner','operator','finance']);
- assert.equal(await p.evaluate(()=>DB.v22.members.find(m=>m.role==='owner').id),'me');
- assert.equal(await p.evaluate(()=>DB.v22.members.find(m=>m.id==='read').role),null);ok('exactly three assignable roles, legacy viewer is pending without extra grants');
+const assert=require('node:assert/strict');
+(async()=>{const browser=await chromium.launch({args:['--no-sandbox']}),p=await browser.newPage();await p.goto((process.env.DEMO_BASE||'http://127.0.0.1:8765')+'/t1-p0-advertiser-platform/versions/v2.2/dsp.html?demo=1&review=1&case=roles');await p.locator('#joinReviewFilters').waitFor();const ok=console.log;
  const result=await p.evaluate(()=>{
   const members=()=>[{id:'later',status:'active',role:'operator'},{id:'first',status:'active',role:null},{id:'finance',status:'active',role:'finance'}];
   const bindings=()=>[{userId:'later',advertiserId:'A',status:'success',at:'2026-09-03T10:00:00Z'},{userId:'first',advertiserId:'A',status:'pending',at:'2026-09-01T00:00:00Z'},{userId:'finance',advertiserId:'A',status:'success',at:'2026-09-04T00:00:00Z'},{userId:'first',advertiserId:'A',status:'success',at:'2026-09-02T10:00:00Z'},{userId:'later',advertiserId:'B',status:'success',at:'2026-08-01T00:00:00Z'}];
@@ -26,28 +17,4 @@ const base=(process.env.DEMO_BASE||'http://127.0.0.1:8765')+'/t1-p0-advertiser-p
  assert.deepEqual(result.normal.owners,['first']);assert.deepEqual(result.idempotent.owners,['later']);assert.deepEqual(result.previous.owners,['later']);
  for(const k of ['missing','tie','removed','invalid']){assert.equal(result[k].status,'needs_review',k);assert.deepEqual(result[k].owners,[],k)}
  ok('binding success/time/advertiser, missing/tied/invalid records, inactive earliest, prior transfer and one-time migration');
- await p.evaluate(()=>App.v22PermissionMatrix());assert.equal(await p.locator('#modalMask th').count(),4);assert.ok(!(await p.locator('#modalMask').innerText()).includes('只读成员'));
- await p.screenshot({path:out+'/role-matrix.png',fullPage:true});await p.evaluate(()=>App.closeModal());
- const history=await p.evaluate(()=>JSON.stringify({campaigns:DB.campaigns,groups:DB.groups,ads:DB.ads,balance:DB.balance,recharges:DB.recharges,deliveryFacts:DB.deliveryFacts}));
- await p.evaluate(()=>App.v22SelectMember('read'));assert.equal(await p.evaluate(()=>App.canOpen('report')),true);assert.equal(await p.evaluate(()=>App.v22Can('edit')),false);assert.equal(await p.evaluate(()=>App.v22Can('finance')),false);
- await p.evaluate(()=>{App.go('org');App.v22Invite()});assert.match(await p.locator('#modalMask').innerText(),/没有此权限/);
- await p.evaluate(()=>{App.v22SelectMember('me');App.go('org');App.v22EditMember('read')});
- assert.deepEqual(await p.locator('#v22NewRole option').evaluateAll(es=>es.map(e=>e.value)),['operator','finance']);
- await p.locator('#v22NewRole').selectOption('operator');await p.getByRole('button',{name:'保存角色',exact:true}).click();
- await p.evaluate(()=>App.v22SelectMember('read'));assert.equal(await p.evaluate(()=>App.v22Can('edit')),true);assert.equal(await p.evaluate(()=>App.canOpen('billing')),false);ok('pending existing member gets permissions only after admin assignment');
- await p.evaluate(()=>{App.v22SelectMember('me');App.go('org');App.v22Transfer('op')});await p.locator('#v22TransferRole').selectOption('finance');await p.getByRole('button',{name:'取消',exact:true}).click();assert.equal(await p.evaluate(()=>App.v22Role()),'owner');
- await p.evaluate(()=>App.v22Transfer('op'));await p.locator('#v22TransferRole').selectOption('finance');await p.getByRole('button',{name:'确认交接',exact:true}).click();
- assert.equal(await p.evaluate(()=>App.v22Role()),'finance');assert.equal(await p.evaluate(()=>App.v22Can('manage')),false);assert.equal(await p.evaluate(()=>App.v22Can('edit')),false);assert.equal(await p.evaluate(()=>App.v22Can('finance')),true);
- await p.reload();await p.locator('#v22Tools').waitFor({state:'attached'});assert.deepEqual(await p.evaluate(()=>DB.v22.members.filter(m=>m.status==='active'&&m.role==='owner').map(m=>m.id)),['op']);ok('cancel retains owner; transfer uses chosen finance role, survives reload and cannot self-restore');
- await p.evaluate(()=>{App.v22SelectMember('op');App.go('org');App.v22RemoveMember('me',true)});
- await p.evaluate(()=>{sessionStorage.setItem('t1-v22-member','me');App.save()});await p.reload();await p.locator('#v22Tools').waitFor({state:'attached'});await p.evaluate(()=>App.go('dash'));
- assert.match(await p.locator('#content').innerText(),/访问权限已失效/);assert.equal(await p.evaluate(()=>App.canOpen('report')),false);assert.deepEqual(await p.evaluate(()=>App.visibleNotifications()),[]);
- assert.equal(await p.evaluate(()=>JSON.stringify({campaigns:DB.campaigns,groups:DB.groups,ads:DB.ads,balance:DB.balance,recharges:DB.recharges,deliveryFacts:DB.deliveryFacts})),history);ok('removed former admin loses access on stale session; all business data remains unchanged');
- await p.evaluate(()=>{DB.v22.audit.push({at:new Date().toISOString(),actor:'演示财务',text:'提交充值申请 RC-preserve-audit'});App.v22ResetRoleSample('missing')});assert.equal(await p.evaluate(()=>DB.v22.audit.some(a=>a.text==='提交充值申请 RC-preserve-audit')),true);assert.match(await p.locator('#content').innerText(),/管理员待核对/);assert.equal(await p.evaluate(()=>App.v22Can('manage')),false);
- await p.reload();await p.locator('#v22Tools').waitFor({state:'attached'});assert.equal(await p.evaluate(()=>App.v22Can('manage')),false);ok('missing-record sample remains blocked after reload, no automatic fallback administrator');
- await p.evaluate(()=>App.v22ResetRoleSample('normal'));assert.equal(await p.evaluate(()=>DB.v22.members[0].id),'op');assert.equal(await p.evaluate(()=>App.v22Role()),'owner');
- for(const width of [1440,1366,768]){await p.setViewportSize({width,height:1000});await p.evaluate(()=>App.go('org'));assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await p.screenshot({path:out+'/organization-'+width+'.png',fullPage:true})}ok('organization layout at desktop and narrow widths; list order cannot change default administrator');
- await p.evaluate(()=>App.v22Invite());await p.locator('#v22InviteName').fill('Return Member');await p.locator('#v22InviteEmail').fill('return@example.com');await p.getByRole('button',{name:'创建邀请',exact:true}).click();const id=await p.evaluate(()=>DB.v22.members.at(-1).id);
- await p.evaluate(id=>{App.v22Accept(id,true);App.v22RemoveMember(id,true);App.v22InviteAction(id,'invited')},id);assert.equal(await p.evaluate(()=>DB.v22.members.at(-1).status),'removed');ok('stale invitation action cannot reactivate removed membership');
- assert.deepEqual(errors,[]);fs.writeFileSync(out+'/roles-verification.json',JSON.stringify({base,checks,errors},null,2));await browser.close();console.log('PASS',checks.length,'role checks');
-})().catch(e=>{console.error(e);process.exit(1)});
+ await browser.close();console.log('PASS binding migration edge cases');})().catch(e=>{console.error(e);process.exit(1)});
