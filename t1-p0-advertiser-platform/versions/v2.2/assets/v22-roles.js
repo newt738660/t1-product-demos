@@ -69,7 +69,7 @@
    {id:'me',name:'Victor Wang',email:'victor@example.com',role:null,status:'active',legacyAccess:{read:true,edit:true,finance:true}},
    {id:'fin',name:'Evan Chen',email:'evan@example.com',role:'finance',status:'active'},
    {id:'read',name:'Alice Li',email:'alice@example.com',role:'viewer',status:'active'}
-  ],bindings:kind==='normal'?sampleBindings():[],bindingSource:'示例绑定记录（非真实用户数据）',roleMigration:null,audit:[]});
+  ],bindings:kind==='normal'?sampleBindings():[],bindingSource:'示例绑定记录（非真实用户数据）',roleMigration:null,audit:DB.v22.audit.filter(a=>!/^(创建成员邀请|邀请|调整角色|移除成员|管理员交接给)|(?:接受|拒绝)邀请（模拟）/.test(a.text))});
   this.v22MigrateRoles(DB.v22);this.save();this.v22SelectMember('me');this.go('org');
  };
  const oldDash=A.view_dash;
