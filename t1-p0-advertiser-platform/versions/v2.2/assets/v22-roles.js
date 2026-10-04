@@ -32,7 +32,7 @@
   return state.roleMigration;
  };
  A.v22BindingTime=function(id){const rows=(DB.v22.bindings||[]).filter(b=>b.userId===id&&b.advertiserId===DB.v22.advertiserId&&b.status==='success'&&Number.isFinite(Date.parse(b.at))).sort((a,b)=>Date.parse(a.at)-Date.parse(b.at));return rows[0]?.at.slice(0,16).replace('T',' ')||'—'};
- A.v22PermissionMatrix=function(){modal('三类固定角色权限',`<div class="table-wrap"><table class="v22-table"><thead><tr><th>功能</th><th>管理员</th><th>投放人员</th><th>财务人员</th></tr></thead><tbody>${[
+ A.v22PermissionMatrix=function(){if(!this.v22Require('manage'))return;modal('三类固定角色权限',`<div class="table-wrap"><table class="v22-table"><thead><tr><th>功能</th><th>管理员</th><th>投放人员</th><th>财务人员</th></tr></thead><tbody>${[
  ['RTB创建、编辑、启停、归档','允许','允许','不允许'],['CPD允许修改的创意','允许','允许','不允许'],['投放详情、效果报表及导出（含消耗）','允许','允许','不允许'],['余额、充值、充值记录与凭证','允许','不允许','允许'],['财务消耗查询与导出','允许','不允许','允许'],['邀请、角色调整、移除、管理员交接','允许','不允许','不允许'],['本人账号、组织关系、帮助','允许','允许','允许']
  ].map(row=>`<tr>${row.map(v=>`<td>${v}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p>管理员不拥有平台充值审核权，也不能编辑由运营管理的CPD计划、排期或价格。</p><p class="v22-hint">仅保留三类成员角色，邀请和申请的处理状态单独展示。不增加部门、自定义角色、逐计划授权或工作空间切换。</p>`)};
  A.v22Transfer=function(id,confirmed=false){
@@ -44,7 +44,7 @@
   if(!['operator','finance'].includes(after))return;
   const actor=me.name;me.role=after;delete me.legacyAccess;target.role='owner';delete target.legacyAccess;
   DB.v22.audit.unshift({at:new Date().toISOString(),actor,text:'管理员交接给 '+target.email+'；原管理员转为'+roles[after].name});
-  this.save();this.closeModal();this.demoRole=after;this.renderNav();this.syncAccountContext();this.syncBell();this.go('org');this.v22MountTools();this.toast('管理员已交接，你现在是'+roles[after].name);
+  this.save();this.closeModal();this.demoRole=after;this.renderNav();this.syncAccountContext();this.syncBell();this.go('access');this.v22MountTools();this.toast('管理员已交接，你现在是'+roles[after].name);
  };
 
 })();
