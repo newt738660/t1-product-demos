@@ -2,13 +2,14 @@
 
 ## 后续修改入口（重要）
 
-**新需求只修改 `t1-p0-advertiser-platform/versions/v2.2/`。**
+**V2.2新需求只修改 `t1-p0-advertiser-platform/versions/v2.2/`。V2.1设计对接内容独立维护在 `versions/v2.1-design/`（2026-10-06新增，按用户要求准备设计交接）。**
 不要再把新需求写入根目录 Demo 或 `versions/review-20260929/`。
 
 | 路径 | 用途 | 修改约束 |
 | --- | --- | --- |
 | 原 `t1-p0-advertiser-platform/` | 兼容已有研发、设计链接 | 保持现有业务内容，不重定向最新版 |
 | `versions/review-20260929/` | 2026-09-29 冻结评审基线 | 不修改业务页面、脚本、样式、素材 |
+| `versions/v2.1-design/` | V2.1设计对接稿，31个场景 | 仅RTB创编与报表设计交接；不覆盖冻结基线或V2.2 |
 | `versions/v2.2/` | 新版本开发稿 | 后续新需求在此迭代 |
 | `versioning/` | 共享的演示版本目录、切换与存储隔离工具 | 非产品功能；修改后须回归旧版 |
 

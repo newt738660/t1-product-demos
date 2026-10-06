@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>T1 V2.1设计对接说明</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">T1 V2.1设计对接说明</h1>
+</header>
+<h1 id="t1-v2.1设计对接说明-v0.1">T1 V2.1设计对接说明 V0.1</h1>
+<p>日期：2026年10月6日<br />
+用途：10月8日设计启动与研发排期对接的准备材料<br />
+范围：RTB自助创编、管理及数据报表；不是新一轮完整需求评审，也不是已确认的开发排期。</p>
+<h2 id="一对接目标与材料使用方式">一、对接目标与材料使用方式</h2>
+<p>本次基于已评审的V2.1需求、现有Demo及已有Figma，核对可以复用的设计、尚需补齐的页面状态和材料间差异。请设计师按页面组评估增量工作，不默认整套重新设计，也不把Demo上已有的每项能力自动作为新增研发范围。</p>
+<ul>
+<li><a
+href="https://newt738660.github.io/t1-product-demos/t1-p0-advertiser-platform/versions/v2.1-design/design.html">设计交接目录（14组页面、31个状态）</a></li>
+<li>同包《T1_V2.1设计页面与状态清单.csv》：逐状态目的和直达链接。</li>
+<li>需求基线：《T1_V2.1_RTB广告创编与数据报表_PRD.docx》，2026年9月17日稿；9月18日已开展需求评审，之后的明确变更不能忽略。</li>
+<li>补充业务规则：《T1_投放情况逐项清单_V1.2.docx》及9月23日确认的归档口径。61条判断需与SSP映射，不等于本Demo已全部实现。</li>
+<li>设计历史依据：9月28日Figma复核清单、9月29日视觉参数导出及研发交付。本文不表示已重新检查当前线上Figma，也不把旧问题直接判为仍未修复。</li>
+</ul>
+<p>使用顺序：先读本说明的范围差异，再按目录操作；完成主流程后查看异常状态。Demo顶部“页面／状态”是评审工具，不进入正式客户页面。切场景、重新载入页面会恢复该版本样例；当前页面内可以连续操作、保存和查看结果。冻结版本及V2.2的数据、业务脚本保持隔离。</p>
+<h2 id="二范围与复用边界">二、范围与复用边界</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>内容</th>
+<th>本轮处理</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>RTB列表、三级对象详情、三步创编、已有父级下新增、独立编辑</td>
+<td>本轮核心；按已有设计补齐状态及交互</td>
+</tr>
+<tr class="even">
+<td>素材选择/上传、指定App/广告位、审核版本、启停、归档</td>
+<td>本轮核心；复用通用弹窗、表单和状态组件</td>
+</tr>
+<tr class="odd">
+<td>RTB与CPD数据报表</td>
+<td>本轮报表范围；CPD不使用RTB成本指标</td>
+</tr>
+<tr class="even">
+<td>登录注册、CPD创意协作</td>
+<td>前序版本能力；复用相关组件与兼容行为，不重复登记首次设计</td>
+</tr>
+<tr class="odd">
+<td>首页与通知、充值财务、组织权限、帮助、邮箱验证与重置</td>
+<td>V2.2，不纳入本次交接</td>
+</tr>
+<tr class="even">
+<td>账号菜单改版、多工作空间切换、独立素材仓库</td>
+<td>不增加</td>
+</tr>
+</tbody>
+</table>
+<p>视觉沿用既有导航、字体层级、按钮、表格、表单、标签、图标与弹窗规范。已有Figma交付是复用起点，不是“尚无设计”。Demo仅帮助核对业务内容与操作，不替代Figma视觉交付；部分字体资源尚未齐备，不能以浏览器回退字体作为最终设计参数。</p>
+<h2 id="三必须先消除的材料差异">三、必须先消除的材料差异</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>项目</th>
+<th>已有材料情况</th>
+<th>本次处理</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>删除／归档</td>
+<td>9月17日PRD仍区分两者；后续已统一归档</td>
+<td>统一“归档”，管理列表默认隐藏、可查回，历史统计与导出保留；不再并列删除</td>
+</tr>
+<tr class="even">
+<td>前两步保存</td>
+<td>旧设计退出提示曾写“计划已保存”</td>
+<td>新建流程前两步仅确认本次表单；最终提交才创建，不把取消描述为删除已保存对象</td>
+</tr>
+<tr class="odd">
+<td>报表范围</td>
+<td>9月17日稿以计划报表及7/14/30日为主；后续Demo扩展多维、下钻、自定义日期及日/周粒度</td>
+<td>保留后续交互供讨论，P14单列待确认；产品和研发确认后再锁定扩展范围，不能只让设计师决定</td>
+</tr>
+<tr class="even">
+<td>库存范围</td>
+<td>原型存在“全部兼容库存”；迁移验收要求限制指定资源</td>
+<td>不视为全量开放承诺；重点交接指定App/广告位，默认范围及选项开放需与SSP确认</td>
+</tr>
+<tr class="odd">
+<td>投放情况</td>
+<td>61条清单与旧原型计算尚未完全一致</td>
+<td>对象自身开关、审核状态、综合投放情况独立表达；最终主原因映射及优先级另行确认</td>
+</tr>
+<tr class="even">
+<td>时区及金额</td>
+<td>Demo使用UTC/USD样例</td>
+<td>正式统计和排期时区需统一SSP口径；不可把样例直接当配置定稿</td>
+</tr>
+</tbody>
+</table>
+<h2 id="四页面与状态交付清单">四、页面与状态交付清单</h2>
+<p>以下编号与在线目录、CSV一致。每组应标明对应Figma画板、复用/修改/新增、设计负责人及预计交付时间；当前未替设计师填报工期。</p>
+<h3 id="p01p03列表与层级详情">P01—P03：列表与层级详情</h3>
+<ul>
+<li>P01
+RTB列表：名称/ID、预算及排期、自身启停、投放情况、效果指标和操作。正常、筛选无结果、多选及批量确认；固定列、长名、横向滚动、分页应可读。暂停行给恢复操作，单条确认显示对象，批量显示数量和范围。</li>
+<li>P02
+计划详情：计划名称/ID、基本设置、预算/排期、广告组列表及新建组；区分设置与统计，不让下级列表失去父级上下文。</li>
+<li>P03
+广告组详情：名称/ID和所属计划始终可见；创意列表优先，组设置可展开；素材缩略图、审核、版本和综合投放情况分开。</li>
+<li>筛选无结果不等于首次无投放；错误/加载不能画成0条。管理列表默认隐藏归档对象，归档筛选可查回。</li>
+</ul>
+<h3
+id="p04p06三步创建已有对象下新增独立编辑">P04—P06：三步创建、已有对象下新增、独立编辑</h3>
+<p>三步为计划→广告组→创意，不增加独立第四步发布页。</p>
+<ol type="1">
+<li>计划：固定周期/长期投放、起止日期、总预算/日预算及适用的日上限、自动/自定义命名。日期、必填、金额错误要指明字段并保留输入。</li>
+<li>广告组：名称、继承的排期/预算及允许调整的范围、竞价、广告形式、地区/设备等已有定向、指定库存。不能超出父级约束；参数上下限待SSP确认。</li>
+<li>创意：名称、素材、标题、描述、CTA、落地链接；已选素材预览和规格、适配结果、提交按钮。第3步高亮创意，按钮表达本次最终提交，不误写“确认广告计划修改”。</li>
+</ol>
+<p>返回已确认步骤先查看，再明确进入编辑；取消修改恢复原值。前两步确认不创建后台对象；最终提交成功才形成计划、组、创意及审核状态。未保存退出分继续编辑/放弃，文案不能暗示计划已经保存。</p>
+<p>P05在已有计划下新建组、已有组下新建创意：父级只读，不随新增改动上级。P06独立编辑：回填、保存范围、取消及冲突提示必须与新建区分；广告组编辑不是重新创建计划。</p>
+<p>沿用现有PRD文案限制：标题100、描述200、CTA20、链接500字符，链接需为合法http(s)地址。若SSP规格不同由产品统一修订，不由设计自行猜测。</p>
+<h3 id="p07p08广告位与素材">P07—P08：广告位与素材</h3>
+<ul>
+<li>指定广告位双栏：候选筛选、搜索、分页、已选清单、添加/移除/清空、确认及取消。取消不改变原选择；已选项不能因翻页丢失。保留App、广告位标识和必要规格。</li>
+<li>素材：选择已有素材、上传、规格说明、成功预览与失败提示。上传类型须与当前广告形式一致；完整图片保持真实比例。</li>
+<li>Demo的文件大小、格式和兼容资源为演示实现，实际限制需SSP提供。上传失败、超限、尺寸不适配等需设计变体；本包不宣称每类服务端失败均可真实触发。</li>
+</ul>
+<h3 id="p09p11审核双版本及生命周期">P09—P11：审核、双版本及生命周期</h3>
+<ul>
+<li>首次审核中：没有可用生效版本，不能显示仍在投放，不能重复提交。</li>
+<li>首次驳回：具体原因、原值回填、修改送审；重提后切换审核中。</li>
+<li>已通过版本修改：新内容待审时保留当前生效版本；对照素材、文案、CTA与链接。新版驳回仍保留旧版，原因对应新版；需设计对应驳回变体，不混为首次驳回。</li>
+<li>暂停/恢复：上级限制向下生效，但不改写下级开关；按钮与当前状态一致。</li>
+<li>归档：统一操作命名，确认影响及历史保留；归档对象只读，不允许启用、编辑或新增下级。操作前后、取消、长对象名称需完整。</li>
+<li>版本“已通过”不等于当前一定可投，仍受排期、资金和上级限制。不要把状态更新延迟直接画成确定停投。</li>
+</ul>
+<h3 id="p12p14报表">P12—P14：报表</h3>
+<ul>
+<li>同一组查询条件驱动指标、趋势、明细、合计、导出。RTB/CPD切换不能留下另一类型的行。</li>
+<li>RTB：曝光、点击、CTR、实际花费、平均CPC、实际CPM；预算、出价与实际成本不得混用。CPD：曝光、点击、CTR，不将合同金额任意分摊成创意花费。</li>
+<li>CTR=总点击/总曝光，CPC=总花费/总点击，CPM=总花费/总曝光×1000；合计不平均各行比率，不只加总当前页。</li>
+<li>指标切换联动趋势标题、单位、轴刻度和提示；金额标币种，CTR用百分比；筛选周期、轴日期、悬浮日期一致。</li>
+<li>零曝光时CTR“—”；有曝光零点击CTR为0，CPC“—”；缺失或延迟不写成0。暂无记录、加载、失败重试及数据延迟分别设计。</li>
+<li>归档历史默认纳入总览、明细、导出；分页和排序不改变查询范围。</li>
+<li>P14高级维度：计划→组→创意的下钻、广告位/地区、日/周粒度、自定义日期为后续原型能力，先确认范围再正式纳入UI和估工。若保留，下钻需携带日期和父级范围，返回不能丢筛选。</li>
+<li>不引入转化、CPA、ROAS等缺乏归因数据的指标。</li>
+</ul>
+<h2
+id="五已有figma需要优先复核的部分">五、已有Figma需要优先复核的部分</h2>
+<p>以下来自9月28日历史复核，10月8日应核对是否已在最新稿修正；不是本次再次判错。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>事项</th>
+<th>复核重点</th>
+<th>参考画板</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A04创编步骤与退出</td>
+<td>第3步高亮、最终提交文案、前两步未落库</td>
+<td><a
+href="https://www.figma.com/design/N6pXwQULab5u3nBe6w2JYL/?node-id=13-16495">创意步骤</a></td>
+</tr>
+<tr class="even">
+<td>A07对象识别</td>
+<td>收起设置仍可见组名、ID、父计划</td>
+<td><a
+href="https://www.figma.com/design/N6pXwQULab5u3nBe6w2JYL/?node-id=26-17211">组详情</a></td>
+</tr>
+<tr class="odd">
+<td>A09/A10报表</td>
+<td>类型、周期、标题、明细成本一致</td>
+<td><a
+href="https://www.figma.com/design/N6pXwQULab5u3nBe6w2JYL/?node-id=43-50198">花费报表</a></td>
+</tr>
+<tr class="even">
+<td>A11/A12图表与空值</td>
+<td>CTR单位、线性刻度、无数据不冒充零环比</td>
+<td><a
+href="https://www.figma.com/design/N6pXwQULab5u3nBe6w2JYL/?node-id=43-49764">CTR报表</a></td>
+</tr>
+<tr class="odd">
+<td>A13/A14账号与操作</td>
+<td>已绑定上下文、暂停行恢复、单条/批量区分</td>
+<td><a
+href="https://www.figma.com/design/N6pXwQULab5u3nBe6w2JYL/?node-id=1-50">RTB列表</a></td>
+</tr>
+<tr class="even">
+<td>A15素材与通用弹窗</td>
+<td>素材实际比例匹配规格；关闭位置一致</td>
+<td><a
+href="https://www.figma.com/design/N6pXwQULab5u3nBe6w2JYL/?node-id=43-52715">素材预览</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="六设计交付要求">六、设计交付要求</h2>
+<ol type="1">
+<li>按P01—P14编号组织画板。正常状态与异常变体同组，明确已完成、待补齐、待业务确认，避免只交单张正常页面。</li>
+<li>提供主流程原型连接：列表进入详情、创建返回修改、保存/取消、版本预览、报表筛选下钻及回退。</li>
+<li>使用统一字体、字号、色值、图标、表格固定列、错误提示和弹窗关闭规范；长内容和1366/1440桌面宽度优先，窄屏说明降级方式，不默认增加移动端整套设计。</li>
+<li>标注禁用原因、加载反馈、必填与校验位置；文案和画板数据自洽，不能用不同账号/投放类型拼接样例。</li>
+<li>明确正式交付画板及版本时间、资源清单和需补字体；改版影响到复用页面时一并指出，不让研发猜测采用哪个稿。</li>
+</ol>
+<h2
+id="七对接会议建议议程与待确认项">七、对接会议建议议程与待确认项</h2>
+<p>建议按以下顺序对齐，不重复讲解已评审的全部PRD：</p>
+<ul>
+<li>5分钟：确认版本范围、现有设计可复用部分及本包使用方式。</li>
+<li>15分钟：走RTB主流程、独立编辑和审核版本，核对前述历史反馈。</li>
+<li>10分钟：报表数据口径与P14范围差异，由产品/研发决定是否纳入。</li>
+<li>10分钟：按页面组确认设计初稿、产品复核、修改稿及正式交付节点；研发说明可并行工作和UI依赖。</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>待确认</th>
+<th>负责确认方</th>
+<th>对交付的影响</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>当前Figma哪些已修改，哪些需补画</td>
+<td>设计、产品</td>
+<td>明确增量范围，避免重复工作</td>
+</tr>
+<tr class="even">
+<td>P14扩展范围、日期筛选方案</td>
+<td>产品、研发</td>
+<td>锁定报表画板和开发估工</td>
+</tr>
+<tr class="odd">
+<td>计划/组预算开放及引擎控制</td>
+<td>SSP、研发，产品收口</td>
+<td>字段、校验及投放情况</td>
+</tr>
+<tr class="even">
+<td>指定库存、素材规格和出价限制</td>
+<td>SSP、研发，产品收口</td>
+<td>选择弹窗、适配提示、表单限制</td>
+</tr>
+<tr class="odd">
+<td>61条投放情况映射、优先级、业务时区</td>
+<td>SSP、研发，产品收口</td>
+<td>状态文案及统计边界</td>
+</tr>
+<tr class="even">
+<td>设计交付、联调、提测及测试节点</td>
+<td>设计、研发、测试共同确认</td>
+<td>输出真实依赖与排期，不由产品单方承诺</td>
+</tr>
+</tbody>
+</table>
+<p>最新看板目标：10月8日开展V2.1
+UI设计与研发排期对接，10月12日检查设计进展并确认排期。以上是协调节点，不代表已经开会、设计完成或研发承诺某天上线。</p>
+<h2 id="八本次准备的完成边界">八、本次准备的完成边界</h2>
+<p>已整理产品/设计对接内容，建立隔离设计稿和31个直接场景入口，便于评估与讨论。设计师的正式UI交付、产品与研发范围确认、SSP接口校验和真实系统验收不在本次“准备完成”的结论内。</p>
+</body>
+</html>
