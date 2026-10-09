@@ -19,6 +19,12 @@
       "label": "V2.2 开发稿",
       "path": "versions/v2.2/",
       "note": "V2.2五模块交互稿：财务、首页通知、组织权限、帮助、账号重置。仅演示，不接入真实后台；规则待评审。"
+    },
+    {
+      "id": "report-query",
+      "label": "数据报告 · 查询下载方案",
+      "path": "versions/report-query/",
+      "note": "10月9日独立讨论稿：计划报告查询、查看与完整下载；RTB/CPD为Mock，历史记录入口尚未确定。"
     }
   ]
 }
