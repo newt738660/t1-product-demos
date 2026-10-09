@@ -3,3 +3,5 @@
 @media(max-width:650px){.qr-filter{padding:16px}.qr-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.qr-filter-bottom{flex-wrap:wrap}.qr-filter-bottom label{width:100%}.qr-result-head{flex-direction:column;padding:18px}.qr-download{flex-direction:row;width:100%;justify-content:space-between}.qr-table{min-width:650px}.qr-pagination{flex-direction:column}.qr-review>div{display:block}.qr-report .page-head{align-items:flex-start}.qr-report h1{font-size:21px}}
 
 body:has(.qr-report) #joinReviewFilters{display:none}
+
+.qr-path{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 24px;border-bottom:1px solid var(--border);font-size:13px}.qr-path b{font-weight:500;overflow-wrap:anywhere}.qr-date,.qr-drill{white-space:nowrap}.qr-filter-bottom .qr-time{width:160px;flex-shrink:0}.qr-table small{line-height:1.5}.qr-table td:first-child{overflow-wrap:anywhere}@media(max-width:650px){.qr-filter-bottom .qr-time{width:100%}.qr-path{padding:14px 18px}.qr-table{min-width:780px}}
