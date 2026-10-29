@@ -5,7 +5,7 @@ const out=process.env.V22_OUTPUT||'/root/.openclaw/workspace/outputs/t1-v22-five
 (async()=>{const browser=await chromium.launch({args:['--no-sandbox']}),context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true}),p=await context.newPage(),errors=[],checks=[];p.on('pageerror',e=>errors.push(e.message));const done=n=>{checks.push(n);console.log('OK',n)};
 const shot=async n=>{await p.waitForTimeout(400);await p.screenshot({path:path.join(out,n+'.png'),fullPage:true})};
 await p.goto(base+'dsp.html?demo=1&review=1');await p.locator('#v22Tools').waitFor({state:'attached'});
-assert.equal(await p.evaluate(()=>!!DB.v22),true);assert.equal(await p.locator('#nav button').count(),7);done('seven scoped navigation entries, no workspace switch');
+assert.equal(await p.evaluate(()=>!!DB.v22),true);assert.equal(await p.locator('#nav button').count(),4);done('four scoped navigation entries, no workspace switch');
 await p.evaluate(()=>App.go('billing'));await shot('finance');const bal=await p.evaluate(()=>DB.balance);
 await p.getByRole('button',{name:'充值',exact:true}).last().click();await p.getByRole('button',{name:'已完成转账，上传凭证',exact:true}).click();await p.getByRole('button',{name:'提交转账凭证',exact:true}).click();assert.match(await p.locator('#v22Error').innerText(),/金额/);await p.locator('#depAmt').fill('100');await p.getByRole('button',{name:'提交转账凭证',exact:true}).click();assert.match(await p.locator('#v22Error').innerText(),/凭证/);
 const file={name:'sample.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII=','base64')};

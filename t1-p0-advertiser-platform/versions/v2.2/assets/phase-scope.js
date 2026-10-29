@@ -48,7 +48,7 @@
   document.querySelector('.sidebar-foot .user-card')?.remove();
   if(!document.getElementById('scopeAccount')){
    const node=document.createElement('div');node.id='scopeAccount';node.className='scope-account';
-   node.innerHTML=`<button class="btn btn-ghost" id="scopeAccountTrigger" aria-expanded="false" aria-haspopup="true" onclick="App.scopeOpenMenu()"><span class="scope-avatar">${E((SESSION.account||'U')[0])}</span><span class="scope-user-name">${E(SESSION.account||'我的账号')}</span><span>⌄</span></button><div id="scopeAccountMenu" class="scope-menu" hidden><div class="scope-menu-identity">${E(this.profile()?.email||SESSION.account)}</div>${B('帮助中心',"App.go('help')")}${B('联系运营',"App.scopeContact('平台使用咨询')")}<hr>${B('更换登录账号','App.scopeExit(true)')}${B('退出登录','App.scopeExit(false)')}</div>`;
+   node.innerHTML=`<button class="btn btn-ghost" id="scopeAccountTrigger" aria-expanded="false" aria-haspopup="true" onclick="App.scopeOpenMenu()"><span class="scope-avatar">${E((SESSION.account||'U')[0])}</span><span class="scope-user-name">${E(SESSION.account||'我的账号')}</span><span>⌄</span></button><div id="scopeAccountMenu" class="scope-menu" hidden><div class="scope-menu-identity">${E(this.profile()?.email||SESSION.account)}</div>${B('账号与验证',"App.go('access')")}${B('联系运营',"App.scopeContact('平台使用咨询')")}<hr>${B('更换登录账号','App.scopeExit(true)')}${B('退出登录','App.scopeExit(false)')}</div>`;
    document.querySelector('.topbar').append(node);
    let timer;node.addEventListener('mouseenter',()=>{clearTimeout(timer);this.scopeOpenMenu();});node.addEventListener('mouseleave',()=>{timer=setTimeout(()=>this.scopeCloseMenu(),220);});
    node.addEventListener('focusout',e=>{if(!node.contains(e.relatedTarget))this.scopeCloseMenu();});
@@ -56,7 +56,7 @@
   }
   const bell=document.getElementById('bellBtn');bell.setAttribute('aria-label','通知');bell.setAttribute('aria-haspopup','true');
   if(window.T1_REVIEW&&!document.getElementById('scopeReviewTools')){
-   const node=document.createElement('details');node.id='scopeReviewTools';node.className='scope-review-tools';node.innerHTML=`<summary>演示工具 · 非产品功能</summary><p>仅评审入口可见；切换会重置本评审标签页的样例，不影响普通Demo。</p><label>预览状态<select class="select" onchange="App.scopeSwitchState(this.value)">${Object.entries(this.scopeStates).map(([k,v])=>`<option value="${k}" ${sessionStorage.getItem('t1-scope-state')===k?'selected':''}>${v}</option>`).join('')}</select></label><p>当前范围：一期＋二期。账户与组织、独立创意中心不在本期。</p>`;document.querySelector('.sidebar-foot').append(node);
+   const node=document.createElement('details');node.id='scopeReviewTools';node.className='scope-review-tools';node.innerHTML=`<summary>演示工具 · 非产品功能</summary><p>仅评审入口可见；切换会重置本评审标签页的样例，不影响普通Demo。</p><label>预览状态<select class="select" onchange="App.scopeSwitchState(this.value)">${Object.entries(this.scopeStates).map(([k,v])=>`<option value="${k}" ${sessionStorage.getItem('t1-scope-state')===k?'selected':''}>${v}</option>`).join('')}</select></label><p>当前范围：一期＋二期。账户与组织、独立创意中心不在本期。</p>`;document.body.append(node);
   }
  };
  A.scopeOpenMenu=function(){this.closeNotifPop();const el=document.getElementById('scopeAccountMenu');if(el)el.hidden=false;document.getElementById('scopeAccountTrigger')?.setAttribute('aria-expanded','true');};
