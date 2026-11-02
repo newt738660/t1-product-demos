@@ -7,7 +7,7 @@
  const error=t=>{const el=document.getElementById('v22Error');if(el)el.textContent=t;else A.toast(t,'warn')};
  const buttonClose=B('关闭','App.closeModal()');
  const modal=(title,body,foot)=>A.modal(`<div class="modal-head"><h3>${title}</h3>${buttonClose}</div><div class="modal-body">${body}<div id="v22Error" class="v22-error" role="alert"></div></div><div class="modal-foot">${foot||buttonClose}</div>`,true);
- const allowed=()=>{if(!A.v22Require('finance'))return false;const s=V22Account.read();if(!s.verified||s.legacy){A.go('access');A.toast('请先完成账号验证','warn');return false}return A.scopeGuard()};
+ const allowed=()=>{if(!A.v22Require('finance'))return false;return A.scopeGuard()};
  const payment=()=>({method:'转账（示例）',currency:'USD',address:'DEMO_ONLY_NOT_A_PAYMENT_ADDRESS'});
  const record=id=>DB.recharges.find(r=>r.id===id);
  const summary=r=>r.status==='approved'?'运营已完成充值，余额已更新。':r.status==='rejected'?'凭证未通过核实，请查看原因并补充。':r.status==='cancelled'?'此记录已撤销，不代表实际转账已退款。':r.processing==='verified'?'付款信息已核实，等待运营完成充值；尚未计入余额。':r.processing==='sync'?'处理结果暂未更新，请勿重复提交；可联系运营核实。':'凭证已提交，等待运营核实并充值；尚未计入余额。';

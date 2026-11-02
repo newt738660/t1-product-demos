@@ -1,0 +1,37 @@
+const {chromium}=require('/root/.openclaw/workspace/t1-dsp-benchmark-demo/node_modules/playwright');
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const base=(process.env.DEMO_BASE||'http://127.0.0.1:8765')+'/t1-p0-advertiser-platform/versions/v2.2/';
+const out='/root/.openclaw/workspace/outputs/t1-email-20261102';fs.mkdirSync(out,{recursive:true});
+(async()=>{const b=await chromium.launch({args:['--no-sandbox']}),c=await b.newContext({viewport:{width:1440,height:1000}}),p=await c.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));
+await p.goto(base+'dsp.html?demo=1&review=1');await p.waitForFunction(()=>typeof App!=='undefined'&&document.getElementById('v22EmailTools'));
+await p.evaluate(()=>{App.scopeSwitchState('active');App.v22SetAccountState('legacy')});
+const business=await p.evaluate(()=>JSON.stringify([DB.balance,DB.campaigns,DB.adGroups,DB.creatives,App.profile().advertiserName,App.profile().advertiserBound]));
+const original=await p.evaluate(()=>V22Account.profile().email);
+await p.getByRole('button',{name:'首次验证邮箱',exact:true}).click();
+await p.getByRole('button',{name:'下一步',exact:true}).click();assert.match(await p.locator('#v22EmailError').innerText(),/请输入/);
+await p.locator('#v22CurrentPassword').fill('wrong');await p.getByRole('button',{name:'下一步',exact:true}).click();assert.match(await p.locator('#v22EmailError').innerText(),/不正确/);
+const unlock=async()=>{await p.locator('#v22CurrentPassword').fill('Demo2026!');await p.getByRole('button',{name:'下一步',exact:true}).click()};await unlock();
+assert.equal(await p.locator('#v22NewEmail').isVisible(),false);
+await p.locator('#v22EmailMode').selectOption('change');await p.locator('#v22NewEmail').fill('bad');await p.getByRole('button',{name:'发送验证邮件',exact:true}).click();assert.match(await p.locator('#v22EmailError').innerText(),/有效/);
+await p.locator('#v22NewEmail').fill('occupied@example.com');await p.getByRole('button',{name:'发送验证邮件',exact:true}).click();assert.match(await p.locator('#v22EmailError').innerText(),/其他账号/);
+await p.locator('#v22NewEmail').fill('updated@example.com');await p.evaluate(()=>App.emailSendFails=true);await p.getByRole('button',{name:'发送验证邮件',exact:true}).click();assert.match(await p.locator('#v22EmailError').innerText(),/失败/);assert.equal(await p.evaluate(()=>V22Account.read().pendingVerification),null);
+await p.evaluate(()=>App.emailSendFails=false);await p.getByRole('button',{name:'发送验证邮件',exact:true}).click();assert.equal(await p.evaluate(()=>V22Account.profile().email),original);
+const first=await p.evaluate(()=>V22Account.read().pendingVerification.id);
+await p.getByRole('button',{name:'重新发送',exact:true}).click();assert.match(await p.locator('#v22EmailError').innerText(),/频繁/);
+await p.screenshot({path:out+'/pending-desktop.png'});
+await p.reload();await p.waitForFunction(()=>document.getElementById('v22EmailTools'));await p.evaluate(()=>App.go('access'));assert.match(await p.locator('#content').innerText(),/updated@example.com/);assert.equal(await p.evaluate(()=>V22Account.profile().email),original);
+await p.getByRole('button',{name:'查看验证进度',exact:true}).click();await p.getByRole('button',{name:'修改待验证邮箱',exact:true}).click();await unlock();await p.locator('#v22EmailMode').selectOption('change');await p.locator('#v22NewEmail').fill('final@example.com');await p.evaluate(()=>V22Account.update({lastEmail:0}));await p.getByRole('button',{name:'发送验证邮件',exact:true}).click();assert.equal(await p.evaluate(id=>V22Account.linkStatus(id),first),'invalid');
+const expired=await p.evaluate(()=>V22Account.read().pendingVerification.id);await p.evaluate(()=>App.v22EmailExpire());
+await p.goto(base+'email-verify.html?demo=1&review=1&id='+expired);assert.match(await p.locator('h1').innerText(),/过期/);assert.equal(await p.evaluate(()=>V22Account.profile().email),original);
+await p.getByRole('link',{name:'返回T1'}).click();await p.getByRole('button',{name:'查看验证进度',exact:true}).click();await p.getByRole('button',{name:'重新发送',exact:true}).click();const id=await p.evaluate(()=>V22Account.read().pendingVerification.id);
+await p.evaluate(()=>App.v22EmailMailbox());await p.locator('#v22MockMailLink').click();assert.match(await p.locator('h1').innerText(),/成功/);await p.reload();assert.match(await p.locator('h1').innerText(),/成功/);await p.goto(base+'email-verify.html?demo=1&review=1&id='+first);assert.match(await p.locator('h1').innerText(),/不可用/);
+await p.getByRole('link',{name:'返回T1'}).click();await p.waitForFunction(()=>typeof App!=='undefined'&&document.getElementById('v22EmailTools'));assert.equal(await p.evaluate(()=>V22Account.profile().email),'final@example.com');assert.equal(await p.getByRole('button',{name:'首次验证邮箱',exact:true}).count(),0);
+assert.equal(await p.evaluate(()=>JSON.stringify([DB.balance,DB.campaigns,DB.adGroups,DB.creatives,App.profile().advertiserName,App.profile().advertiserBound])),business);
+await p.screenshot({path:out+'/verified-desktop.png'});await p.setViewportSize({width:390,height:844});await p.screenshot({path:out+'/verified-mobile.png'});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+// Current-email verification, cancellation and non-blocking legacy business.
+await p.evaluate(()=>{App.v22SetAccountState('legacy');App.go('plans')});assert.notEqual(await p.locator('#content h1').first().innerText(),'账号与验证');
+await p.evaluate(()=>App.openDeposit());assert.match(await p.locator('#modalMask').innerText(),/充值|付款/);await p.evaluate(()=>{App.closeModal();App.go('access');App.v22VerifyEmail()});await unlock();await p.getByRole('button',{name:'发送验证邮件',exact:true}).click();const same=await p.evaluate(()=>V22Account.read().pendingVerification.id);await p.goto(base+'email-verify.html?demo=1&review=1&id='+same);await p.getByRole('link',{name:'返回T1'}).click();await p.waitForFunction(()=>document.getElementById('v22EmailTools'));assert.equal(await p.evaluate(()=>V22Account.profile().email),'final@example.com');
+// Unverified password recovery is not an email-only takeover path.
+await p.evaluate(()=>{App.v22SetAccountState('legacy');App.v22RecoveryLink('forgot')});assert.match(await p.locator('#modalMask').innerText(),/不能只凭/);await p.goto(base+'login.html?review=1#forgot');await p.locator('#v22RecoveryEmail').fill('final@example.com');await p.getByRole('button',{name:'发送找回邮件',exact:true}).click();assert.match(await p.locator('#v22AuthError').innerText(),/无法/);await p.evaluate(()=>Auth.show('legacy'));assert.equal(await p.locator('#v22OldAccount').count(),0);assert.match(await p.locator('#auth-security').innerText(),/当前密码登录/);
+const saved=await p.evaluate(()=>JSON.stringify({...localStorage,...sessionStorage}));assert.ok(!saved.includes('Demo2026!'));assert.deepEqual(errors,[]);fs.writeFileSync(out+'/verification.json',JSON.stringify({base,passed:true,errors},null,2));await b.close();console.log('PASS legacy email: password, correction, occupied, failure, pending persistence, stale/expired/resend/repeated links, data preservation, responsive, business access, recovery guard');
+})().catch(e=>{console.error(e);process.exit(1)});
