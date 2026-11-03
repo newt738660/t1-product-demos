@@ -7,7 +7,7 @@ await p.goto(base+'dsp.html?demo=1&review=1');await p.waitForFunction(()=>typeof
 await p.evaluate(()=>{App.scopeSwitchState('active');App.v22SetAccountState('legacy')});
 const business=await p.evaluate(()=>JSON.stringify([DB.balance,DB.campaigns,DB.adGroups,DB.creatives,App.profile().advertiserName,App.profile().advertiserBound]));
 const original=await p.evaluate(()=>V22Account.profile().email);
-await p.getByRole('button',{name:'首次验证邮箱',exact:true}).click();
+await p.getByRole('button',{name:'验证或更正登录邮箱',exact:true}).click();
 await p.getByRole('button',{name:'下一步',exact:true}).click();assert.match(await p.locator('#v22EmailError').innerText(),/请输入/);
 await p.locator('#v22CurrentPassword').fill('wrong');await p.getByRole('button',{name:'下一步',exact:true}).click();assert.match(await p.locator('#v22EmailError').innerText(),/不正确/);
 const unlock=async()=>{await p.locator('#v22CurrentPassword').fill('Demo2026!');await p.getByRole('button',{name:'下一步',exact:true}).click()};await unlock();
@@ -25,7 +25,7 @@ const expired=await p.evaluate(()=>V22Account.read().pendingVerification.id);awa
 await p.goto(base+'email-verify.html?demo=1&review=1&id='+expired);assert.match(await p.locator('h1').innerText(),/过期/);assert.equal(await p.evaluate(()=>V22Account.profile().email),original);
 await p.getByRole('link',{name:'返回T1'}).click();await p.getByRole('button',{name:'查看验证进度',exact:true}).click();await p.getByRole('button',{name:'重新发送',exact:true}).click();const id=await p.evaluate(()=>V22Account.read().pendingVerification.id);
 await p.evaluate(()=>App.v22EmailMailbox());await p.locator('#v22MockMailLink').click();assert.match(await p.locator('h1').innerText(),/成功/);await p.reload();assert.match(await p.locator('h1').innerText(),/成功/);await p.goto(base+'email-verify.html?demo=1&review=1&id='+first);assert.match(await p.locator('h1').innerText(),/不可用/);
-await p.getByRole('link',{name:'返回T1'}).click();await p.waitForFunction(()=>typeof App!=='undefined'&&document.getElementById('v22EmailTools'));assert.equal(await p.evaluate(()=>V22Account.profile().email),'final@example.com');assert.equal(await p.getByRole('button',{name:'首次验证邮箱',exact:true}).count(),0);
+await p.getByRole('link',{name:'返回T1'}).click();await p.waitForFunction(()=>typeof App!=='undefined'&&document.getElementById('v22EmailTools'));assert.equal(await p.evaluate(()=>V22Account.profile().email),'final@example.com');assert.equal(await p.getByRole('button',{name:'验证或更正登录邮箱',exact:true}).count(),0);
 assert.equal(await p.evaluate(()=>JSON.stringify([DB.balance,DB.campaigns,DB.adGroups,DB.creatives,App.profile().advertiserName,App.profile().advertiserBound])),business);
 await p.screenshot({path:out+'/verified-desktop.png'});await p.setViewportSize({width:390,height:844});await p.screenshot({path:out+'/verified-mobile.png'});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
 // Current-email verification, cancellation and non-blocking legacy business.

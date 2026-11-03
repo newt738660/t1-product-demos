@@ -56,8 +56,8 @@
 
     <section class="auth-form">
       <div class="auth-view on" id="auth-login">
-        <div class="auth-head"><h1>登录 T1 Ads</h1><p>欢迎回来，请使用你的账号进入广告主工作台</p></div>
-        <div class="field"><label>邮箱或账号</label><input class="input" id="loginAccount" placeholder="you@example.com" autocomplete="username"></div>
+        <div class="auth-head"><h1>登录 T1 Ads</h1><p>请使用登录邮箱和密码进入广告主工作台</p></div>
+        <div class="field"><label>登录邮箱</label><input class="input" id="loginAccount" placeholder="you@example.com" autocomplete="username"></div>
         <div class="field"><label>密码</label><input class="input" id="loginPassword" type="password" placeholder="请输入密码" autocomplete="current-password"></div>
         <div class="auth-row">
           <label class="auth-check"><input type="checkbox" checked>记住我</label>
@@ -70,14 +70,14 @@
 
       <div class="auth-view" id="auth-register">
         <button class="auth-back" onclick="Auth.show('login')">← 返回登录</button>
-        <div class="auth-head"><h1>创建 T1 账号</h1><p>创建登录账号；有商务邀请码时可同时绑定广告主</p></div>
-        <div class="field"><label>姓名</label><input class="input" id="registerName" placeholder="请输入姓名" autocomplete="name"></div>
-        <div class="field"><label>邮箱</label><input class="input" id="registerEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
-        <div class="field"><label>密码</label><input class="input" id="registerPassword" type="password" placeholder="至少 6 位" autocomplete="new-password"></div>
+        <div class="auth-head"><h1>创建 T1 账号</h1><p>填写资料后通过邮件激活；广告主绑定在登录后另行确认</p></div>
+        <div class="field"><label>昵称</label><input class="input" id="registerName" placeholder="用于系统内展示，不用于登录" autocomplete="nickname"></div>
+        <div class="field"><label>登录邮箱</label><input class="input" id="registerEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
+        <div class="field"><label>密码</label><input class="input" id="registerPassword" type="password" placeholder="至少8位" autocomplete="new-password"></div>
         <div class="field"><label>确认密码</label><input class="input" id="registerPassword2" type="password" placeholder="再次输入密码" autocomplete="new-password"></div>
         <div class="field"><label>广告主邀请码（选填）</label><input class="input" id="registerInvite" placeholder="如有商务邀请码，可在注册时直接填写"><div class="hint" id="registerInviteNote">也可以注册后在平台内使用邀请码。</div></div>
         <div class="auth-error" id="registerError"></div>
-        <button class="btn btn-primary auth-submit" onclick="Auth.register()">注册并进入 T1</button>
+        <button class="btn btn-primary auth-submit" onclick="Auth.register()">注册并发送激活邮件</button>
         <div class="auth-terms">开始真实投放或查看历史投放数据前，需完成广告主开户或关联。</div>
       </div>
 
@@ -119,7 +119,7 @@
       </div>
     </section>
   </main>
-<script src="assets/auth.js?v=20260928scope"></script>
+<script src="assets/auth.js?v=20261103-auth"></script>
 <script src="assets/theme.js?v=2026082202"></script>
 <script>
 // Keep the review flow in its isolated namespace after logging in.
@@ -135,9 +135,10 @@ if(window.T1_REVIEW){
 </script>
 <link rel="stylesheet" href="assets/figma-theme.css?v=20260929-exact1" />
 <script src="assets/figma-theme.js?v=20260929-exact1"></script>
-<link rel="stylesheet" href="assets/v22.css?v=20260929b" />
+<link rel="stylesheet" href="assets/v22.css?v=20261103-auth" />
 <script src="assets/v22-account.js?v=20261102-email"></script>
-<script src="assets/v22-auth.js?v=20261102-email"></script>
+<script src="assets/v22-auth-state.js?v=20261103-auth"></script>
+<script src="assets/v22-auth.js?v=20261103-auth"></script>
 <script src="../../versioning/switcher.js"></script>
 </body>
 </html>

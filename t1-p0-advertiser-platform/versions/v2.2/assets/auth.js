@@ -93,7 +93,7 @@
   if(['register','forgot','application','pending'].indexOf(requested)>=0) Auth.show(requested);
   if(linkedInvite){
     document.getElementById('registerInvite').value=linkedInvite;
-    document.getElementById('registerInviteNote').textContent='邀请码已由商务注册链接自动填写；注册后请确认对应广告主。';
-    Auth.show('register');
+    document.getElementById('registerInviteNote').textContent='邀请码已由商务注册链接带入；激活并登录后再确认广告主。';
+    if(!requested||requested==='register')Auth.show('register');
   }
 })();

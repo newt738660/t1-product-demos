@@ -6,3 +6,7 @@
 #v22NewEmailField[hidden],#v22OriginalEmail[hidden]{display:none!important}
 #v22EmailTools p,.v22-security-row p{overflow-wrap:anywhere}
 @media(max-width:600px){.v22-security-row{flex-wrap:wrap;gap:12px}.modal-foot{flex-wrap:wrap}}
+
+/* Auth review controls stay outside the customer form, collapsed by default. */
+.auth-review-tools{position:fixed;left:10px;bottom:10px;z-index:9999;width:285px;max-width:calc(100vw - 20px);box-sizing:border-box;border:1px solid #dce3ef;border-radius:10px;background:var(--surface,#fff);padding:12px;font-size:12px;box-shadow:0 4px 18px #182a4814}
+.auth-review-tools[open]{max-height:55vh;overflow:auto}.auth-review-tools summary{cursor:pointer}.auth-review-tools p{line-height:1.7;overflow-wrap:anywhere}.auth-review-tools label{display:block;margin:10px 0}.auth-review-tools select{width:100%}.auth-review-tools button{margin:4px 3px 4px 0}.auth-page{padding-bottom:75px}.auth-form h1,.auth-form p{overflow-wrap:anywhere}
