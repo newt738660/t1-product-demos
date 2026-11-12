@@ -44,11 +44,7 @@
  const close=A.closeModal;A.closeModal=function(){if(logoutPending){location.href=S.url('login');return}close.call(this)};
  A.v22ChangePassword=function(){
    if(credential()&&!localStorage.getItem('54ads_session_dsp')){location.href=S.url('login');return}
-   modal('修改密码',`<p>输入当前密码确认身份。新密码需为8—64位，至少包含字母和数字，允许符号。</p><label class="v22-field">当前密码<input class="input" type="password" id="v22ChangeCurrent" autocomplete="current-password"></label><label class="v22-field">新密码<input class="input" type="password" id="v22ChangeNew" autocomplete="new-password"></label><label class="v22-field">确认新密码<input class="input" type="password" id="v22ChangeConfirm" autocomplete="new-password"></label>${B('忘记当前密码？','App.v22ForgotCurrentPassword()')}<p>修改成功后，所有设备需重新登录。</p>`,B('取消','App.closeModal()')+B('保存修改','App.v22SavePassword()','btn btn-primary'));
- };
- A.v22ForgotCurrentPassword=function(){
-   if(S.read().verified){location.href=S.url('forgot');return}
-   modal('暂时无法自助找回密码','<p>当前邮箱尚未验证，暂不支持邮件找回密码。修改密码或更正邮箱需要先确认当前密码。</p>',B('返回修改密码','App.v22ChangePassword()'));
+   modal('修改密码',`<p>输入当前密码确认身份。新密码需为8—64位，至少包含字母和数字，允许符号。</p><label class="v22-field">当前密码<input class="input" type="password" id="v22ChangeCurrent" autocomplete="current-password"></label><label class="v22-field">新密码<input class="input" type="password" id="v22ChangeNew" autocomplete="new-password"></label><label class="v22-field">确认新密码<input class="input" type="password" id="v22ChangeConfirm" autocomplete="new-password"></label><p>修改成功后，所有设备需重新登录。</p>`,B('取消','App.closeModal()')+B('保存修改','App.v22SavePassword()','btn btn-primary'));
  };
  A.v22SavePassword=async function(){
    if(saving)return;
